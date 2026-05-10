@@ -3,14 +3,14 @@ RUN npm install -g pnpm
 
 FROM base AS deps
 WORKDIR /app
-# Copy root manifests + lockfile so pnpm can validate the frozen install
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-# Copy every workspace package.json so pnpm can resolve the full graph
 COPY apps/api/package.json ./apps/api/
 COPY apps/web/package.json ./apps/web/
 COPY apps/mobile/package.json ./apps/mobile/
 COPY packages/db/package.json ./packages/db/
 COPY packages/ui/package.json ./packages/ui/
+# Copy Prisma schema so postinstall prisma generate can run
+COPY apps/api/prisma ./apps/api/prisma
 RUN pnpm install --frozen-lockfile --filter api...
 
 FROM base AS builder
@@ -20,8 +20,9 @@ COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/api ./apps/api
 COPY packages ./packages
-RUN pnpm --filter api build
+# Generate Prisma client before compiling TypeScript
 RUN pnpm --filter api db:generate
+RUN pnpm --filter api build
 
 FROM node:20-alpine AS runner
 WORKDIR /app
