@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-turbo@latest . --package-manager pnpm)",
+      "PowerShell(New-Item -ItemType Directory -Force \"E:\\\\Saas Projects\\\\Mobile Shop\\\\apps\\\\api\\\\prisma\")",
+      "PowerShell(Copy-Item \"E:\\\\Saas Projects\\\\Mobile Shop\\\\packages\\\\db\\\\prisma\\\\schema.prisma\" \"E:\\\\Saas Projects\\\\Mobile Shop\\\\apps\\\\api\\\\prisma\\\\schema.prisma\")"
+    ]
+  }
+}

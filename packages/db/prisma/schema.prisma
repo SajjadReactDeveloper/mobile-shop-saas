@@ -1,0 +1,428 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum SubscriptionTier {
+  FREE
+  PRO
+  BUSINESS
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum UserRole {
+  OWNER
+  CASHIER
+  TECHNICIAN
+}
+
+enum AuthProvider {
+  EMAIL
+  GOOGLE
+  PHONE
+}
+
+enum ProductCategory {
+  MOBILE
+  ACCESSORY
+  SIM
+  CHARGER
+  SPARE_PART
+  OTHER
+}
+
+enum ImeiStatus {
+  IN_STOCK
+  SOLD
+  RETURNED
+}
+
+enum EasyLoadNetwork {
+  JAZZ
+  TELENOR
+  ZONG
+  UFONE
+  WARID
+}
+
+enum EasyLoadTxnType {
+  LOAD
+  TOPUP
+}
+
+enum EasypaisaTxnType {
+  SEND
+  RECEIVE
+  CASH_IN
+  CASH_OUT
+  WITHDRAW
+}
+
+enum RepairStatus {
+  RECEIVED
+  DIAGNOSING
+  AWAITING_PARTS
+  IN_REPAIR
+  READY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  EASYPAISA
+  JAZZCASH
+  BANK_TRANSFER
+  CREDIT
+}
+
+// ─── SaaS / Tenant Root ───────────────────────────────────────────────────────
+
+model Shop {
+  id               String             @id @default(cuid())
+  name             String
+  city             String?
+  address          String?
+  phone            String?
+  logoUrl          String?
+  enabledModules   String[]           @default(["POS", "EASY_LOAD", "EASYPAISA", "REPAIRS"])
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  // Relations
+  users            User[]
+  products         Product[]
+  sales            Sale[]
+  purchases        Purchase[]
+  customers        Customer[]
+  easyLoadAccounts EasyLoadAccount[]
+  easypaisaAccounts EasypaisaAccount[]
+  repairJobs       RepairJob[]
+  cashRegisters    CashRegister[]
+  subscription     Subscription?
+}
+
+model Subscription {
+  id            String             @id @default(cuid())
+  shopId        String             @unique
+  stripeSubId   String?
+  tier          SubscriptionTier   @default(FREE)
+  status        SubscriptionStatus @default(TRIALING)
+  trialEndsAt   DateTime?
+  renewsAt      DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  shop          Shop               @relation(fields: [shopId], references: [id], onDelete: Cascade)
+}
+
+// ─── Users / Auth ─────────────────────────────────────────────────────────────
+
+model User {
+  id           String       @id @default(cuid())
+  shopId       String
+  name         String
+  phone        String?
+  email        String?
+  passwordHash String?
+  googleId     String?      @unique
+  provider     AuthProvider @default(EMAIL)
+  role         UserRole     @default(CASHIER)
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  shop         Shop         @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  sales        Sale[]
+  repairJobs   RepairJob[]  @relation("TechnicianJobs")
+
+  @@unique([shopId, email])
+  @@unique([shopId, phone])
+}
+
+// ─── Inventory ────────────────────────────────────────────────────────────────
+
+model Product {
+  id            String          @id @default(cuid())
+  shopId        String
+  name          String
+  brand         String?
+  model         String?
+  category      ProductCategory @default(OTHER)
+  buyingPrice   Decimal         @db.Decimal(10, 2)
+  sellingPrice  Decimal         @db.Decimal(10, 2)
+  stockQty      Int             @default(0)
+  imeiTracked   Boolean         @default(false)
+  lowStockAlert Int             @default(5)
+  imageUrl      String?
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  shop          Shop            @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  imeiLog       ImeiLog[]
+  saleItems     SaleItem[]
+  purchaseItems PurchaseItem[]
+  repairParts   RepairPart[]
+}
+
+model ImeiLog {
+  id        String     @id @default(cuid())
+  productId String
+  imei      String
+  status    ImeiStatus @default(IN_STOCK)
+  saleId    String?
+  notes     String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  product   Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sale      Sale?      @relation(fields: [saleId], references: [id])
+
+  @@unique([productId, imei])
+}
+
+// ─── Sales ────────────────────────────────────────────────────────────────────
+
+model Customer {
+  id           String      @id @default(cuid())
+  shopId       String
+  name         String
+  phone        String?
+  balanceOwed  Decimal     @default(0) @db.Decimal(10, 2)
+  notes        String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  shop         Shop        @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  sales        Sale[]
+  repairJobs   RepairJob[]
+  ledgerEntries LedgerEntry[]
+
+  @@unique([shopId, phone])
+}
+
+model LedgerEntry {
+  id          String      @id @default(cuid())
+  customerId  String
+  amount      Decimal     @db.Decimal(10, 2)
+  type        String      // CREDIT | PAYMENT
+  description String?
+  saleId      String?
+  createdAt   DateTime    @default(now())
+
+  customer    Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model Sale {
+  id            String        @id @default(cuid())
+  shopId        String
+  customerId    String?
+  invoiceNumber String
+  subtotal      Decimal       @db.Decimal(10, 2)
+  discount      Decimal       @default(0) @db.Decimal(10, 2)
+  total         Decimal       @db.Decimal(10, 2)
+  amountPaid    Decimal       @db.Decimal(10, 2)
+  paymentMethod PaymentMethod @default(CASH)
+  receiptUrl    String?
+  notes         String?
+  createdById   String
+  createdAt     DateTime      @default(now())
+
+  shop          Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  customer      Customer?     @relation(fields: [customerId], references: [id])
+  createdBy     User          @relation(fields: [createdById], references: [id])
+  items         SaleItem[]
+  imeiLogs      ImeiLog[]
+
+  @@unique([shopId, invoiceNumber])
+}
+
+model SaleItem {
+  id         String   @id @default(cuid())
+  saleId     String
+  productId  String
+  qty        Int
+  unitPrice  Decimal  @db.Decimal(10, 2)
+  imei       String?
+
+  sale       Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id])
+}
+
+// ─── Purchases (Stock-in) ─────────────────────────────────────────────────────
+
+model Purchase {
+  id          String         @id @default(cuid())
+  shopId      String
+  supplier    String?
+  total       Decimal        @db.Decimal(10, 2)
+  notes       String?
+  createdAt   DateTime       @default(now())
+
+  shop        Shop           @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  items       PurchaseItem[]
+}
+
+model PurchaseItem {
+  id         String   @id @default(cuid())
+  purchaseId String
+  productId  String
+  qty        Int
+  unitPrice  Decimal  @db.Decimal(10, 2)
+  imeis      String[] @default([])
+
+  purchase   Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id])
+}
+
+// ─── Easy Load ────────────────────────────────────────────────────────────────
+
+model EasyLoadAccount {
+  id             String          @id @default(cuid())
+  shopId         String
+  network        EasyLoadNetwork
+  phoneNumber    String
+  currentBalance Decimal         @default(0) @db.Decimal(10, 2)
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  shop           Shop            @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  transactions   EasyLoadTxn[]
+
+  @@unique([shopId, network, phoneNumber])
+}
+
+model EasyLoadTxn {
+  id             String          @id @default(cuid())
+  accountId      String
+  type           EasyLoadTxnType
+  amount         Decimal         @db.Decimal(10, 2)
+  customerPhone  String?
+  profitMargin   Decimal         @default(0) @db.Decimal(10, 2)
+  balanceAfter   Decimal         @db.Decimal(10, 2)
+  notes          String?
+  createdAt      DateTime        @default(now())
+
+  account        EasyLoadAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+// ─── Easypaisa / JazzCash ─────────────────────────────────────────────────────
+
+model EasypaisaAccount {
+  id             String             @id @default(cuid())
+  shopId         String
+  accountName    String
+  accountPhone   String
+  provider       String             @default("EASYPAISA") // EASYPAISA | JAZZCASH
+  currentBalance Decimal            @default(0) @db.Decimal(10, 2)
+  isActive       Boolean            @default(true)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  shop           Shop               @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  transactions   EasypaisaTxn[]
+
+  @@unique([shopId, accountPhone])
+}
+
+model EasypaisaTxn {
+  id             String           @id @default(cuid())
+  accountId      String
+  type           EasypaisaTxnType
+  amount         Decimal          @db.Decimal(10, 2)
+  fee            Decimal          @default(0) @db.Decimal(10, 2)
+  commission     Decimal          @default(0) @db.Decimal(10, 2)
+  counterparty   String?
+  balanceAfter   Decimal          @db.Decimal(10, 2)
+  notes          String?
+  createdAt      DateTime         @default(now())
+
+  account        EasypaisaAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+}
+
+// ─── Repair Jobs ──────────────────────────────────────────────────────────────
+
+model RepairJob {
+  id            String       @id @default(cuid())
+  shopId        String
+  customerId    String
+  jobNumber     String
+  deviceBrand   String
+  deviceModel   String
+  faultDesc     String
+  photos        String[]     @default([])
+  status        RepairStatus @default(RECEIVED)
+  advancePaid   Decimal      @default(0) @db.Decimal(10, 2)
+  totalQuote    Decimal?     @db.Decimal(10, 2)
+  technicianId  String?
+  deliveredAt   DateTime?
+  notes         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  shop          Shop         @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  customer      Customer     @relation(fields: [customerId], references: [id])
+  technician    User?        @relation("TechnicianJobs", fields: [technicianId], references: [id])
+  parts         RepairPart[]
+
+  @@unique([shopId, jobNumber])
+}
+
+model RepairPart {
+  id        String    @id @default(cuid())
+  jobId     String
+  productId String
+  qty       Int
+  unitPrice Decimal   @db.Decimal(10, 2)
+
+  job       RepairJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  product   Product   @relation(fields: [productId], references: [id])
+}
+
+// ─── Cash Register ────────────────────────────────────────────────────────────
+
+model CashRegister {
+  id               String    @id @default(cuid())
+  shopId           String
+  date             DateTime  @db.Date
+  openingBalance   Decimal   @db.Decimal(10, 2)
+  closingBalance   Decimal?  @db.Decimal(10, 2)
+  salesCash        Decimal   @default(0) @db.Decimal(10, 2)
+  easyLoadCash     Decimal   @default(0) @db.Decimal(10, 2)
+  easypaisaCash    Decimal   @default(0) @db.Decimal(10, 2)
+  repairCash       Decimal   @default(0) @db.Decimal(10, 2)
+  expenses         Decimal   @default(0) @db.Decimal(10, 2)
+  isClosed         Boolean   @default(false)
+  notes            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  shop             Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  expenseItems     CashExpense[]
+
+  @@unique([shopId, date])
+}
+
+model CashExpense {
+  id             String       @id @default(cuid())
+  cashRegisterId String
+  description    String
+  amount         Decimal      @db.Decimal(10, 2)
+  createdAt      DateTime     @default(now())
+
+  cashRegister   CashRegister @relation(fields: [cashRegisterId], references: [id], onDelete: Cascade)
+}
