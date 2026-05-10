@@ -22,4 +22,5 @@ COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/apps/api/node_modules ./node_modules
 COPY --from=builder /app/apps/api/prisma ./prisma
 EXPOSE 4000
-CMD ["node", "dist/main"]
+# Run migrations then start — safe to run on every deploy (idempotent)
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
