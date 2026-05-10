@@ -1,22 +1,24 @@
-import { Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class NotificationsService {
-  private readonly logger = new Logger(NotificationsService.name)
+  private readonly logger = new Logger(NotificationsService.name);
 
   constructor(private config: ConfigService) {}
 
   async sendWhatsApp(to: string, message: string): Promise<void> {
-    const token = this.config.get<string>('WHATSAPP_TOKEN')
-    const phoneNumberId = this.config.get<string>('WHATSAPP_PHONE_NUMBER_ID')
+    const token = this.config.get<string>('WHATSAPP_TOKEN');
+    const phoneNumberId = this.config.get<string>('WHATSAPP_PHONE_NUMBER_ID');
 
     if (!token || !phoneNumberId) {
-      this.logger.warn(`WhatsApp not configured. Would send to ${to}: ${message}`)
-      return
+      this.logger.warn(
+        `WhatsApp not configured. Would send to ${to}: ${message}`,
+      );
+      return;
     }
 
-    const phone = to.replace(/^\+/, '').replace(/\s/g, '')
+    const phone = to.replace(/^\+/, '').replace(/\s/g, '');
 
     try {
       const response = await fetch(
@@ -34,14 +36,14 @@ export class NotificationsService {
             text: { body: message },
           }),
         },
-      )
+      );
 
       if (!response.ok) {
-        const err = await response.json()
-        this.logger.error(`WhatsApp send failed: ${JSON.stringify(err)}`)
+        const err: unknown = await response.json();
+        this.logger.error(`WhatsApp send failed: ${JSON.stringify(err)}`);
       }
     } catch (err) {
-      this.logger.error(`WhatsApp send error: ${err}`)
+      this.logger.error(`WhatsApp send error: ${err}`);
     }
   }
 }

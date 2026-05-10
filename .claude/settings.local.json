@@ -3,7 +3,11 @@
     "allow": [
       "Bash(npx create-turbo@latest . --package-manager pnpm)",
       "PowerShell(New-Item -ItemType Directory -Force \"E:\\\\Saas Projects\\\\Mobile Shop\\\\apps\\\\api\\\\prisma\")",
-      "PowerShell(Copy-Item \"E:\\\\Saas Projects\\\\Mobile Shop\\\\packages\\\\db\\\\prisma\\\\schema.prisma\" \"E:\\\\Saas Projects\\\\Mobile Shop\\\\apps\\\\api\\\\prisma\\\\schema.prisma\")"
+      "PowerShell(Copy-Item \"E:\\\\Saas Projects\\\\Mobile Shop\\\\packages\\\\db\\\\prisma\\\\schema.prisma\" \"E:\\\\Saas Projects\\\\Mobile Shop\\\\apps\\\\api\\\\prisma\\\\schema.prisma\")",
+      "PowerShell(Get-Content \"C:\\\\Users\\\\SAJJAD~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\E--Saas-Projects-Mobile-Shop\\\\46dd067e-233c-4cfa-805b-50f667c49a15\\\\tasks\\\\bp90kn1kn.output\" | Where-Object { $_ -match \"success|complete|Your project|cd mobile|npm run\" } | Select-Object -Last 10)",
+      "Bash(git push *)",
+      "Bash(pnpm lint *)",
+      "Bash(pnpm --filter api lint)"
     ]
   }
 }
