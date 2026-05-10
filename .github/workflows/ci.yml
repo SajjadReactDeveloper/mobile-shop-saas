@@ -42,15 +42,5 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
 
-  deploy-api:
-    name: Deploy API to Render
-    needs: lint-and-build
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Trigger Render deploy
-        run: |
-          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
-
+  # Render auto-deploys via its GitHub integration — no action needed here
   # Web auto-deploys via Vercel GitHub integration — no action needed here
