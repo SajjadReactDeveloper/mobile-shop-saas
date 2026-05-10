@@ -9,7 +9,6 @@ COPY apps/web/package.json ./apps/web/
 COPY apps/mobile/package.json ./apps/mobile/
 COPY packages/db/package.json ./packages/db/
 COPY packages/ui/package.json ./packages/ui/
-# Copy Prisma schema so postinstall prisma generate can run
 COPY apps/api/prisma ./apps/api/prisma
 RUN pnpm install --frozen-lockfile --filter api...
 
@@ -20,7 +19,6 @@ COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/api ./apps/api
 COPY packages ./packages
-# Generate Prisma client before compiling TypeScript
 RUN pnpm --filter api db:generate
 RUN pnpm --filter api build
 
@@ -31,4 +29,5 @@ COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/apps/api/node_modules ./node_modules
 COPY --from=builder /app/apps/api/prisma ./prisma
 EXPOSE 4000
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
+# Use local prisma binary — avoids npx downloading it at runtime
+CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node dist/main"]
