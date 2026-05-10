@@ -11,6 +11,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { EasyLoadService } from './easy-load.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { EasyLoadNetwork } from '@prisma/client';
 import type { AuthenticatedUser } from '../auth/types/auth.types';
 
 @ApiTags('Easy Load')
@@ -29,7 +30,11 @@ export class EasyLoadController {
   addAccount(
     @CurrentUser() user: AuthenticatedUser,
     @Body()
-    body: { network: string; phoneNumber: string; currentBalance: number },
+    body: {
+      network: EasyLoadNetwork;
+      phoneNumber: string;
+      currentBalance: number;
+    },
   ) {
     return this.easyLoadService.addAccount(user.shopId, body);
   }
@@ -46,7 +51,8 @@ export class EasyLoadController {
   load(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
-    @Body() body: { customerPhone: string; amount: number; profit: number },
+    @Body()
+    body: { customerPhone: string; amount: number; profitMargin: number },
   ) {
     return this.easyLoadService.load(id, user.shopId, body);
   }

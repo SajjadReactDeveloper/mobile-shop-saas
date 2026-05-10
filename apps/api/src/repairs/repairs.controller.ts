@@ -40,12 +40,15 @@ export class RepairsController {
     @CurrentUser() user: AuthenticatedUser,
     @Body()
     body: {
-      customerId?: string;
+      customerId: string;
+      deviceBrand: string;
       deviceModel: string;
-      faultDescription: string;
-      advancePaid: number;
-      totalQuote: number;
+      faultDesc: string;
+      photos?: string[];
+      advancePaid?: number;
+      totalQuote?: number;
       technicianId?: string;
+      notes?: string;
     },
   ) {
     return this.repairsService.create(user.shopId, body);

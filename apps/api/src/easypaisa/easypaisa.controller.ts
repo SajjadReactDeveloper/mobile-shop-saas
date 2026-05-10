@@ -3,6 +3,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { EasypaisaService } from './easypaisa.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { EasypaisaTxnType } from '@prisma/client';
 import type { AuthenticatedUser } from '../auth/types/auth.types';
 
 @ApiTags('Easypaisa / JazzCash')
@@ -20,7 +21,13 @@ export class EasypaisaController {
   @Post('accounts')
   addAccount(
     @CurrentUser() user: AuthenticatedUser,
-    @Body() body: { accountPhone: string; currentBalance: number },
+    @Body()
+    body: {
+      accountName: string;
+      accountPhone: string;
+      provider?: string;
+      currentBalance: number;
+    },
   ) {
     return this.easypaisaService.addAccount(user.shopId, body);
   }
@@ -39,10 +46,12 @@ export class EasypaisaController {
     @Param('id') id: string,
     @Body()
     body: {
-      type: string;
+      type: EasypaisaTxnType;
       amount: number;
-      fee: number;
-      description?: string;
+      fee?: number;
+      commission?: number;
+      counterparty?: string;
+      notes?: string;
     },
   ) {
     return this.easypaisaService.addTransaction(id, user.shopId, body);

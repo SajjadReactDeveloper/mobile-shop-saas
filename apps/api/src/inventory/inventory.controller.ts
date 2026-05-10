@@ -77,7 +77,7 @@ export class InventoryController {
     @Body()
     body: {
       qty: number;
-      buyingPrice: number;
+      unitPrice: number;
       imeis?: string[];
       supplier?: string;
     },

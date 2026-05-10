@@ -11,6 +11,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { SalesService } from './sales.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { PaymentMethod } from '@prisma/client';
 import type { AuthenticatedUser } from '../auth/types/auth.types';
 
 @ApiTags('Sales')
@@ -58,8 +59,9 @@ export class SalesController {
         imei?: string;
       }[];
       discount?: number;
-      paymentMethod: string;
-      isCredit?: boolean;
+      paymentMethod: PaymentMethod;
+      amountPaid: number;
+      notes?: string;
     },
   ) {
     return this.salesService.create(user.shopId, user.id, body);

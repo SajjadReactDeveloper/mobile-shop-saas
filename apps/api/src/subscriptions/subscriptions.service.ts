@@ -6,7 +6,7 @@ import Stripe from 'stripe';
 @Injectable()
 export class SubscriptionsService {
   private readonly logger = new Logger(SubscriptionsService.name);
-  private stripe: Stripe;
+  private stripe: InstanceType<typeof Stripe>;
 
   constructor(
     private prisma: PrismaService,
@@ -31,12 +31,14 @@ export class SubscriptionsService {
       success_url: `${returnUrl}?success=true`,
       cancel_url: `${returnUrl}?canceled=true`,
     });
+
     return { url: session.url };
   }
 
   async handleWebhook(payload: Buffer, signature: string) {
     const webhookSecret = this.config.get<string>('STRIPE_WEBHOOK_SECRET', '');
-    let event: Stripe.Event;
+
+    let event: any;
 
     try {
       event = this.stripe.webhooks.constructEvent(
@@ -50,8 +52,10 @@ export class SubscriptionsService {
     }
 
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const shopId = session.metadata?.shopId;
+      const session = event.data.object;
+
+      const shopId = session.metadata?.shopId as string | undefined;
+
       if (shopId && session.subscription) {
         await this.prisma.subscription.update({
           where: { shopId },
@@ -65,9 +69,9 @@ export class SubscriptionsService {
     }
 
     if (event.type === 'customer.subscription.deleted') {
-      const sub = event.data.object as Stripe.Subscription;
+      const sub = event.data.object;
       await this.prisma.subscription.updateMany({
-        where: { stripeSubId: sub.id },
+        where: { stripeSubId: sub.id as string },
         data: { status: 'CANCELED', tier: 'FREE' },
       });
     }
