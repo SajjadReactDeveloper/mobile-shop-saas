@@ -25,12 +25,14 @@ RUN pnpm --filter api build
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-# Install prisma CLI globally so migrate deploy works at startup.
-# The CLI is a devDep hoisted to root node_modules during build; copying
-# only apps/api/node_modules to the runner leaves the binary broken.
-RUN npm install -g prisma@6
+# Fresh npm install into a single flat node_modules — avoids pnpm's
+# workspace hoisting where @nestjs/core and others live in the root
+# /app/node_modules rather than apps/api/node_modules.
+COPY apps/api/package.json ./package.json
+COPY apps/api/prisma ./prisma
+RUN npm install --omit=dev && \
+    npm install prisma && \
+    npx prisma generate
 COPY --from=builder /app/apps/api/dist ./dist
-COPY --from=builder /app/apps/api/node_modules ./node_modules
-COPY --from=builder /app/apps/api/prisma ./prisma
 EXPOSE 4000
-CMD ["sh", "-c", "prisma migrate deploy && node dist/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
