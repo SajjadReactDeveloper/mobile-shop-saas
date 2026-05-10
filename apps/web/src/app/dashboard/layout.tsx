@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { authApi } from '@/lib/auth'
 import {
   LayoutDashboard, ShoppingCart, Package, Smartphone, Wrench,
-  Users, Wallet, PhoneCall, BarChart3, LogOut, Menu, X, DollarSign,
+  Users, Wallet, PhoneCall, BarChart3, LogOut, Menu, DollarSign,
 } from 'lucide-react'
 
 const navItems = [
@@ -24,7 +24,7 @@ const navItems = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<{ shop?: { name?: string } } | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {

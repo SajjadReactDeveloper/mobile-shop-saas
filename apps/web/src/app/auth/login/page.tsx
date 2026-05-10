@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { authApi, saveToken } from '@/lib/auth'
+import { getApiError } from '@/lib/error'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -25,8 +26,8 @@ export default function LoginPage() {
       const res = await authApi.login({ email, password })
       saveToken(res.accessToken)
       router.push('/dashboard')
-    } catch (err: any) {
-      setError(err.response?.data?.message ?? 'Login failed')
+    } catch (err) {
+      setError(getApiError(err, 'Login failed'))
     } finally {
       setLoading(false)
     }
@@ -39,8 +40,8 @@ export default function LoginPage() {
     try {
       await authApi.sendOtp(phone)
       setOtpSent(true)
-    } catch (err: any) {
-      setError(err.response?.data?.message ?? 'Failed to send OTP')
+    } catch (err) {
+      setError(getApiError(err, 'Failed to send OTP'))
     } finally {
       setLoading(false)
     }
@@ -54,8 +55,8 @@ export default function LoginPage() {
       const res = await authApi.verifyOtp(phone, otp)
       saveToken(res.accessToken)
       router.push('/dashboard')
-    } catch (err: any) {
-      setError(err.response?.data?.message ?? 'Invalid OTP')
+    } catch (err) {
+      setError(getApiError(err, 'Invalid OTP'))
     } finally {
       setLoading(false)
     }

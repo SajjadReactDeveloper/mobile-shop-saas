@@ -92,7 +92,7 @@ export default function DashboardPage() {
             <h2 className="font-semibold text-yellow-800">Low Stock Alert ({lowStock.length} items)</h2>
           </div>
           <div className="flex flex-wrap gap-2">
-            {lowStock.slice(0, 8).map((p: any) => (
+            {lowStock.slice(0, 8).map((p: { id: string; name: string; stockQty: number }) => (
               <span key={p.id} className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
                 {p.name} ({p.stockQty} left)
               </span>
@@ -105,7 +105,7 @@ export default function DashboardPage() {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
           <h2 className="font-semibold text-gray-900 mb-3">Easy Load Today</h2>
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-            {easyLoadSummary.map((acc: any) => (
+            {easyLoadSummary.map((acc: { phoneNumber: string; network: string; currentBalance: number; totalProfit: number }) => (
               <div key={acc.phoneNumber} className="text-center p-3 bg-gray-50 rounded-lg">
                 <div className="text-xs text-gray-500">{acc.network}</div>
                 <div className="font-bold text-gray-900 text-sm mt-0.5">PKR {Number(acc.currentBalance).toLocaleString()}</div>

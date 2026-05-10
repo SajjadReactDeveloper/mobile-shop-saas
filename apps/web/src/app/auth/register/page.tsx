@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { authApi, saveToken } from '@/lib/auth'
+import { getApiError } from '@/lib/error'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -22,8 +23,8 @@ export default function RegisterPage() {
       const res = await authApi.register(form)
       saveToken(res.accessToken)
       router.push('/dashboard')
-    } catch (err: any) {
-      setError(err.response?.data?.message ?? 'Registration failed')
+    } catch (err) {
+      setError(getApiError(err, 'Registration failed'))
     } finally {
       setLoading(false)
     }
