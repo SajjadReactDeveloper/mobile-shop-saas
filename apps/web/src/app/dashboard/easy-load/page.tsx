@@ -3,244 +3,153 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import {
-  PhoneCall, Plus, X, Loader2, ChevronDown,
-  ArrowDownCircle, ArrowUpCircle, TrendingUp,
-} from 'lucide-react'
+import { Plus, ArrowDownCircle, ArrowUpCircle, TrendingUp, History } from 'lucide-react'
+import { Button, Card, Badge, Modal, Input, PageHeader, Empty, PageLoader } from '@/components/ui'
 
 type Network = 'JAZZ' | 'TELENOR' | 'ZONG' | 'UFONE' | 'WARID'
 
-interface EasyLoadAccount {
-  id: string
-  network: Network
-  phoneNumber: string
-  currentBalance: number
-  isActive: boolean
-}
-
-interface EasyLoadTxn {
-  id: string
-  type: 'LOAD' | 'TOPUP'
-  amount: number
-  customerPhone?: string
-  profitMargin?: number
-  balanceAfter: number
-  notes?: string
-  createdAt: string
-}
-
-interface DailySummaryItem {
-  network: Network
-  phoneNumber: string
-  currentBalance: number
-  totalLoaded: number
-  totalProfit: number
-  txnCount: number
-}
+interface EasyLoadAccount { id: string; network: Network; phoneNumber: string; currentBalance: number; isActive: boolean }
+interface EasyLoadTxn { id: string; type: 'LOAD' | 'TOPUP'; amount: number; customerPhone?: string; profitMargin?: number; balanceAfter: number; createdAt: string }
+interface DailySummaryItem { network: Network; phoneNumber: string; currentBalance: number; totalLoaded: number; totalProfit: number; txnCount: number }
 
 const NETWORKS: Network[] = ['JAZZ', 'TELENOR', 'ZONG', 'UFONE', 'WARID']
-
-const NETWORK_COLORS: Record<Network, string> = {
-  JAZZ: 'bg-red-100 text-red-700',
-  TELENOR: 'bg-blue-100 text-blue-700',
-  ZONG: 'bg-purple-100 text-purple-700',
-  UFONE: 'bg-green-100 text-green-700',
-  WARID: 'bg-orange-100 text-orange-700',
+const NET_COLOR: Record<Network, 'red' | 'blue' | 'purple' | 'green' | 'orange'> = {
+  JAZZ: 'red', TELENOR: 'blue', ZONG: 'purple', UFONE: 'green', WARID: 'orange',
 }
-
-const input = 'w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500'
-const btn = 'px-4 py-2 text-sm font-medium rounded-lg transition-colors'
-
-function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-          <h2 className="font-semibold text-gray-900">{title}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
-        </div>
-        <div className="px-5 py-4">{children}</div>
-      </div>
-    </div>
-  )
+const NET_BG: Record<Network, string> = {
+  JAZZ: 'bg-red-50 text-red-700', TELENOR: 'bg-blue-50 text-blue-700',
+  ZONG: 'bg-purple-50 text-purple-700', UFONE: 'bg-green-50 text-green-700',
+  WARID: 'bg-orange-50 text-orange-700',
 }
-
-// ─── Add Account Modal ───────────────────────────────────────────────────────
 
 function AddAccountModal({ onClose }: { onClose: () => void }) {
   const qc = useQueryClient()
   const [form, setForm] = useState({ network: 'JAZZ' as Network, phoneNumber: '', currentBalance: '' })
-
   const mut = useMutation({
-    mutationFn: (data: object) => api.post('/easy-load/accounts', data).then(r => r.data),
+    mutationFn: (d: object) => api.post('/easy-load/accounts', d).then(r => r.data),
     onSuccess: () => { void qc.invalidateQueries({ queryKey: ['el-accounts'] }); onClose() },
   })
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault()
-    mut.mutate({ network: form.network, phoneNumber: form.phoneNumber, currentBalance: Number(form.currentBalance) })
-  }
-
+  const submit = (e: React.FormEvent) => { e.preventDefault(); mut.mutate({ network: form.network, phoneNumber: form.phoneNumber, currentBalance: Number(form.currentBalance) }) }
   return (
     <form onSubmit={submit} className="space-y-4">
-      <div className="space-y-1">
-        <label className="text-xs font-medium text-gray-600">Network *</label>
-        <div className="relative">
-          <select className={input + ' appearance-none pr-8'} value={form.network} onChange={e => setForm(f => ({ ...f, network: e.target.value as Network }))}>
-            {NETWORKS.map(n => <option key={n} value={n}>{n}</option>)}
-          </select>
-          <ChevronDown className="absolute right-2 top-2.5 w-4 h-4 text-gray-400 pointer-events-none" />
+      <div>
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Network *</p>
+        <div className="grid grid-cols-5 gap-2">
+          {NETWORKS.map(n => (
+            <button key={n} type="button" onClick={() => setForm(f => ({ ...f, network: n }))}
+              className={`py-2 text-xs font-bold rounded-lg border-2 transition-all ${form.network === n ? `${NET_BG[n]} border-current` : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>
+              {n}
+            </button>
+          ))}
         </div>
       </div>
-      <div className="space-y-1">
-        <label className="text-xs font-medium text-gray-600">SIM Phone Number *</label>
-        <input className={input} required type="tel" value={form.phoneNumber} onChange={e => setForm(f => ({ ...f, phoneNumber: e.target.value }))} placeholder="03001234567" />
-      </div>
-      <div className="space-y-1">
-        <label className="text-xs font-medium text-gray-600">Current Balance (PKR) *</label>
-        <input className={input} required type="number" min="0" value={form.currentBalance} onChange={e => setForm(f => ({ ...f, currentBalance: e.target.value }))} placeholder="0" />
-      </div>
-      {mut.error && <p className="text-xs text-red-600">{(mut.error as { response?: { data?: { message?: string } } }).response?.data?.message ?? 'Failed'}</p>}
-      <div className="flex gap-2 pt-1">
-        <button type="button" onClick={onClose} className={btn + ' flex-1 bg-gray-100 text-gray-700 hover:bg-gray-200'}>Cancel</button>
-        <button type="submit" disabled={mut.isPending} className={btn + ' flex-1 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2'}>
-          {mut.isPending && <Loader2 className="w-4 h-4 animate-spin" />} Add SIM
-        </button>
+      <Input label="SIM Phone Number *" required type="tel" value={form.phoneNumber} onChange={e => setForm(f => ({ ...f, phoneNumber: e.target.value }))} placeholder="03001234567" />
+      <Input label="Current Balance (PKR) *" required type="number" min="0" value={form.currentBalance} onChange={e => setForm(f => ({ ...f, currentBalance: e.target.value }))} placeholder="0" />
+      {mut.error && <p className="text-xs text-red-500">{(mut.error as { response?: { data?: { message?: string } } }).response?.data?.message ?? 'Failed'}</p>}
+      <div className="flex gap-2 pt-2">
+        <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>Cancel</Button>
+        <Button type="submit" className="flex-1" loading={mut.isPending}>Add SIM</Button>
       </div>
     </form>
   )
 }
-
-// ─── Load Modal ──────────────────────────────────────────────────────────────
 
 function LoadModal({ account, onClose }: { account: EasyLoadAccount; onClose: () => void }) {
   const qc = useQueryClient()
   const [form, setForm] = useState({ customerPhone: '', amount: '', profitMargin: '10' })
-
   const mut = useMutation({
-    mutationFn: (data: object) => api.post(`/easy-load/accounts/${account.id}/load`, data).then(r => r.data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['el-accounts'] })
-      void qc.invalidateQueries({ queryKey: ['el-txns', account.id] })
-      void qc.invalidateQueries({ queryKey: ['el-summary'] })
-      onClose()
-    },
+    mutationFn: (d: object) => api.post(`/easy-load/accounts/${account.id}/load`, d).then(r => r.data),
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: ['el-accounts'] }); void qc.invalidateQueries({ queryKey: ['el-txns', account.id] }); void qc.invalidateQueries({ queryKey: ['el-summary'] }); onClose() },
   })
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault()
-    mut.mutate({ customerPhone: form.customerPhone, amount: Number(form.amount), profitMargin: Number(form.profitMargin) })
-  }
-
+  const submit = (e: React.FormEvent) => { e.preventDefault(); mut.mutate({ customerPhone: form.customerPhone, amount: Number(form.amount), profitMargin: Number(form.profitMargin) }) }
   return (
     <form onSubmit={submit} className="space-y-4">
-      <div className="p-3 bg-gray-50 rounded-xl text-sm">
-        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${NETWORK_COLORS[account.network]}`}>{account.network}</span>
-        <span className="ml-2 text-gray-600">{account.phoneNumber}</span>
-        <div className="font-bold text-gray-900 mt-1">Balance: PKR {Number(account.currentBalance).toLocaleString()}</div>
+      <div className={`p-3 rounded-xl flex items-center gap-3 ${NET_BG[account.network]} bg-opacity-30`}>
+        <Badge color={NET_COLOR[account.network]}>{account.network}</Badge>
+        <div>
+          <div className="text-sm font-semibold">{account.phoneNumber}</div>
+          <div className="text-xs opacity-80">Balance: PKR {Number(account.currentBalance).toLocaleString()}</div>
+        </div>
       </div>
-      <div className="space-y-1">
-        <label className="text-xs font-medium text-gray-600">Customer Phone *</label>
-        <input className={input} required type="tel" value={form.customerPhone} onChange={e => setForm(f => ({ ...f, customerPhone: e.target.value }))} placeholder="03001234567" />
-      </div>
+      <Input label="Customer Phone *" required type="tel" value={form.customerPhone} onChange={e => setForm(f => ({ ...f, customerPhone: e.target.value }))} placeholder="03001234567" />
       <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-gray-600">Amount (PKR) *</label>
-          <input className={input} required type="number" min="1" max={account.currentBalance} value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} placeholder="100" />
-        </div>
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-gray-600">Your Profit (PKR)</label>
-          <input className={input} type="number" min="0" value={form.profitMargin} onChange={e => setForm(f => ({ ...f, profitMargin: e.target.value }))} />
-        </div>
+        <Input label="Amount (PKR) *" required type="number" min="1" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} placeholder="100" />
+        <Input label="Your Profit (PKR)" type="number" min="0" value={form.profitMargin} onChange={e => setForm(f => ({ ...f, profitMargin: e.target.value }))} />
       </div>
-      {mut.error && <p className="text-xs text-red-600">{(mut.error as { response?: { data?: { message?: string } } }).response?.data?.message ?? 'Failed'}</p>}
-      <div className="flex gap-2 pt-1">
-        <button type="button" onClick={onClose} className={btn + ' flex-1 bg-gray-100 text-gray-700 hover:bg-gray-200'}>Cancel</button>
-        <button type="submit" disabled={mut.isPending} className={btn + ' flex-1 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2'}>
-          {mut.isPending && <Loader2 className="w-4 h-4 animate-spin" />} Send Load
-        </button>
+      {form.amount && Number(form.amount) > 0 && (
+        <div className="flex justify-between text-sm px-3 py-2 bg-gray-50 rounded-xl">
+          <span className="text-gray-500">Balance after</span>
+          <span className="font-bold text-gray-900">PKR {(Number(account.currentBalance) - Number(form.amount)).toLocaleString()}</span>
+        </div>
+      )}
+      {mut.error && <p className="text-xs text-red-500">{(mut.error as { response?: { data?: { message?: string } } }).response?.data?.message ?? 'Failed'}</p>}
+      <div className="flex gap-2 pt-2">
+        <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>Cancel</Button>
+        <Button type="submit" className="flex-1" loading={mut.isPending}>Send Load</Button>
       </div>
     </form>
   )
 }
-
-// ─── Top-up Modal ────────────────────────────────────────────────────────────
 
 function TopupModal({ account, onClose }: { account: EasyLoadAccount; onClose: () => void }) {
   const qc = useQueryClient()
   const [amount, setAmount] = useState('')
-
   const mut = useMutation({
-    mutationFn: (data: object) => api.post(`/easy-load/accounts/${account.id}/topup`, data).then(r => r.data),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['el-accounts'] })
-      void qc.invalidateQueries({ queryKey: ['el-txns', account.id] })
-      onClose()
-    },
+    mutationFn: (d: object) => api.post(`/easy-load/accounts/${account.id}/topup`, d).then(r => r.data),
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: ['el-accounts'] }); void qc.invalidateQueries({ queryKey: ['el-txns', account.id] }); onClose() },
   })
-
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault()
-    mut.mutate({ amount: Number(amount) })
-  }
-
+  const submit = (e: React.FormEvent) => { e.preventDefault(); mut.mutate({ amount: Number(amount) }) }
   return (
     <form onSubmit={submit} className="space-y-4">
-      <div className="p-3 bg-gray-50 rounded-xl text-sm">
-        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${NETWORK_COLORS[account.network]}`}>{account.network}</span>
-        <span className="ml-2 text-gray-600">{account.phoneNumber}</span>
-        <div className="font-bold text-gray-900 mt-1">Current: PKR {Number(account.currentBalance).toLocaleString()}</div>
+      <div className={`p-3 rounded-xl flex items-center gap-3 ${NET_BG[account.network]} bg-opacity-30`}>
+        <Badge color={NET_COLOR[account.network]}>{account.network}</Badge>
+        <div>
+          <div className="text-sm font-semibold">{account.phoneNumber}</div>
+          <div className="text-xs opacity-80">Current: PKR {Number(account.currentBalance).toLocaleString()}</div>
+        </div>
       </div>
-      <div className="space-y-1">
-        <label className="text-xs font-medium text-gray-600">Top-up Amount (PKR) *</label>
-        <input className={input} required type="number" min="1" value={amount} onChange={e => setAmount(e.target.value)} placeholder="500" autoFocus />
-      </div>
-      {amount && (
-        <div className="text-sm text-gray-500">Balance after top-up: <span className="font-semibold text-green-600">PKR {(Number(account.currentBalance) + Number(amount)).toLocaleString()}</span></div>
+      <Input label="Top-up Amount (PKR) *" required type="number" min="1" value={amount} onChange={e => setAmount(e.target.value)} placeholder="500" />
+      {amount && Number(amount) > 0 && (
+        <div className="flex justify-between text-sm px-3 py-2 bg-emerald-50 rounded-xl font-semibold text-emerald-700">
+          <span>New balance</span>
+          <span>PKR {(Number(account.currentBalance) + Number(amount)).toLocaleString()}</span>
+        </div>
       )}
-      {mut.error && <p className="text-xs text-red-600">{(mut.error as { response?: { data?: { message?: string } } }).response?.data?.message ?? 'Failed'}</p>}
-      <div className="flex gap-2 pt-1">
-        <button type="button" onClick={onClose} className={btn + ' flex-1 bg-gray-100 text-gray-700 hover:bg-gray-200'}>Cancel</button>
-        <button type="submit" disabled={mut.isPending} className={btn + ' flex-1 bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2'}>
-          {mut.isPending && <Loader2 className="w-4 h-4 animate-spin" />} Top Up
-        </button>
+      {mut.error && <p className="text-xs text-red-500">{(mut.error as { response?: { data?: { message?: string } } }).response?.data?.message ?? 'Failed'}</p>}
+      <div className="flex gap-2 pt-2">
+        <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>Cancel</Button>
+        <Button type="submit" variant="success" className="flex-1" loading={mut.isPending}>Top Up</Button>
       </div>
     </form>
   )
 }
-
-// ─── Transactions Panel ──────────────────────────────────────────────────────
 
 function TxnPanel({ account }: { account: EasyLoadAccount }) {
   const { data: txns = [], isLoading } = useQuery<EasyLoadTxn[]>({
     queryKey: ['el-txns', account.id],
     queryFn: () => api.get(`/easy-load/accounts/${account.id}/transactions`).then(r => r.data),
   })
-
-  if (isLoading) return <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-gray-400" /></div>
-  if (!txns.length) return <p className="text-sm text-gray-400 text-center py-6">No transactions yet</p>
-
+  if (isLoading) return <PageLoader />
+  if (!txns.length) return <p className="text-xs text-gray-400 text-center py-4">No transactions yet</p>
   return (
-    <div className="space-y-2 max-h-64 overflow-y-auto">
+    <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
       {txns.map(t => (
-        <div key={t.id} className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded-lg">
+        <div key={t.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
           <div className="flex items-center gap-2">
             {t.type === 'LOAD'
               ? <ArrowDownCircle className="w-4 h-4 text-red-500 shrink-0" />
-              : <ArrowUpCircle className="w-4 h-4 text-green-500 shrink-0" />}
+              : <ArrowUpCircle className="w-4 h-4 text-emerald-500 shrink-0" />}
             <div>
-              <div className="text-xs font-medium text-gray-800">
-                {t.type === 'LOAD' ? `Load → ${t.customerPhone}` : 'Top-up'}
-              </div>
+              <div className="text-xs font-semibold text-gray-800">{t.type === 'LOAD' ? `→ ${t.customerPhone}` : 'Top-up'}</div>
               <div className="text-xs text-gray-400">{new Date(t.createdAt).toLocaleString('en-PK', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</div>
             </div>
           </div>
           <div className="text-right">
-            <div className={`text-xs font-bold ${t.type === 'LOAD' ? 'text-red-600' : 'text-green-600'}`}>
+            <div className={`text-xs font-bold ${t.type === 'LOAD' ? 'text-red-600' : 'text-emerald-600'}`}>
               {t.type === 'LOAD' ? '−' : '+'} PKR {Number(t.amount).toLocaleString()}
             </div>
             {t.type === 'LOAD' && t.profitMargin && (
-              <div className="text-xs text-green-600">+PKR {Number(t.profitMargin).toLocaleString()} profit</div>
+              <div className="text-xs text-emerald-600">+{Number(t.profitMargin).toLocaleString()} profit</div>
             )}
           </div>
         </div>
@@ -248,8 +157,6 @@ function TxnPanel({ account }: { account: EasyLoadAccount }) {
     </div>
   )
 }
-
-// ─── Main Page ───────────────────────────────────────────────────────────────
 
 export default function EasyLoadPage() {
   const today = new Date().toISOString().split('T')[0]
@@ -261,7 +168,6 @@ export default function EasyLoadPage() {
     queryKey: ['el-accounts'],
     queryFn: () => api.get('/easy-load/accounts').then(r => r.data),
   })
-
   const { data: summary = [] } = useQuery<DailySummaryItem[]>({
     queryKey: ['el-summary', today],
     queryFn: () => api.get(`/easy-load/daily-summary?date=${today}`).then(r => r.data),
@@ -269,94 +175,97 @@ export default function EasyLoadPage() {
 
   const totalLoaded = summary.reduce((s, a) => s + a.totalLoaded, 0)
   const totalProfit = summary.reduce((s, a) => s + a.totalProfit, 0)
-
-  const openLoad = (acc: EasyLoadAccount) => { setSelectedAccount(acc); setModal('load') }
-  const openTopup = (acc: EasyLoadAccount) => { setSelectedAccount(acc); setModal('topup') }
   const closeModal = () => { setModal(null); setSelectedAccount(null) }
 
   return (
     <div className="space-y-5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Easy Load</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{accounts.length} SIM account{accounts.length !== 1 ? 's' : ''}</p>
-        </div>
-        <button onClick={() => setModal('add')} className={btn + ' bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2'}>
-          <Plus className="w-4 h-4" /> Add SIM
-        </button>
-      </div>
+      <PageHeader
+        title="Easy Load"
+        subtitle={`${accounts.length} SIM account${accounts.length !== 1 ? 's' : ''}`}
+        action={<Button onClick={() => setModal('add')}><Plus className="w-4 h-4" /> Add SIM</Button>}
+      />
 
-      {/* Today's summary */}
+      {/* Today summary */}
       {summary.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="w-4 h-4 text-green-600" />
-            <span className="text-sm font-semibold text-gray-800">Today&apos;s Summary</span>
-            <span className="text-xs text-gray-400 ml-auto">Total loaded: PKR {totalLoaded.toLocaleString()} · Profit: PKR {totalProfit.toLocaleString()}</span>
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-green-600" />
+              </div>
+              <span className="text-sm font-bold text-gray-900">Today&apos;s Summary</span>
+            </div>
+            <div className="text-xs text-gray-500 text-right">
+              <span className="font-semibold text-gray-900">PKR {totalLoaded.toLocaleString()}</span> loaded ·{' '}
+              <span className="font-semibold text-emerald-600">PKR {totalProfit.toLocaleString()}</span> profit
+            </div>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             {summary.map(acc => (
-              <div key={acc.phoneNumber} className="text-center p-3 bg-gray-50 rounded-lg">
-                <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${NETWORK_COLORS[acc.network]}`}>{acc.network}</span>
-                <div className="font-bold text-gray-900 text-sm mt-1.5">PKR {Number(acc.currentBalance).toLocaleString()}</div>
-                <div className="text-xs text-gray-500 mt-0.5">{acc.txnCount} loads today</div>
-                {acc.totalProfit > 0 && <div className="text-xs text-green-600 mt-0.5">+PKR {acc.totalProfit} profit</div>}
+              <div key={acc.phoneNumber} className="bg-gray-50 rounded-xl p-3 text-center">
+                <Badge color={NET_COLOR[acc.network]}>{acc.network}</Badge>
+                <div className="font-bold text-gray-900 text-sm mt-2">PKR {Number(acc.currentBalance).toLocaleString()}</div>
+                <div className="text-xs text-gray-400 mt-0.5">{acc.txnCount} loads</div>
+                {acc.totalProfit > 0 && <div className="text-xs text-emerald-600">+{acc.totalProfit} profit</div>}
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
-      {/* Account cards */}
-      {isLoading ? (
-        <div className="flex justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>
-      ) : accounts.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
-          <PhoneCall className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 text-sm">No SIM accounts yet</p>
-          <button onClick={() => setModal('add')} className={btn + ' bg-blue-600 text-white hover:bg-blue-700 mt-3 mx-auto flex items-center gap-2'}>
-            <Plus className="w-4 h-4" /> Add first SIM
-          </button>
-        </div>
+      {/* Accounts */}
+      {isLoading ? <PageLoader /> : accounts.length === 0 ? (
+        <Card>
+          <Empty icon="📱" title="No SIM accounts yet" desc="Add a SIM account to start managing easy load."
+            action={<Button onClick={() => setModal('add')}><Plus className="w-4 h-4" /> Add SIM</Button>} />
+        </Card>
       ) : (
         <div className="space-y-3">
           {accounts.map(acc => (
-            <div key={acc.id} className="bg-white rounded-xl border border-gray-200 shadow-sm">
-              <div className="flex items-center justify-between px-4 py-4">
-                <div className="flex items-center gap-3">
-                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${NETWORK_COLORS[acc.network]}`}>{acc.network}</span>
+            <Card key={acc.id} padding={false}>
+              <div className="flex items-center justify-between px-5 py-4">
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xs font-extrabold ${NET_BG[acc.network]}`}>
+                    {acc.network.slice(0, 4)}
+                  </div>
                   <div>
-                    <div className="text-sm font-medium text-gray-800">{acc.phoneNumber}</div>
-                    <div className="text-xs font-bold text-gray-900 mt-0.5">PKR {Number(acc.currentBalance).toLocaleString()}</div>
+                    <div className="text-xs text-gray-500">{acc.phoneNumber}</div>
+                    <div className="text-xl font-extrabold text-gray-900">PKR {Number(acc.currentBalance).toLocaleString()}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => openTopup(acc)} className={btn + ' bg-green-50 text-green-700 hover:bg-green-100 text-xs flex items-center gap-1'}>
-                    <ArrowUpCircle className="w-3.5 h-3.5" /> Top Up
-                  </button>
-                  <button onClick={() => openLoad(acc)} className={btn + ' bg-blue-600 text-white hover:bg-blue-700 text-xs flex items-center gap-1'}>
-                    <ArrowDownCircle className="w-3.5 h-3.5" /> Load
-                  </button>
+                  <Button variant="secondary" size="sm" onClick={() => { setSelectedAccount(acc); setModal('topup') }}>
+                    <ArrowUpCircle className="w-4 h-4" /> Top Up
+                  </Button>
+                  <Button size="sm" onClick={() => { setSelectedAccount(acc); setModal('load') }}>
+                    <ArrowDownCircle className="w-4 h-4" /> Send Load
+                  </Button>
                   <button onClick={() => setExpandedId(expandedId === acc.id ? null : acc.id)}
-                    className="text-xs text-gray-400 hover:text-gray-600 px-2 py-2">
-                    {expandedId === acc.id ? 'Hide' : 'History'}
+                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                    <History className="w-4 h-4" />
                   </button>
                 </div>
               </div>
               {expandedId === acc.id && (
-                <div className="border-t border-gray-100 px-4 py-3">
+                <div className="border-t border-gray-100 px-5 py-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Recent Transactions</p>
                   <TxnPanel account={acc} />
                 </div>
               )}
-            </div>
+            </Card>
           ))}
         </div>
       )}
 
-      {modal === 'add' && <Modal title="Add SIM Account" onClose={closeModal}><AddAccountModal onClose={closeModal} /></Modal>}
-      {modal === 'load' && selectedAccount && <Modal title="Send Load" onClose={closeModal}><LoadModal account={selectedAccount} onClose={closeModal} /></Modal>}
-      {modal === 'topup' && selectedAccount && <Modal title="Top Up Balance" onClose={closeModal}><TopupModal account={selectedAccount} onClose={closeModal} /></Modal>}
+      <Modal open={modal === 'add'} onClose={closeModal} title="Add SIM Account" size="sm">
+        <AddAccountModal onClose={closeModal} />
+      </Modal>
+      <Modal open={modal === 'load' && !!selectedAccount} onClose={closeModal} title="Send Load" size="sm">
+        {selectedAccount && <LoadModal account={selectedAccount} onClose={closeModal} />}
+      </Modal>
+      <Modal open={modal === 'topup' && !!selectedAccount} onClose={closeModal} title="Top Up Balance" size="sm">
+        {selectedAccount && <TopupModal account={selectedAccount} onClose={closeModal} />}
+      </Modal>
     </div>
   )
 }

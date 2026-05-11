@@ -2,7 +2,12 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import { Package, Users, Wrench, TrendingUp, AlertTriangle } from 'lucide-react'
+import Link from 'next/link'
+import {
+  Package, Users, Wrench, TrendingUp, AlertTriangle,
+  ShoppingCart, PhoneCall, Wallet, DollarSign, ArrowRight,
+} from 'lucide-react'
+import { Stat, Card, Badge, PageLoader } from '@/components/ui'
 
 export default function DashboardPage() {
   const today = new Date().toISOString().split('T')[0]
@@ -12,7 +17,7 @@ export default function DashboardPage() {
     queryFn: () => api.get('/shop/stats').then((r) => r.data),
   })
 
-  const { data: todaySummary } = useQuery({
+  const { data: todaySummary, isLoading } = useQuery({
     queryKey: ['daily-summary', today],
     queryFn: () => api.get(`/sales/daily-summary?date=${today}`).then((r) => r.data),
   })
@@ -27,94 +32,261 @@ export default function DashboardPage() {
     queryFn: () => api.get(`/easy-load/daily-summary?date=${today}`).then((r) => r.data),
   })
 
-  const cards = [
-    {
-      label: 'Today Sales',
-      value: `PKR ${(todaySummary?.totalRevenue ?? 0).toLocaleString()}`,
-      sub: `${todaySummary?.totalSales ?? 0} transactions`,
-      icon: TrendingUp,
-      color: 'text-green-600 bg-green-50',
-    },
-    {
-      label: 'Today Profit',
-      value: `PKR ${(todaySummary?.grossProfit ?? 0).toLocaleString()}`,
-      sub: 'Gross profit',
-      icon: TrendingUp,
-      color: 'text-blue-600 bg-blue-50',
-    },
-    {
-      label: 'Products',
-      value: stats?.products ?? '—',
-      sub: 'Active items',
-      icon: Package,
-      color: 'text-purple-600 bg-purple-50',
-    },
-    {
-      label: 'Pending Repairs',
-      value: stats?.pendingRepairs ?? '—',
-      sub: 'In progress',
-      icon: Wrench,
-      color: 'text-orange-600 bg-orange-50',
-    },
-    {
-      label: 'Customers',
-      value: stats?.customers ?? '—',
-      sub: 'Total registered',
-      icon: Users,
-      color: 'text-cyan-600 bg-cyan-50',
-    },
+  const { data: pendingRepairs } = useQuery({
+    queryKey: ['pending-repairs'],
+    queryFn: () => api.get('/repairs?status=RECEIVED&status=IN_REPAIR&status=DIAGNOSING&status=AWAITING_PARTS').then((r) => r.data),
+  })
+
+  if (isLoading) return <PageLoader />
+
+  const revenue = todaySummary?.totalRevenue ?? 0
+  const profit  = todaySummary?.grossProfit ?? 0
+  const sales   = todaySummary?.totalSales ?? 0
+
+  const quickLinks = [
+    { href: '/dashboard/sales',         icon: ShoppingCart, label: 'New Sale',        color: 'bg-blue-600 text-white' },
+    { href: '/dashboard/inventory',     icon: Package,      label: 'Add Product',     color: 'bg-purple-600 text-white' },
+    { href: '/dashboard/repairs',       icon: Wrench,       label: 'New Repair',      color: 'bg-orange-500 text-white' },
+    { href: '/dashboard/cash-register', icon: DollarSign,   label: 'Cash Register',   color: 'bg-emerald-600 text-white' },
   ]
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500 text-sm mt-1">{new Date().toLocaleDateString('en-PK', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+        <h1 className="text-xl font-bold text-gray-900">Good {getGreeting()}</h1>
+        <p className="text-sm text-gray-500 mt-0.5">
+          {new Date().toLocaleDateString('en-PK', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+        </p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        {cards.map((card) => (
-          <div key={card.label} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${card.color} mb-3`}>
-              <card.icon className="w-5 h-5" />
-            </div>
-            <div className="text-xl font-bold text-gray-900">{card.value}</div>
-            <div className="text-xs text-gray-500 mt-0.5">{card.label}</div>
-            <div className="text-xs text-gray-400 mt-0.5">{card.sub}</div>
-          </div>
+      {/* Quick links */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {quickLinks.map(({ href, icon: Icon, label, color }) => (
+          <Link key={href} href={href}
+            className={`flex flex-col items-center gap-2 py-4 rounded-xl font-semibold text-sm transition-all hover:scale-105 hover:shadow-lg ${color}`}>
+            <Icon className="w-5 h-5" />
+            {label}
+          </Link>
         ))}
       </div>
 
-      {lowStock && lowStock.length > 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle className="w-5 h-5 text-yellow-600" />
-            <h2 className="font-semibold text-yellow-800">Low Stock Alert ({lowStock.length} items)</h2>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {lowStock.slice(0, 8).map((p: { id: string; name: string; stockQty: number }) => (
-              <span key={p.id} className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                {p.name} ({p.stockQty} left)
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* KPI stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Stat
+          label="Today's Revenue"
+          value={`PKR ${revenue.toLocaleString()}`}
+          sub={`${sales} transactions`}
+          icon={TrendingUp}
+          color="text-emerald-600 bg-emerald-50"
+        />
+        <Stat
+          label="Today's Profit"
+          value={`PKR ${profit.toLocaleString()}`}
+          sub="Gross margin"
+          icon={TrendingUp}
+          color="text-blue-600 bg-blue-50"
+        />
+        <Stat
+          label="Total Products"
+          value={stats?.products ?? '—'}
+          sub="In inventory"
+          icon={Package}
+          color="text-purple-600 bg-purple-50"
+        />
+        <Stat
+          label="Customers"
+          value={stats?.customers ?? '—'}
+          sub="Registered"
+          icon={Users}
+          color="text-cyan-600 bg-cyan-50"
+        />
+      </div>
 
+      {/* Low stock + Repairs row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Low stock */}
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-yellow-50 rounded-lg flex items-center justify-center">
+                <AlertTriangle className="w-4 h-4 text-yellow-600" />
+              </div>
+              <div>
+                <div className="text-sm font-bold text-gray-900">Low Stock</div>
+                <div className="text-xs text-gray-500">{lowStock?.length ?? 0} items need restocking</div>
+              </div>
+            </div>
+            <Link href="/dashboard/inventory" className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">
+              View all <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          {lowStock && lowStock.length > 0 ? (
+            <div className="space-y-2">
+              {lowStock.slice(0, 5).map((p: { id: string; name: string; stockQty: number; lowStockThreshold?: number }) => (
+                <div key={p.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                  <span className="text-sm text-gray-700 truncate">{p.name}</span>
+                  <Badge color="yellow">{p.stockQty} left</Badge>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-6 text-sm text-gray-400">All products well stocked ✓</div>
+          )}
+        </Card>
+
+        {/* Pending repairs */}
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center">
+                <Wrench className="w-4 h-4 text-orange-600" />
+              </div>
+              <div>
+                <div className="text-sm font-bold text-gray-900">Active Repairs</div>
+                <div className="text-xs text-gray-500">{pendingRepairs?.length ?? stats?.pendingRepairs ?? 0} jobs in progress</div>
+              </div>
+            </div>
+            <Link href="/dashboard/repairs" className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">
+              View all <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          {pendingRepairs && pendingRepairs.length > 0 ? (
+            <div className="space-y-2">
+              {pendingRepairs.slice(0, 5).map((r: { id: string; customer?: { name: string }; deviceModel: string; status: string }) => (
+                <div key={r.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                  <div>
+                    <div className="text-sm text-gray-700">{r.customer?.name ?? 'Walk-in'}</div>
+                    <div className="text-xs text-gray-400">{r.deviceModel}</div>
+                  </div>
+                  <RepairBadge status={r.status} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-6 text-sm text-gray-400">No active repairs 🎉</div>
+          )}
+        </Card>
+      </div>
+
+      {/* Easy load summary */}
       {easyLoadSummary && easyLoadSummary.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
-          <h2 className="font-semibold text-gray-900 mb-3">Easy Load Today</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-            {easyLoadSummary.map((acc: { phoneNumber: string; network: string; currentBalance: number; totalProfit: number }) => (
-              <div key={acc.phoneNumber} className="text-center p-3 bg-gray-50 rounded-lg">
-                <div className="text-xs text-gray-500">{acc.network}</div>
-                <div className="font-bold text-gray-900 text-sm mt-0.5">PKR {Number(acc.currentBalance).toLocaleString()}</div>
-                <div className="text-xs text-green-600 mt-0.5">+PKR {acc.totalProfit} profit</div>
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                <PhoneCall className="w-4 h-4 text-blue-600" />
+              </div>
+              <div>
+                <div className="text-sm font-bold text-gray-900">Easy Load — Today</div>
+                <div className="text-xs text-gray-500">Balance per network</div>
+              </div>
+            </div>
+            <Link href="/dashboard/easy-load" className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">
+              Manage <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            {easyLoadSummary.map((acc: { phoneNumber: string; network: string; currentBalance: number; totalProfit?: number }) => (
+              <div key={acc.phoneNumber} className="bg-gray-50 rounded-xl p-3 text-center">
+                <NetworkDot network={acc.network} />
+                <div className="font-bold text-gray-900 text-sm mt-2">PKR {Number(acc.currentBalance).toLocaleString()}</div>
+                {acc.totalProfit !== undefined && (
+                  <div className="text-xs text-emerald-600 mt-0.5">+{acc.totalProfit} profit</div>
+                )}
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
+
+      {/* Wallet quick view */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Link href="/dashboard/customers" className="group">
+          <Card className="hover:border-blue-200 hover:shadow-md transition-all cursor-pointer">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-cyan-50 rounded-lg flex items-center justify-center">
+                <Users className="w-4 h-4 text-cyan-600" />
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">Udhaar Total</div>
+                <div className="text-sm font-bold text-gray-900">PKR {(stats?.totalUdhaar ?? 0).toLocaleString()}</div>
+              </div>
+            </div>
+          </Card>
+        </Link>
+        <Link href="/dashboard/easypaisa" className="group">
+          <Card className="hover:border-blue-200 hover:shadow-md transition-all cursor-pointer">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-green-50 rounded-lg flex items-center justify-center">
+                <Wallet className="w-4 h-4 text-green-600" />
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">Easypaisa</div>
+                <div className="text-sm font-bold text-gray-900">Wallet</div>
+              </div>
+            </div>
+          </Card>
+        </Link>
+        <Link href="/dashboard/cash-register" className="group">
+          <Card className="hover:border-blue-200 hover:shadow-md transition-all cursor-pointer">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-4 h-4 text-emerald-600" />
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">Cash Register</div>
+                <div className="text-sm font-bold text-gray-900">Daily Session</div>
+              </div>
+            </div>
+          </Card>
+        </Link>
+        <Link href="/dashboard/reports" className="group">
+          <Card className="hover:border-blue-200 hover:shadow-md transition-all cursor-pointer">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-purple-50 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-purple-600" />
+              </div>
+              <div>
+                <div className="text-xs text-gray-500">Reports</div>
+                <div className="text-sm font-bold text-gray-900">Analytics</div>
+              </div>
+            </div>
+          </Card>
+        </Link>
+      </div>
     </div>
+  )
+}
+
+function getGreeting() {
+  const h = new Date().getHours()
+  if (h < 12) return 'morning 🌅'
+  if (h < 17) return 'afternoon ☀️'
+  return 'evening 🌙'
+}
+
+const REPAIR_STATUS_COLOR: Record<string, 'blue' | 'yellow' | 'orange' | 'purple' | 'green' | 'gray' | 'red'> = {
+  RECEIVED: 'blue', DIAGNOSING: 'yellow', AWAITING_PARTS: 'orange',
+  IN_REPAIR: 'purple', READY: 'green', DELIVERED: 'gray', CANCELLED: 'red',
+}
+const REPAIR_STATUS_LABEL: Record<string, string> = {
+  RECEIVED: 'Received', DIAGNOSING: 'Diagnosing', AWAITING_PARTS: 'Awaiting Parts',
+  IN_REPAIR: 'In Repair', READY: 'Ready', DELIVERED: 'Delivered', CANCELLED: 'Cancelled',
+}
+function RepairBadge({ status }: { status: string }) {
+  return <Badge color={REPAIR_STATUS_COLOR[status] ?? 'gray'}>{REPAIR_STATUS_LABEL[status] ?? status}</Badge>
+}
+
+const NET_COLORS: Record<string, string> = {
+  JAZZ: 'bg-red-100 text-red-700', TELENOR: 'bg-blue-100 text-blue-700',
+  ZONG: 'bg-purple-100 text-purple-700', UFONE: 'bg-green-100 text-green-700',
+  WARID: 'bg-orange-100 text-orange-700',
+}
+function NetworkDot({ network }: { network: string }) {
+  return (
+    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold ${NET_COLORS[network] ?? 'bg-gray-100 text-gray-700'}`}>
+      {network}
+    </span>
   )
 }
