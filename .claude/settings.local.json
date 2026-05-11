@@ -7,7 +7,20 @@
       "PowerShell(Get-Content \"C:\\\\Users\\\\SAJJAD~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\E--Saas-Projects-Mobile-Shop\\\\46dd067e-233c-4cfa-805b-50f667c49a15\\\\tasks\\\\bp90kn1kn.output\" | Where-Object { $_ -match \"success|complete|Your project|cd mobile|npm run\" } | Select-Object -Last 10)",
       "Bash(git push *)",
       "Bash(pnpm lint *)",
-      "Bash(pnpm --filter api lint)"
+      "Bash(pnpm --filter api lint)",
+      "Bash(git commit -m ' *)",
+      "Bash(pnpm build *)",
+      "Bash(git add *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(pnpm --filter api build)",
+      "Bash(pnpm --filter @repo/web build)",
+      "Bash(node -e \"const pkg = require\\('./node_modules/@react-native-async-storage/async-storage/package.json'\\); console.log\\(pkg.version\\)\")",
+      "Bash(node -e \"const d=require\\('./node_modules/expo/package.json'\\); console.log\\('Expo version:', d.version\\)\")",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/@react-native-async-storage/async-storage/package.json'\\).version\\)\")",
+      "Bash(pnpm install *)",
+      "Bash(Remove-Item -Recurse -Force \"E:\\\\Saas Projects\\\\Mobile Shop\\\\apps\\\\mobile\\\\node_modules\" -ErrorAction SilentlyContinue)",
+      "Bash(Write-Host \"Done\")"
     ]
   }
 }

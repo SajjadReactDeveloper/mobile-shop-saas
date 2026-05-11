@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { authApi } from '@/lib/auth'
+import { OnboardingTour } from '@/components/OnboardingTour'
 import {
   LayoutDashboard, ShoppingCart, Package, Smartphone, Wrench,
   Users, Wallet, PhoneCall, BarChart3, LogOut, Menu, DollarSign,
@@ -181,6 +182,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {children}
           </div>
         </main>
+        <OnboardingTour />
       </div>
     </div>
   )

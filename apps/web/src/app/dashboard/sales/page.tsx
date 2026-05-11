@@ -50,37 +50,59 @@ function ImeiPicker({ productId, selected, onSelect }: { productId: string; sele
 }
 
 function InvoiceModal({ sale, onClose }: { sale: Sale; onClose: () => void }) {
-  const printReceipt = () => {
-    const w = window.open('', '_blank', 'width=400,height=600')
-    if (!w) return
-    w.document.write(`<html><head><title>${sale.invoiceNumber}</title>
-    <style>body{font-family:monospace;font-size:13px;padding:20px;width:300px;margin:0}
-    h2{text-align:center;margin:0 0 4px}p{text-align:center;margin:2px 0;font-size:11px}
-    hr{border:none;border-top:1px dashed #ccc;margin:10px 0}
-    .row{display:flex;justify-content:space-between;margin:3px 0}
-    .total{font-weight:bold;font-size:15px}</style></head><body>
-    <h2>Mobile Shop</h2><p>${sale.invoiceNumber}</p>
-    <p>${new Date(sale.createdAt).toLocaleString('en-PK')}</p>
-    <hr/>${sale.items.map(i => `<div class="row"><span>${i.product.name} x${i.qty}</span><span>PKR ${(i.qty * i.unitPrice).toLocaleString()}</span></div>`).join('')}
-    <hr/><div class="row total"><span>Total</span><span>PKR ${Number(sale.total).toLocaleString()}</span></div>
-    <div class="row"><span>Paid</span><span>PKR ${Number(sale.amountPaid).toLocaleString()}</span></div>
-    <div class="row"><span>Method</span><span>${sale.paymentMethod}</span></div>
-    <hr/><p>Thank you for shopping!</p></body></html>`)
-    w.document.close(); w.print()
-  }
+  const printReceipt = () => window.print()
+  const credit = Number(sale.total) - Number(sale.amountPaid)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
-        <div className="bg-emerald-50 px-6 pt-8 pb-6 text-center border-b border-emerald-100">
-          <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-9 h-9 text-emerald-600" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      {/* Hidden 80mm thermal receipt — only shown when printing */}
+      <div id="thermal-receipt" style={{ fontFamily: 'monospace', fontSize: 12, width: 280, lineHeight: 1.5 }}>
+        <div style={{ textAlign: 'center', borderBottom: '1px dashed #ccc', paddingBottom: 8, marginBottom: 8 }}>
+          <div style={{ fontWeight: 'bold', fontSize: 16 }}>📱 Mobile Shop</div>
+          <div style={{ fontSize: 11 }}>{sale.invoiceNumber}</div>
+          <div style={{ fontSize: 10, color: '#555' }}>{new Date(sale.createdAt).toLocaleString('en-PK')}</div>
+          {sale.customer && <div style={{ fontSize: 10 }}>Customer: {sale.customer.name}</div>}
+        </div>
+        {sale.items.map((item, i) => (
+          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+            <span>{item.product.name} x{item.qty}</span>
+            <span>PKR {(item.qty * item.unitPrice).toLocaleString()}</span>
           </div>
-          <h2 className="text-xl font-bold text-gray-900">Sale Complete!</h2>
-          <p className="text-sm text-gray-500 mt-1 font-mono">{sale.invoiceNumber}</p>
+        ))}
+        <div style={{ borderTop: '1px dashed #ccc', marginTop: 8, paddingTop: 8 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: 14 }}>
+            <span>TOTAL</span><span>PKR {Number(sale.total).toLocaleString()}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
+            <span>Paid</span><span>PKR {Number(sale.amountPaid).toLocaleString()}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
+            <span>Method</span><span>{sale.paymentMethod}</span>
+          </div>
+          {credit > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#dc2626' }}>
+              <span>Udhaar</span><span>PKR {credit.toLocaleString()}</span>
+            </div>
+          )}
+        </div>
+        <div style={{ textAlign: 'center', marginTop: 12, fontSize: 10, borderTop: '1px dashed #ccc', paddingTop: 8 }}>
+          <div>Thank you for shopping! شکریہ</div>
+          <div style={{ color: '#888', marginTop: 2 }}>Mobile Shop SaaS</div>
+        </div>
+      </div>
+
+      {/* Screen modal */}
+      <div className="relative bg-white rounded-3xl shadow-2xl shadow-black/25 w-full max-w-sm overflow-hidden">
+        {/* Success header */}
+        <div className="bg-gradient-to-br from-emerald-500 to-green-600 px-6 pt-8 pb-6 text-center">
+          <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="w-9 h-9 text-white" />
+          </div>
+          <h2 className="text-xl font-extrabold text-white">Sale Complete!</h2>
+          <p className="text-sm text-emerald-100 mt-1 font-mono">{sale.invoiceNumber}</p>
         </div>
 
-        <div className="px-6 py-4">
+        <div className="px-6 py-5">
           <div className="space-y-2 mb-4">
             {sale.items.map((item, i) => (
               <div key={i} className="flex justify-between text-sm">
@@ -90,15 +112,15 @@ function InvoiceModal({ sale, onClose }: { sale: Sale; onClose: () => void }) {
             ))}
           </div>
           <div className="border-t border-dashed border-gray-200 pt-3 space-y-1.5">
-            <div className="flex justify-between font-bold text-gray-900">
+            <div className="flex justify-between font-bold text-gray-900 text-base">
               <span>Total</span><span>PKR {Number(sale.total).toLocaleString()}</span>
             </div>
             <div className="flex justify-between text-sm text-gray-500">
               <span>Paid</span><span>PKR {Number(sale.amountPaid).toLocaleString()}</span>
             </div>
-            {Number(sale.total) > Number(sale.amountPaid) && (
+            {credit > 0 && (
               <div className="flex justify-between text-sm font-semibold text-red-600">
-                <span>Credit (Udhaar)</span><span>PKR {(Number(sale.total) - Number(sale.amountPaid)).toLocaleString()}</span>
+                <span>Udhaar (Credit)</span><span>PKR {credit.toLocaleString()}</span>
               </div>
             )}
           </div>

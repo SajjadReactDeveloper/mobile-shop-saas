@@ -25,6 +25,14 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* ── 80mm thermal receipt print ── */
+@media print {
+  body * { visibility: hidden !important; }
+  #thermal-receipt, #thermal-receipt * { visibility: visible !important; }
+  #thermal-receipt { position: fixed; left: 0; top: 0; width: 80mm; padding: 4mm; }
+  @page { size: 80mm auto; margin: 0; }
+}
+
 /* Hide scrollbar everywhere it's not wanted */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

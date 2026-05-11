@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import { Wrench, Plus, X, ChevronRight, ArrowLeft } from 'lucide-react'
+import { Wrench, Plus, X, ChevronRight, ArrowLeft, Camera, Loader2 } from 'lucide-react'
 import { Button, Card, Badge, Modal, Input, TextArea, Select, PageHeader, Empty, PageLoader, Tabs, ListSkeleton } from '@/components/ui'
 
 type RepairStatus = 'RECEIVED' | 'DIAGNOSING' | 'AWAITING_PARTS' | 'IN_REPAIR' | 'READY' | 'DELIVERED' | 'CANCELLED'
@@ -34,10 +34,57 @@ const NEXT_STATUS: Partial<Record<RepairStatus, RepairStatus>> = {
   AWAITING_PARTS: 'IN_REPAIR', IN_REPAIR: 'READY', READY: 'DELIVERED',
 }
 
+/* ─── Cloudinary Photo Upload ─── */
+function PhotoUpload({ value, onChange }: { value: string; onChange: (url: string) => void }) {
+  const [uploading, setUploading] = useState(false)
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !cloudName || !uploadPreset) return
+    setUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('upload_preset', uploadPreset)
+      fd.append('folder', 'repairs')
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: fd })
+      const data = await res.json() as { secure_url?: string }
+      if (data.secure_url) onChange(data.secure_url)
+    } catch { /* silent fail */ }
+    finally { setUploading(false) }
+  }
+
+  if (!cloudName || !uploadPreset) return null // gracefully hidden if not configured
+
+  return (
+    <div>
+      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Device Photo</p>
+      {value ? (
+        <div className="relative inline-block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={value} alt="Device" className="w-full h-32 object-cover rounded-xl border border-gray-100" />
+          <button type="button" onClick={() => onChange('')}
+            className="absolute top-1.5 right-1.5 w-6 h-6 bg-black/60 rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-colors">
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      ) : (
+        <label className={`flex flex-col items-center gap-2 p-4 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${uploading ? 'border-violet-300 bg-violet-50' : 'border-gray-200 hover:border-violet-300 hover:bg-violet-50/50'}`}>
+          {uploading ? <Loader2 className="w-6 h-6 text-violet-500 animate-spin" /> : <Camera className="w-6 h-6 text-gray-400" />}
+          <span className="text-xs text-gray-500">{uploading ? 'Uploading…' : 'Tap to upload photo'}</span>
+          <input type="file" accept="image/*" className="hidden" onChange={handleFile} disabled={uploading} />
+        </label>
+      )}
+    </div>
+  )
+}
+
 /* ─── New Job Modal ─── */
 function NewJobModal({ onClose }: { onClose: () => void }) {
   const qc = useQueryClient()
-  const [form, setForm] = useState({ customerId: '', deviceBrand: '', deviceModel: '', faultDesc: '', advancePaid: '0', totalQuote: '', notes: '' })
+  const [form, setForm] = useState({ customerId: '', deviceBrand: '', deviceModel: '', faultDesc: '', advancePaid: '0', totalQuote: '', notes: '', photoUrl: '' })
   const [customerSearch, setCustomerSearch] = useState('')
   const [showDrop, setShowDrop] = useState(false)
   const { data: customers = [] } = useQuery<Customer[]>({ queryKey: ['customers'], queryFn: () => api.get('/customers').then(r => r.data) })
@@ -50,7 +97,7 @@ function NewJobModal({ onClose }: { onClose: () => void }) {
   const filtered = customers.filter(c => c.name.toLowerCase().includes(customerSearch.toLowerCase()) || (c.phone ?? '').includes(customerSearch))
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
-    mut.mutate({ customerId: form.customerId, deviceBrand: form.deviceBrand, deviceModel: form.deviceModel, faultDesc: form.faultDesc, advancePaid: Number(form.advancePaid) || undefined, totalQuote: form.totalQuote ? Number(form.totalQuote) : undefined, notes: form.notes || undefined })
+    mut.mutate({ customerId: form.customerId, deviceBrand: form.deviceBrand, deviceModel: form.deviceModel, faultDesc: form.faultDesc, advancePaid: Number(form.advancePaid) || undefined, totalQuote: form.totalQuote ? Number(form.totalQuote) : undefined, notes: form.notes || undefined, photoUrl: form.photoUrl || undefined })
   }
   return (
     <form onSubmit={submit} className="space-y-4">
@@ -96,6 +143,7 @@ function NewJobModal({ onClose }: { onClose: () => void }) {
         <Input label="Quote (PKR)" type="number" min="0" value={form.totalQuote} onChange={e => set('totalQuote', e.target.value)} placeholder="Optional" />
       </div>
       <Input label="Notes" value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="Optional" />
+      <PhotoUpload value={form.photoUrl} onChange={url => set('photoUrl', url)} />
       {mut.error && <p className="text-xs text-red-500">{(mut.error as { response?: { data?: { message?: string } } }).response?.data?.message ?? 'Failed'}</p>}
       <div className="flex gap-2 pt-2">
         <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>Cancel</Button>

@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { X, Loader2 } from 'lucide-react'
+import { X, Loader2, AlertCircle, CheckCircle2, Info, AlertTriangle } from 'lucide-react'
 
 /* ─────────────────────────────────────────────
    Button
@@ -11,11 +11,11 @@ type BtnSize = 'sm' | 'md' | 'lg'
 
 const btnBase = 'inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none cursor-pointer'
 const btnVariants: Record<BtnVariant, string> = {
-  primary:   'bg-violet-600 text-white hover:bg-violet-700 active:scale-[0.97] focus-visible:ring-violet-500 shadow-sm shadow-violet-200',
+  primary:   'bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:from-violet-700 hover:to-purple-700 active:scale-[0.97] focus-visible:ring-violet-500 shadow-md shadow-violet-200/60',
   secondary: 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] focus-visible:ring-gray-300 shadow-sm',
-  danger:    'bg-red-600 text-white hover:bg-red-700 active:scale-[0.97] focus-visible:ring-red-500 shadow-sm shadow-red-200',
+  danger:    'bg-gradient-to-r from-red-600 to-rose-600 text-white hover:from-red-700 hover:to-rose-700 active:scale-[0.97] focus-visible:ring-red-500 shadow-md shadow-red-200/60',
   ghost:     'text-gray-600 hover:bg-gray-100 hover:text-gray-900 active:scale-[0.97] focus-visible:ring-gray-300',
-  success:   'bg-emerald-600 text-white hover:bg-emerald-700 active:scale-[0.97] focus-visible:ring-emerald-500 shadow-sm shadow-emerald-200',
+  success:   'bg-gradient-to-r from-emerald-600 to-green-600 text-white hover:from-emerald-700 hover:to-green-700 active:scale-[0.97] focus-visible:ring-emerald-500 shadow-md shadow-emerald-200/60',
 }
 const btnSizes: Record<BtnSize, string> = {
   sm:  'h-8 px-3 text-xs',
@@ -50,13 +50,15 @@ const inputBase = 'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
   error?: string
+  hint?: string
 }
-export function Input({ label, error, className = '', ...props }: InputProps) {
+export function Input({ label, error, hint, className = '', ...props }: InputProps) {
   return (
     <div className="flex flex-col gap-1.5">
       {label && <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{label}</label>}
       <input className={`${inputBase} ${error ? 'border-red-400 focus:ring-red-400/50 focus:border-red-400' : ''} ${className}`} {...props} />
       {error && <span className="text-xs text-red-500">{error}</span>}
+      {hint && !error && <span className="text-xs text-gray-400">{hint}</span>}
     </div>
   )
 }
@@ -86,12 +88,33 @@ export function TextArea({ label, className = '', ...props }: TextAreaProps) {
 }
 
 /* ─────────────────────────────────────────────
+   Alert
+───────────────────────────────────────────── */
+type AlertVariant = 'info' | 'success' | 'warning' | 'error'
+const alertStyles: Record<AlertVariant, { wrap: string; icon: React.ElementType; iconClass: string }> = {
+  info:    { wrap: 'bg-blue-50 border-blue-200 text-blue-800',   icon: Info,           iconClass: 'text-blue-500' },
+  success: { wrap: 'bg-emerald-50 border-emerald-200 text-emerald-800', icon: CheckCircle2,  iconClass: 'text-emerald-500' },
+  warning: { wrap: 'bg-amber-50 border-amber-200 text-amber-800', icon: AlertTriangle,  iconClass: 'text-amber-500' },
+  error:   { wrap: 'bg-red-50 border-red-200 text-red-800',      icon: AlertCircle,    iconClass: 'text-red-500' },
+}
+interface AlertProps { variant?: AlertVariant; children: React.ReactNode; className?: string }
+export function Alert({ variant = 'info', children, className = '' }: AlertProps) {
+  const s = alertStyles[variant]
+  return (
+    <div className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-sm ${s.wrap} ${className}`}>
+      <s.icon className={`w-4 h-4 mt-0.5 shrink-0 ${s.iconClass}`} />
+      <div className="flex-1">{children}</div>
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────────
    Card
 ───────────────────────────────────────────── */
-interface CardProps { children: React.ReactNode; className?: string; padding?: boolean }
-export function Card({ children, className = '', padding = true }: CardProps) {
+interface CardProps { children: React.ReactNode; className?: string; padding?: boolean; hover?: boolean }
+export function Card({ children, className = '', padding = true, hover = false }: CardProps) {
   return (
-    <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm ${padding ? 'p-5' : ''} ${className}`}>
+    <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm ${hover ? 'hover:shadow-md hover:border-gray-200 transition-all duration-200 cursor-pointer' : ''} ${padding ? 'p-5' : ''} ${className}`}>
       {children}
     </div>
   )
@@ -100,7 +123,7 @@ export function Card({ children, className = '', padding = true }: CardProps) {
 /* ─────────────────────────────────────────────
    Badge
 ───────────────────────────────────────────── */
-type BadgeColor = 'blue' | 'green' | 'red' | 'yellow' | 'purple' | 'gray' | 'orange' | 'cyan' | 'pink'
+type BadgeColor = 'blue' | 'green' | 'red' | 'yellow' | 'purple' | 'gray' | 'orange' | 'cyan' | 'pink' | 'violet'
 const badgeColors: Record<BadgeColor, string> = {
   blue:   'bg-blue-50 text-blue-700 ring-blue-200',
   green:  'bg-emerald-50 text-emerald-700 ring-emerald-200',
@@ -111,6 +134,7 @@ const badgeColors: Record<BadgeColor, string> = {
   orange: 'bg-orange-50 text-orange-700 ring-orange-200',
   cyan:   'bg-cyan-50 text-cyan-700 ring-cyan-200',
   pink:   'bg-pink-50 text-pink-700 ring-pink-200',
+  violet: 'bg-violet-50 text-violet-700 ring-violet-200',
 }
 interface BadgeProps { color?: BadgeColor; children: React.ReactNode; className?: string }
 export function Badge({ color = 'gray', children, className = '' }: BadgeProps) {
@@ -129,14 +153,14 @@ const modalSizes = { sm: 'max-w-sm', md: 'max-w-lg', lg: 'max-w-2xl', xl: 'max-w
 export function Modal({ open, onClose, title, children, size = 'md' }: ModalProps) {
   if (!open) return null
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className={`relative w-full ${modalSizes[size]} bg-white rounded-2xl shadow-2xl shadow-black/20 flex flex-col max-h-[90vh] ring-1 ring-black/5`}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/80 rounded-t-2xl">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className={`relative w-full ${modalSizes[size]} bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl shadow-black/25 flex flex-col max-h-[92vh] ring-1 ring-black/5`}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
           <h2 className="text-base font-bold text-gray-900">{title}</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-700 hover:bg-gray-200 rounded-lg p-1.5 transition-all"
+            className="text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg p-1.5 transition-all"
           >
             <X className="w-4 h-4" />
           </button>
@@ -163,7 +187,7 @@ interface StatProps {
 }
 export function Stat({ label, value, sub, icon: Icon, color, iconColor, trend }: StatProps) {
   return (
-    <Card className="relative overflow-hidden">
+    <Card className="relative overflow-hidden group">
       <div className="flex items-start justify-between">
         <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shadow-sm ${color}`}>
           <Icon className={`w-5 h-5 ${iconColor ?? 'text-current'}`} />
@@ -205,8 +229,10 @@ export function PageHeader({ title, subtitle, action }: PageHeaderProps) {
 interface EmptyProps { icon: string; title: string; desc: string; action?: React.ReactNode }
 export function Empty({ icon, title, desc, action }: EmptyProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-center px-6">
-      <div className="text-5xl mb-4 select-none">{icon}</div>
+    <div className="flex flex-col items-center justify-center py-16 text-center px-6">
+      <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4 text-3xl select-none shadow-inner border border-gray-100">
+        {icon}
+      </div>
       <h3 className="text-base font-bold text-gray-900 mb-1">{title}</h3>
       <p className="text-sm text-gray-400 max-w-xs mb-5 leading-relaxed">{desc}</p>
       {action}
@@ -226,7 +252,7 @@ export function Table({ children, className = '' }: { children: React.ReactNode;
 }
 export function Th({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <th className={`text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider px-5 py-3 bg-gray-50/80 first:rounded-tl-none last:rounded-tr-none ${className}`}>
+    <th className={`text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider px-5 py-3 bg-gray-50/80 ${className}`}>
       {children}
     </th>
   )
@@ -262,15 +288,14 @@ function Sk({ className = '' }: { className?: string }) {
   return <div className={`animate-pulse bg-gray-100 rounded-xl ${className}`} />
 }
 
-/** Generic shimmer block — set width/height via className */
 export function Skeleton({ className = '' }: { className?: string }) {
   return <Sk className={className} />
 }
 
-/** Stat card grid skeleton (Dashboard / Reports) */
 export function StatsSkeleton({ count = 4 }: { count?: number }) {
+  const colClass = count === 2 ? 'lg:grid-cols-2' : count === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'
   return (
-    <div className={`grid grid-cols-2 lg:grid-cols-${count} gap-4`}>
+    <div className={`grid grid-cols-2 ${colClass} gap-4`}>
       {Array.from({ length: count }).map((_, i) => (
         <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
           <Sk className="w-11 h-11 rounded-2xl" />
@@ -284,18 +309,15 @@ export function StatsSkeleton({ count = 4 }: { count?: number }) {
   )
 }
 
-/** Table skeleton — header row + data rows */
 export function TableSkeleton({ rows = 6, cols = 5 }: { rows?: number; cols?: number }) {
   const widths = ['w-2/5', 'w-1/4', 'w-1/5', 'w-1/4', 'w-1/6']
   return (
     <div className="overflow-hidden">
-      {/* header */}
       <div className="flex gap-4 px-5 py-3 bg-gray-50/80 border-b border-gray-100">
         {Array.from({ length: cols }).map((_, i) => (
           <Sk key={i} className={`h-3 rounded-md ${widths[i % widths.length]}`} />
         ))}
       </div>
-      {/* rows */}
       {Array.from({ length: rows }).map((_, r) => (
         <div key={r} className="flex gap-4 items-center px-5 py-4 border-b border-gray-50">
           <div className="flex-1 space-y-1.5">
@@ -311,7 +333,6 @@ export function TableSkeleton({ rows = 6, cols = 5 }: { rows?: number; cols?: nu
   )
 }
 
-/** List skeleton — avatar + two text lines per row (Customers, Repairs, Staff) */
 export function ListSkeleton({ rows = 6 }: { rows?: number }) {
   return (
     <div className="divide-y divide-gray-50">
@@ -329,7 +350,6 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
   )
 }
 
-/** Account card stack skeleton (EasyLoad, Easypaisa) */
 export function CardListSkeleton({ rows = 3 }: { rows?: number }) {
   return (
     <div className="space-y-3">
@@ -359,7 +379,6 @@ export function CardListSkeleton({ rows = 3 }: { rows?: number }) {
   )
 }
 
-/** Dashboard page skeleton */
 export function DashboardSkeleton() {
   return (
     <div className="space-y-6">
