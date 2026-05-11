@@ -135,11 +135,10 @@ export default function App() {
           return (
             <TouchableOpacity
               key={tab.id}
-              style={s.tabItem}
+              style={[s.tabItem, active && s.tabItemActive]}
               onPress={() => navigate(tab.id)}
               activeOpacity={0.7}
             >
-              {active && <View style={s.tabIndicator} />}
               <View style={[s.tabIconWrap, active && s.tabIconWrapActive]}>
                 <Text style={s.tabIcon}>{tab.icon}</Text>
               </View>
@@ -171,15 +170,17 @@ const s = StyleSheet.create({
     borderTopColor: '#ede9fe',
     height: TAB_BAR_HEIGHT,
     paddingBottom: Platform.OS === 'ios' ? 20 : 0,
-    paddingTop: 6,
+    paddingTop: 0,
     shadowColor: '#7c3aed',
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.07,
     shadowRadius: 10,
     elevation: 12,
   },
-  tabItem:        { flex: 1, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 2 },
-  tabIndicator:   { position: 'absolute', top: -1, left: '20%', right: '20%', height: 3, backgroundColor: '#7c3aed', borderRadius: 3 },
+  // Each tab item shows its active state via a top border — avoids all the
+  // absolute-positioning maths that made the old indicator misalign.
+  tabItem:        { flex: 1, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 8, borderTopWidth: 3, borderTopColor: 'transparent' },
+  tabItemActive:  { borderTopColor: '#7c3aed' },
   tabIconWrap:    { width: 36, height: 28, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
   tabIconWrapActive: { backgroundColor: '#f5f3ff' },
   tabIcon:        { fontSize: 20 },

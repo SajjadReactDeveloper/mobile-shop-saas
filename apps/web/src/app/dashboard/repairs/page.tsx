@@ -115,7 +115,7 @@ function NewJobModal({ onClose }: { onClose: () => void }) {
           </div>
         ) : (
           <div className="relative">
-            <input className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500"
+            <input className="w-full px-3 py-2 text-sm text-gray-900 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 placeholder:text-gray-400"
               placeholder="Search customer…" value={customerSearch}
               onChange={e => { setCustomerSearch(e.target.value); setShowDrop(true) }}
               onFocus={() => setShowDrop(true)} onBlur={() => setTimeout(() => setShowDrop(false), 150)} />
