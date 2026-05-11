@@ -7,7 +7,7 @@ import {
   ShoppingCart, Search, Plus, Minus, Trash2, X,
   CheckCircle, Receipt, Clock, User, Printer,
 } from 'lucide-react'
-import { Button, Card, Badge, PageLoader, TableSkeleton } from '@/components/ui'
+import { Button, Card, Badge, TableSkeleton } from '@/components/ui'
 
 type PaymentMethod = 'CASH' | 'EASYPAISA' | 'JAZZCASH' | 'BANK_TRANSFER' | 'CREDIT'
 

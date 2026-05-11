@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { Save, Plus, CheckCircle, ChevronDown, Trash2 } from 'lucide-react'
-import { Button, Card, Badge, Modal, Input, Select, PageHeader, PageLoader, Tabs, ListSkeleton, StatsSkeleton } from '@/components/ui'
+import { Button, Card, Badge, Modal, Input, Select, PageHeader, Tabs, ListSkeleton, StatsSkeleton } from '@/components/ui'
 
 type UserRole = 'OWNER' | 'CASHIER' | 'TECHNICIAN'
 type SubscriptionTier = 'FREE' | 'PRO' | 'BUSINESS'

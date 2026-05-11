@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { DollarSign, Plus, Lock, History, CheckCircle, ShoppingCart, PhoneCall, Wallet, Wrench } from 'lucide-react'
-import { Button, Card, Badge, Modal, Input, PageHeader, Empty, PageLoader, CardListSkeleton } from '@/components/ui'
+import { Button, Card, Badge, Modal, Input, PageHeader, Empty, CardListSkeleton } from '@/components/ui'
 
 interface CashExpense { id: string; description: string; amount: number; createdAt: string }
 interface CashRegister {

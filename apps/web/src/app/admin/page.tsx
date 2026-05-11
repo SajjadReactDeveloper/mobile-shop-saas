@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
@@ -9,7 +8,7 @@ import {
   CheckCircle, AlertTriangle, Clock, XCircle,
   Smartphone, BarChart3, RefreshCw,
 } from 'lucide-react'
-import { Card, Badge, StatsSkeleton, ListSkeleton, Alert } from '@/components/ui'
+import { Badge, Alert } from '@/components/ui'
 
 interface AdminStats {
   totalShops: number
@@ -43,7 +42,6 @@ const STATUS_ICON: Record<string, React.ElementType> = {
 
 export default function AdminPage() {
   const router = useRouter()
-  const [unauthorized, setUnauthorized] = useState(false)
 
   const { data: stats, isLoading: statsLoading, error: statsError } = useQuery<AdminStats>({
     queryKey: ['admin-stats'],
@@ -57,14 +55,8 @@ export default function AdminPage() {
     retry: false,
   })
 
-  useEffect(() => {
-    if (statsError) {
-      const status = (statsError as { response?: { status?: number } }).response?.status
-      if (status === 401 || status === 403) {
-        setUnauthorized(true)
-      }
-    }
-  }, [statsError])
+  const errorStatus = (statsError as { response?: { status?: number } } | null)?.response?.status
+  const unauthorized = errorStatus === 401 || errorStatus === 403
 
   if (unauthorized) {
     return (

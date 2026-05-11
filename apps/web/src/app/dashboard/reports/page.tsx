@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { TrendingUp, Package, Users, Calendar } from 'lucide-react'
-import { Card, Badge, PageHeader, PageLoader, Stat, StatsSkeleton, TableSkeleton } from '@/components/ui'
+import { Card, Badge, PageHeader, Stat, StatsSkeleton, TableSkeleton } from '@/components/ui'
 
 interface Overview {
   period: { from: string; to: string }
