@@ -6,4 +6,4 @@
  * only adds comfortable breathing room between the spacer bottom and the
  * first line of header text.  14 dp works well on all device sizes.
  */
-export const STATUS_TOP = 14
+export const STATUS_TOP = 24
