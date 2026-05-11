@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { TrendingUp, Package, Users, Calendar } from 'lucide-react'
-import { Card, Badge, PageHeader, PageLoader, Stat } from '@/components/ui'
+import { Card, Badge, PageHeader, PageLoader, Stat, StatsSkeleton, TableSkeleton } from '@/components/ui'
 
 interface Overview {
   period: { from: string; to: string }
@@ -112,7 +112,7 @@ export default function ReportsPage() {
         )}
       </div>
 
-      {ovLoading ? <PageLoader /> : overview ? (
+      {ovLoading ? <StatsSkeleton count={4} /> : overview ? (
         <>
           {/* KPI */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -147,7 +147,7 @@ export default function ReportsPage() {
             <div className="px-5 py-4 border-b border-gray-100">
               <h2 className="text-sm font-bold text-gray-900">Top Products by Revenue</h2>
             </div>
-            {tpLoading ? <PageLoader /> : topProducts.length === 0 ? (
+            {tpLoading ? <TableSkeleton rows={5} cols={3} /> : topProducts.length === 0 ? (
               <p className="text-sm text-gray-400 text-center py-8">No sales in this period</p>
             ) : (
               <div className="divide-y divide-gray-50">

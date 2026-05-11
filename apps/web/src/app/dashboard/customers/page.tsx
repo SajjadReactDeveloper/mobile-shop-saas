@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { Plus, Search, ChevronRight, MessageCircle, Banknote, ArrowLeft, AlertTriangle } from 'lucide-react'
-import { Button, Card, Badge, Modal, Input, PageHeader, Empty, PageLoader, Tabs } from '@/components/ui'
+import { Button, Card, Badge, Modal, Input, PageHeader, Empty, PageLoader, Tabs, ListSkeleton } from '@/components/ui'
 
 interface LedgerEntry { id: string; type: 'CREDIT' | 'PAYMENT'; amount: number; description: string; createdAt: string }
 interface Sale { id: string; invoiceNumber: string; total: number; createdAt: string }
@@ -218,7 +218,7 @@ export default function CustomersPage() {
       </div>
 
       <Card padding={false}>
-        {isLoading ? <PageLoader /> : filtered.length === 0 ? (
+        {isLoading ? <ListSkeleton rows={7} /> : filtered.length === 0 ? (
           <Empty icon="👤" title={search ? 'No customers found' : 'No customers yet'} desc="Add customers to track sales and udhaar."
             action={!search ? <Button onClick={() => setShowAdd(true)}><Plus className="w-4 h-4" /> Add Customer</Button> : undefined} />
         ) : (

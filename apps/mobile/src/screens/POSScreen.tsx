@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  TextInput, Modal, ActivityIndicator, Alert, FlatList,
+  TextInput, Modal, Alert, FlatList,
 } from 'react-native'
 import { api } from '../lib/api'
+import { POSScreenSkeleton } from '../components/Skeleton'
 
 type PaymentMethod = 'CASH' | 'EASYPAISA' | 'JAZZCASH' | 'BANK_TRANSFER' | 'CREDIT'
 
@@ -98,7 +99,7 @@ export function POSScreen() {
     } finally { setPlacing(false) }
   }
 
-  if (loading) return <View style={s.center}><ActivityIndicator size="large" color="#2563eb" /></View>
+  if (loading) return <POSScreenSkeleton />
 
   return (
     <View style={s.container}>

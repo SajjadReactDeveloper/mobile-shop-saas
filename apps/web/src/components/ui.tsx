@@ -256,6 +256,145 @@ export function PageLoader() {
 }
 
 /* ─────────────────────────────────────────────
+   Skeleton Loaders
+───────────────────────────────────────────── */
+function Sk({ className = '' }: { className?: string }) {
+  return <div className={`animate-pulse bg-gray-100 rounded-xl ${className}`} />
+}
+
+/** Generic shimmer block — set width/height via className */
+export function Skeleton({ className = '' }: { className?: string }) {
+  return <Sk className={className} />
+}
+
+/** Stat card grid skeleton (Dashboard / Reports) */
+export function StatsSkeleton({ count = 4 }: { count?: number }) {
+  return (
+    <div className={`grid grid-cols-2 lg:grid-cols-${count} gap-4`}>
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4">
+          <Sk className="w-11 h-11 rounded-2xl" />
+          <div className="space-y-2">
+            <Sk className="h-7 w-3/4" />
+            <Sk className="h-4 w-1/2" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** Table skeleton — header row + data rows */
+export function TableSkeleton({ rows = 6, cols = 5 }: { rows?: number; cols?: number }) {
+  const widths = ['w-2/5', 'w-1/4', 'w-1/5', 'w-1/4', 'w-1/6']
+  return (
+    <div className="overflow-hidden">
+      {/* header */}
+      <div className="flex gap-4 px-5 py-3 bg-gray-50/80 border-b border-gray-100">
+        {Array.from({ length: cols }).map((_, i) => (
+          <Sk key={i} className={`h-3 rounded-md ${widths[i % widths.length]}`} />
+        ))}
+      </div>
+      {/* rows */}
+      {Array.from({ length: rows }).map((_, r) => (
+        <div key={r} className="flex gap-4 items-center px-5 py-4 border-b border-gray-50">
+          <div className="flex-1 space-y-1.5">
+            <Sk className="h-4 w-3/5" />
+            <Sk className="h-3 w-2/5" />
+          </div>
+          {Array.from({ length: cols - 1 }).map((__, c) => (
+            <Sk key={c} className={`h-4 rounded-lg ${widths[(c + 1) % widths.length]}`} />
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** List skeleton — avatar + two text lines per row (Customers, Repairs, Staff) */
+export function ListSkeleton({ rows = 6 }: { rows?: number }) {
+  return (
+    <div className="divide-y divide-gray-50">
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="flex items-center gap-4 px-5 py-4">
+          <Sk className="w-10 h-10 rounded-full shrink-0" />
+          <div className="flex-1 space-y-2">
+            <Sk className="h-4 w-1/3" />
+            <Sk className="h-3 w-1/4" />
+          </div>
+          <Sk className="h-6 w-16 rounded-full" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** Account card stack skeleton (EasyLoad, Easypaisa) */
+export function CardListSkeleton({ rows = 3 }: { rows?: number }) {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Sk className="w-10 h-10 rounded-2xl shrink-0" />
+              <div className="space-y-2">
+                <Sk className="h-4 w-32" />
+                <Sk className="h-3 w-20" />
+              </div>
+            </div>
+            <div className="text-right space-y-2">
+              <Sk className="h-5 w-24 ml-auto" />
+              <Sk className="h-3 w-16 ml-auto" />
+            </div>
+          </div>
+          <div className="flex gap-2 mt-4">
+            <Sk className="h-8 flex-1 rounded-xl" />
+            <Sk className="h-8 flex-1 rounded-xl" />
+            <Sk className="h-8 flex-1 rounded-xl" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** Dashboard page skeleton */
+export function DashboardSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="space-y-1.5">
+        <Sk className="h-6 w-44" />
+        <Sk className="h-4 w-56" />
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {Array.from({ length: 4 }).map((_, i) => <Sk key={i} className="h-20 rounded-xl" />)}
+      </div>
+      <StatsSkeleton count={4} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
+            <div className="flex items-center gap-3">
+              <Sk className="w-8 h-8 rounded-lg" />
+              <div className="space-y-1.5">
+                <Sk className="h-4 w-28" />
+                <Sk className="h-3 w-20" />
+              </div>
+            </div>
+            {Array.from({ length: 4 }).map((__, j) => (
+              <div key={j} className="flex justify-between items-center py-2 border-b border-gray-50">
+                <Sk className="h-4 w-2/5" />
+                <Sk className="h-5 w-16 rounded-full" />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────────
    Tabs
 ───────────────────────────────────────────── */
 interface TabsProps { tabs: { key: string; label: string; count?: number }[]; active: string; onChange: (k: string) => void }

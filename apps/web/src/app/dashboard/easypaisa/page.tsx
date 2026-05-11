@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { Wallet, Plus, ArrowUpRight, ArrowDownLeft, History } from 'lucide-react'
-import { Button, Card, Badge, Modal, Input, Select, PageHeader, Empty, PageLoader } from '@/components/ui'
+import { Button, Card, Badge, Modal, Input, Select, PageHeader, Empty, PageLoader, CardListSkeleton } from '@/components/ui'
 
 type TxnType = 'SEND' | 'RECEIVE' | 'CASH_IN' | 'CASH_OUT' | 'WITHDRAW'
 
@@ -170,7 +170,7 @@ export default function EasypaisaPage() {
         action={<Button onClick={() => setModal('add-account')}><Plus className="w-4 h-4" /> Add Wallet</Button>}
       />
 
-      {isLoading ? <PageLoader /> : accounts.length === 0 ? (
+      {isLoading ? <CardListSkeleton rows={2} /> : accounts.length === 0 ? (
         <Card>
           <Empty icon="💰" title="No wallet accounts yet" desc="Add your Easypaisa or JazzCash agent wallet to track transactions."
             action={<Button onClick={() => setModal('add-account')}><Plus className="w-4 h-4" /> Add Wallet</Button>} />

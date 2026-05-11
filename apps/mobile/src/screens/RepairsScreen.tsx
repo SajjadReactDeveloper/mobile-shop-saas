@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  RefreshControl, ActivityIndicator, Alert, Modal, TextInput,
+  RefreshControl, Alert, Modal, TextInput,
 } from 'react-native'
 import { api } from '../lib/api'
+import { ListItemsSkeleton } from '../components/Skeleton'
 
 type RepairStatus = 'RECEIVED' | 'DIAGNOSING' | 'AWAITING_PARTS' | 'IN_REPAIR' | 'READY' | 'DELIVERED' | 'CANCELLED'
 
@@ -109,7 +110,7 @@ export function RepairsScreen() {
     (c.phone ?? '').includes(form.customerSearch)
   )
 
-  if (loading) return <View style={s.center}><ActivityIndicator size="large" color="#2563eb" /></View>
+  if (loading) return <ListItemsSkeleton rows={6} />
 
   const active = jobs.filter(j => j.status !== 'DELIVERED' && j.status !== 'CANCELLED')
   const done = jobs.filter(j => j.status === 'DELIVERED' || j.status === 'CANCELLED')

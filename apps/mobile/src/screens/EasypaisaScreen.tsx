@@ -4,6 +4,7 @@ import {
   RefreshControl, ActivityIndicator, Alert, Modal, TextInput,
 } from 'react-native'
 import { api } from '../lib/api'
+import { AccountCardsSkeleton } from '../components/Skeleton'
 
 type TxnType = 'SEND' | 'RECEIVE' | 'CASH_IN' | 'CASH_OUT' | 'WITHDRAW'
 
@@ -130,7 +131,7 @@ export function EasypaisaScreen() {
       : Number(txnAccount.currentBalance) - Number(txnForm.amount || 0)
     : 0
 
-  if (loading) return <View style={s.center}><ActivityIndicator size="large" color="#16a34a" /></View>
+  if (loading) return <AccountCardsSkeleton rows={2} />
 
   return (
     <View style={s.container}>

@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  RefreshControl, ActivityIndicator, Alert, Modal, TextInput,
+  RefreshControl, Alert, Modal, TextInput,
 } from 'react-native'
 import { api } from '../lib/api'
+import { AccountCardsSkeleton } from '../components/Skeleton'
 
 type Network = 'JAZZ' | 'TELENOR' | 'ZONG' | 'UFONE' | 'WARID'
 
@@ -89,7 +90,7 @@ export function EasyLoadScreen() {
     } finally { setSaving(false) }
   }
 
-  if (loading) return <View style={s.center}><ActivityIndicator size="large" color="#2563eb" /></View>
+  if (loading) return <AccountCardsSkeleton rows={3} />
 
   return (
     <View style={s.container}>

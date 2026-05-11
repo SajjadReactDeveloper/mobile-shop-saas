@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { View, Text, ScrollView, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native'
+import { View, Text, ScrollView, StyleSheet, RefreshControl } from 'react-native'
 import { api } from '../lib/api'
+import { DashboardScreenSkeleton } from '../components/Skeleton'
 
 export function DashboardScreen() {
   const [stats, setStats] = useState<{ products?: number; pendingRepairs?: number; customers?: number } | null>(null)
@@ -35,7 +36,7 @@ export function DashboardScreen() {
 
   const onRefresh = async () => { setRefreshing(true); await load(); setRefreshing(false) }
 
-  if (loading) return <View style={s.center}><ActivityIndicator size="large" color="#2563eb" /></View>
+  if (loading) return <DashboardScreenSkeleton />
 
   const cards = [
     { label: "Today's Revenue",  value: `PKR ${(todaySummary?.totalRevenue ?? 0).toLocaleString()}`,  sub: `${todaySummary?.totalSales ?? 0} transactions`, color: '#2563eb', bg: '#eff6ff' },

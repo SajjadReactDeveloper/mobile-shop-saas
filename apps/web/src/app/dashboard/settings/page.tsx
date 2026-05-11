@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { Save, Plus, CheckCircle, ChevronDown, Trash2 } from 'lucide-react'
-import { Button, Card, Badge, Modal, Input, Select, PageHeader, PageLoader, Tabs } from '@/components/ui'
+import { Button, Card, Badge, Modal, Input, Select, PageHeader, PageLoader, Tabs, ListSkeleton, StatsSkeleton } from '@/components/ui'
 
 type UserRole = 'OWNER' | 'CASHIER' | 'TECHNICIAN'
 type SubscriptionTier = 'FREE' | 'PRO' | 'BUSINESS'
@@ -113,7 +113,7 @@ function StaffTab() {
       </div>
 
       <Card padding={false}>
-        {isLoading ? <PageLoader /> : activeStaff.length === 0 ? (
+        {isLoading ? <ListSkeleton rows={4} /> : activeStaff.length === 0 ? (
           <div className="text-center py-10 text-gray-400 text-sm">No staff members yet</div>
         ) : (
           <div className="divide-y divide-gray-50">
@@ -259,7 +259,7 @@ export default function SettingsPage() {
         onChange={setTab}
       />
 
-      {isLoading ? <PageLoader /> : shop ? (
+      {isLoading ? <StatsSkeleton count={3} /> : shop ? (
         <>
           {tab === 'shop'    && <ShopTab shop={shop} />}
           {tab === 'staff'   && <StaffTab />}

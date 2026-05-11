@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { Wrench, Plus, X, ChevronRight, ArrowLeft } from 'lucide-react'
-import { Button, Card, Badge, Modal, Input, TextArea, Select, PageHeader, Empty, PageLoader, Tabs } from '@/components/ui'
+import { Button, Card, Badge, Modal, Input, TextArea, Select, PageHeader, Empty, PageLoader, Tabs, ListSkeleton } from '@/components/ui'
 
 type RepairStatus = 'RECEIVED' | 'DIAGNOSING' | 'AWAITING_PARTS' | 'IN_REPAIR' | 'READY' | 'DELIVERED' | 'CANCELLED'
 
@@ -302,7 +302,7 @@ export default function RepairsPage() {
       </div>
 
       <Card padding={false}>
-        {isLoading ? <PageLoader /> : jobs.length === 0 ? (
+        {isLoading ? <ListSkeleton rows={6} /> : jobs.length === 0 ? (
           <Empty icon="🔧" title="No repair jobs" desc="Create a job card to start tracking repairs."
             action={<Button onClick={() => setShowNew(true)}><Plus className="w-4 h-4" /> Create Job</Button>} />
         ) : (

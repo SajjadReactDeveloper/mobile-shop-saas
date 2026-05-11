@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  TextInput, Modal, RefreshControl, ActivityIndicator, Alert,
+  TextInput, Modal, RefreshControl, Alert,
 } from 'react-native'
 import { api } from '../lib/api'
+import { ListItemsSkeleton } from '../components/Skeleton'
 
 interface Product {
   id: string
@@ -91,7 +92,7 @@ export function InventoryScreen() {
     (p.brand ?? '').toLowerCase().includes(search.toLowerCase())
   )
 
-  if (loading) return <View style={s.center}><ActivityIndicator size="large" color="#2563eb" /></View>
+  if (loading) return <ListItemsSkeleton rows={8} />
 
   return (
     <View style={s.container}>

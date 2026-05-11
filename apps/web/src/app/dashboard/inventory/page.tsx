@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { Plus, Search, Eye, PlusCircle, AlertTriangle } from 'lucide-react'
-import { Button, Card, Badge, Modal, Input, Select, PageHeader, Empty, PageLoader, Table, Th, Td, Tabs } from '@/components/ui'
+import { Button, Card, Badge, Modal, Input, Select, PageHeader, Empty, PageLoader, Table, Th, Td, Tabs, TableSkeleton } from '@/components/ui'
 
 type ProductCategory = 'MOBILE' | 'ACCESSORY' | 'SIM' | 'CHARGER' | 'SPARE_PART' | 'OTHER'
 
@@ -213,7 +213,7 @@ export default function InventoryPage() {
       </div>
 
       <Card padding={false}>
-        {isLoading ? <PageLoader /> : filtered.length === 0 ? (
+        {isLoading ? <TableSkeleton rows={7} cols={6} /> : filtered.length === 0 ? (
           <Empty icon="📦" title="No products yet" desc="Add your first product to start tracking inventory."
             action={<Button onClick={() => setModal('add')}><Plus className="w-4 h-4" /> Add Product</Button>} />
         ) : (

@@ -7,7 +7,7 @@ import {
   Package, Users, Wrench, TrendingUp, AlertTriangle,
   ShoppingCart, PhoneCall, Wallet, DollarSign, ArrowRight,
 } from 'lucide-react'
-import { Stat, Card, Badge, PageLoader } from '@/components/ui'
+import { Stat, Card, Badge, DashboardSkeleton } from '@/components/ui'
 
 export default function DashboardPage() {
   const today = new Date().toISOString().split('T')[0]
@@ -37,7 +37,7 @@ export default function DashboardPage() {
     queryFn: () => api.get('/repairs?status=RECEIVED&status=IN_REPAIR&status=DIAGNOSING&status=AWAITING_PARTS').then((r) => r.data),
   })
 
-  if (isLoading) return <PageLoader />
+  if (isLoading) return <DashboardSkeleton />
 
   const revenue = todaySummary?.totalRevenue ?? 0
   const profit  = todaySummary?.grossProfit ?? 0

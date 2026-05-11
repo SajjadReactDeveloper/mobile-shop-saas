@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  RefreshControl, ActivityIndicator, Alert, Modal, TextInput,
+  RefreshControl, Alert, Modal, TextInput,
 } from 'react-native'
 import { api } from '../lib/api'
+import { AccountCardsSkeleton } from '../components/Skeleton'
 
 interface CashExpense { id: string; description: string; amount: number; createdAt: string }
 
@@ -91,7 +92,7 @@ export function CashRegisterScreen() {
     )
   }
 
-  if (loading) return <View style={s.center}><ActivityIndicator size="large" color="#2563eb" /></View>
+  if (loading) return <AccountCardsSkeleton rows={2} />
 
   const income = register
     ? Number(register.salesCash) + Number(register.easyLoadCash) + Number(register.easypaisaCash) + Number(register.repairCash)

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { Plus, ArrowDownCircle, ArrowUpCircle, TrendingUp, History } from 'lucide-react'
-import { Button, Card, Badge, Modal, Input, PageHeader, Empty, PageLoader } from '@/components/ui'
+import { Button, Card, Badge, Modal, Input, PageHeader, Empty, PageLoader, CardListSkeleton } from '@/components/ui'
 
 type Network = 'JAZZ' | 'TELENOR' | 'ZONG' | 'UFONE' | 'WARID'
 
@@ -214,7 +214,7 @@ export default function EasyLoadPage() {
       )}
 
       {/* Accounts */}
-      {isLoading ? <PageLoader /> : accounts.length === 0 ? (
+      {isLoading ? <CardListSkeleton rows={3} /> : accounts.length === 0 ? (
         <Card>
           <Empty icon="📱" title="No SIM accounts yet" desc="Add a SIM account to start managing easy load."
             action={<Button onClick={() => setModal('add')}><Plus className="w-4 h-4" /> Add SIM</Button>} />

@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  ActivityIndicator, Alert, TextInput,
+  Alert, TextInput,
 } from 'react-native'
 import { api } from '../lib/api'
+import { SettingsScreenSkeleton } from '../components/Skeleton'
 
 type UserRole = 'OWNER' | 'CASHIER' | 'TECHNICIAN'
 type SubscriptionTier = 'FREE' | 'PRO' | 'BUSINESS'
@@ -81,7 +82,7 @@ export function SettingsScreen({ onLogout }: Props) {
     ])
   }
 
-  if (loading) return <View style={s.center}><ActivityIndicator size="large" color="#2563eb" /></View>
+  if (loading) return <SettingsScreenSkeleton />
 
   const sub = shop?.subscription
   const tier = sub?.tier ?? 'FREE'

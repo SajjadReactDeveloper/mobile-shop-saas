@@ -7,7 +7,7 @@ import {
   ShoppingCart, Search, Plus, Minus, Trash2, X,
   CheckCircle, Receipt, Clock, User, Printer,
 } from 'lucide-react'
-import { Button, Card, Badge, PageLoader } from '@/components/ui'
+import { Button, Card, Badge, PageLoader, TableSkeleton } from '@/components/ui'
 
 type PaymentMethod = 'CASH' | 'EASYPAISA' | 'JAZZCASH' | 'BANK_TRANSFER' | 'CREDIT'
 
@@ -121,7 +121,7 @@ function RecentSales() {
     queryKey: ['sales', today],
     queryFn: () => api.get(`/sales?from=${today}&to=${today}`).then(r => r.data),
   })
-  if (isLoading) return <PageLoader />
+  if (isLoading) return <TableSkeleton rows={5} cols={4} />
   if (sales.length === 0) return (
     <div className="flex flex-col items-center justify-center py-20 text-gray-400">
       <Clock className="w-10 h-10 mb-3 text-gray-200" />

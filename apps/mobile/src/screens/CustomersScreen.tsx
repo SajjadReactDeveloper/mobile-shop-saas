@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  RefreshControl, ActivityIndicator, Alert, Modal, TextInput,
+  RefreshControl, Alert, Modal, TextInput,
 } from 'react-native'
 import { api } from '../lib/api'
+import { ListItemsSkeleton, Sk } from '../components/Skeleton'
 
 interface LedgerEntry { id: string; type: 'CREDIT' | 'PAYMENT'; amount: number; description: string; createdAt: string }
 interface Sale { id: string; invoiceNumber: string; total: number; createdAt: string }
@@ -139,7 +140,9 @@ export function CustomersScreen() {
         </View>
 
         {detailLoading ? (
-          <View style={s.center}><ActivityIndicator size="large" color="#2563eb" /></View>
+          <View style={{ padding: 16, gap: 12 }}>
+            {Array.from({ length: 4 }).map((_, i) => <Sk key={i} h={48} radius={12} />)}
+          </View>
         ) : detail ? (
           <ScrollView>
             {/* Balance card */}
@@ -244,7 +247,7 @@ export function CustomersScreen() {
   }
 
   // ─── List View ───────────────────────────────────────────────
-  if (loading) return <View style={s.center}><ActivityIndicator size="large" color="#2563eb" /></View>
+  if (loading) return <ListItemsSkeleton rows={7} />
 
   return (
     <View style={s.container}>
