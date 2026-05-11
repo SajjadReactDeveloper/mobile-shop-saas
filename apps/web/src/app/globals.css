@@ -33,6 +33,11 @@ body {
   @page { size: 80mm auto; margin: 0; }
 }
 
+/* Cursor pointer on all interactive elements */
+button, [role="button"], [role="tab"], [role="menuitem"],
+select, label[for], summary { cursor: pointer; }
+a { cursor: pointer; }
+
 /* Hide scrollbar everywhere it's not wanted */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

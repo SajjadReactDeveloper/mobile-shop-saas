@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+﻿import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   TextInput, Modal, Alert, FlatList,
@@ -266,7 +266,7 @@ const s = StyleSheet.create({
   removeBtn:      { color: '#d1d5db', fontSize: 16, paddingLeft: 4 },
   section:        { backgroundColor: '#fff', marginHorizontal: 12, marginTop: 8, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#e5e7eb' },
   sectionTitle:   { fontSize: 12, fontWeight: '700', color: '#6b7280', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 },
-  selectedCustomer: { backgroundColor: '#eff6ff', borderRadius: 8, padding: 10, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  selectedCustomer: { backgroundColor: '#f5f3ff', borderRadius: 8, padding: 10, flexDirection: 'row', alignItems: 'center', gap: 8 },
   selectedCustomerName: { flex: 1, fontSize: 14, fontWeight: '600', color: '#1d4ed8' },
   owes:           { fontSize: 11, color: '#dc2626' },
   clearCustomer:  { color: '#6b7280', fontSize: 12 },
@@ -277,12 +277,12 @@ const s = StyleSheet.create({
   discountInput:  { borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, fontSize: 14, width: 100, textAlign: 'right' },
   payGrid:        { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
   payBtn:         { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8, borderWidth: 1, borderColor: '#e5e7eb', backgroundColor: '#f9fafb' },
-  payBtnActive:   { backgroundColor: '#2563eb', borderColor: '#2563eb' },
+  payBtnActive:   { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
   payBtnText:     { fontSize: 12, color: '#374151', fontWeight: '600' },
   payBtnTextActive: { color: '#fff' },
   changeLabel:    { fontSize: 14, color: '#16a34a', fontWeight: '600' },
   changeVal:      { fontSize: 14, color: '#16a34a', fontWeight: '700' },
-  checkoutBtn:    { backgroundColor: '#2563eb', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 12 },
+  checkoutBtn:    { backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 12 },
   checkoutBtnDisabled: { opacity: 0.5 },
   checkoutText:   { color: '#fff', fontWeight: '700', fontSize: 15 },
   modal:          { flex: 1, backgroundColor: '#fff' },
@@ -298,6 +298,6 @@ const s = StyleSheet.create({
   successEmoji:   { fontSize: 48, marginBottom: 12 },
   successTitle:   { fontSize: 20, fontWeight: '700', color: '#111827', marginBottom: 4 },
   successInv:     { fontSize: 14, color: '#6b7280', marginBottom: 20 },
-  successBtn:     { backgroundColor: '#2563eb', borderRadius: 12, paddingVertical: 12, paddingHorizontal: 32 },
+  successBtn:     { backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 12, paddingHorizontal: 32 },
   successBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 })

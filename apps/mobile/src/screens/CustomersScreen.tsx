@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+﻿import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   RefreshControl, Alert, Modal, TextInput,
@@ -347,10 +347,10 @@ const s = StyleSheet.create({
   header:           { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingTop: 52, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
   title:            { fontSize: 20, fontWeight: '700', color: '#111827' },
   subtitle:         { fontSize: 12, color: '#6b7280', marginTop: 2 },
-  addBtn:           { backgroundColor: '#2563eb', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8 },
+  addBtn:           { backgroundColor: '#7c3aed', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8 },
   addBtnText:       { color: '#fff', fontWeight: '700', fontSize: 13 },
   backBtn:          { padding: 4 },
-  backText:         { fontSize: 15, color: '#2563eb', fontWeight: '600' },
+  backText:         { fontSize: 15, color: '#7c3aed', fontWeight: '600' },
   payBtn:           { backgroundColor: '#16a34a', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8 },
   payBtnText:       { color: '#fff', fontWeight: '700', fontSize: 13 },
   alertBanner:      { backgroundColor: '#fefce8', borderBottomWidth: 1, borderBottomColor: '#fde68a', paddingVertical: 10, paddingHorizontal: 16 },
@@ -358,9 +358,9 @@ const s = StyleSheet.create({
   searchRow:        { flexDirection: 'row', gap: 8, padding: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
   searchInput:      { flex: 1, backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 9, fontSize: 14 },
   filterBtn:        { paddingHorizontal: 12, paddingVertical: 9, borderRadius: 10, borderWidth: 1, borderColor: '#e5e7eb', backgroundColor: '#fff', justifyContent: 'center' },
-  filterBtnActive:  { backgroundColor: '#eff6ff', borderColor: '#2563eb' },
+  filterBtnActive:  { backgroundColor: '#f5f3ff', borderColor: '#7c3aed' },
   filterBtnText:    { fontSize: 12, color: '#6b7280', fontWeight: '600' },
-  filterBtnTextActive: { color: '#2563eb' },
+  filterBtnTextActive: { color: '#7c3aed' },
   empty:            { textAlign: 'center', color: '#9ca3af', marginTop: 48, fontSize: 14, paddingHorizontal: 32 },
   custCard:         { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', marginHorizontal: 12, marginTop: 8, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#e5e7eb' },
   avatar:           { width: 40, height: 40, borderRadius: 20, backgroundColor: '#dbeafe', justifyContent: 'center', alignItems: 'center' },
@@ -409,7 +409,7 @@ const s = StyleSheet.create({
   previewRed:       { backgroundColor: '#fef2f2' },
   previewLabel:     { fontSize: 13, color: '#374151' },
   previewValue:     { fontSize: 14, fontWeight: '700', color: '#111827' },
-  saveBtn:          { backgroundColor: '#2563eb', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 24 },
+  saveBtn:          { backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 24 },
   saveBtnDisabled:  { opacity: 0.5 },
   saveBtnText:      { color: '#fff', fontWeight: '700', fontSize: 15 },
 })

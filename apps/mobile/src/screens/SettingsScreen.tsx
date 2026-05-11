@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+﻿import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   Alert, TextInput,
@@ -15,8 +15,8 @@ interface Shop { id: string; name: string; city?: string; address?: string; phon
 interface StaffUser { id: string; name: string; email?: string; phone?: string; role: UserRole; isActive: boolean }
 
 const ROLE_LABEL: Record<UserRole, string> = { OWNER: 'Owner', CASHIER: 'Cashier', TECHNICIAN: 'Technician' }
-const ROLE_COLOR: Record<UserRole, string> = { OWNER: '#7c3aed', CASHIER: '#2563eb', TECHNICIAN: '#d97706' }
-const ROLE_BG: Record<UserRole, string> = { OWNER: '#f5f3ff', CASHIER: '#eff6ff', TECHNICIAN: '#fffbeb' }
+const ROLE_COLOR: Record<UserRole, string> = { OWNER: '#7c3aed', CASHIER: '#7c3aed', TECHNICIAN: '#d97706' }
+const ROLE_BG: Record<UserRole, string> = { OWNER: '#f5f3ff', CASHIER: '#f5f3ff', TECHNICIAN: '#fffbeb' }
 
 const TIER_BADGE: Record<SubscriptionTier, { bg: string; text: string }> = {
   FREE:     { bg: '#f3f4f6', text: '#374151' },
@@ -247,15 +247,15 @@ const s = StyleSheet.create({
   logoutText:       { color: '#dc2626', fontWeight: '700', fontSize: 13 },
   tabBar:           { flexDirection: 'row', backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb', paddingHorizontal: 16, paddingTop: 8 },
   tabItem:          { flex: 1, paddingVertical: 10, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: 'transparent' },
-  tabItemActive:    { borderBottomColor: '#2563eb' },
+  tabItemActive:    { borderBottomColor: '#7c3aed' },
   tabLabel:         { fontSize: 12, fontWeight: '600', color: '#9ca3af' },
-  tabLabelActive:   { color: '#2563eb' },
+  tabLabelActive:   { color: '#7c3aed' },
   tabContent:       { padding: 12 },
   card:             { backgroundColor: '#fff', borderRadius: 14, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: '#e5e7eb' },
   cardTitle:        { fontSize: 14, fontWeight: '700', color: '#374151', marginBottom: 8 },
   label:            { fontSize: 12, fontWeight: '600', color: '#6b7280', marginBottom: 4, marginTop: 12 },
   input:            { borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, color: '#111827', backgroundColor: '#f9fafb' },
-  saveBtn:          { backgroundColor: '#2563eb', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginBottom: 12 },
+  saveBtn:          { backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginBottom: 12 },
   saveBtnDim:       { backgroundColor: '#16a34a' },
   saveBtnText:      { color: '#fff', fontWeight: '700', fontSize: 15 },
   sectionMeta:      { fontSize: 13, color: '#6b7280', marginBottom: 8, paddingHorizontal: 4 },
@@ -268,7 +268,7 @@ const s = StyleSheet.create({
   staffContact:     { fontSize: 12, color: '#9ca3af', marginTop: 2 },
   roleBadge:        { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   roleText:         { fontSize: 11, fontWeight: '700' },
-  infoBox:          { backgroundColor: '#eff6ff', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#bfdbfe' },
+  infoBox:          { backgroundColor: '#f5f3ff', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#bfdbfe' },
   infoText:         { fontSize: 13, color: '#1e40af', lineHeight: 20 },
   // Billing
   statusText:       { fontSize: 14, fontWeight: '700' },
@@ -276,7 +276,7 @@ const s = StyleSheet.create({
   tierBadge:        { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   tierText:         { fontSize: 12, fontWeight: '800' },
   tierCard:         { backgroundColor: '#fff', borderRadius: 14, padding: 16, marginBottom: 10, borderWidth: 1.5, borderColor: '#e5e7eb' },
-  tierCardActive:   { borderColor: '#2563eb', backgroundColor: '#eff6ff' },
+  tierCardActive:   { borderColor: '#7c3aed', backgroundColor: '#f5f3ff' },
   currentPlanBadge: { backgroundColor: '#16a34a', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3, alignSelf: 'flex-start', marginBottom: 8 },
   currentPlanText:  { color: '#fff', fontSize: 11, fontWeight: '700' },
   tierName:         { fontSize: 16, fontWeight: '800', color: '#111827' },

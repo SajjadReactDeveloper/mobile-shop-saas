@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+﻿import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   TextInput, Modal, RefreshControl, Alert,
@@ -204,7 +204,7 @@ const s = StyleSheet.create({
   center:           { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header:           { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingTop: 52, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
   title:            { fontSize: 20, fontWeight: '700', color: '#111827' },
-  addBtn:           { backgroundColor: '#2563eb', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8 },
+  addBtn:           { backgroundColor: '#7c3aed', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8 },
   addBtnText:       { color: '#fff', fontWeight: '700', fontSize: 14 },
   searchWrap:       { padding: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
   searchInput:      { backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 9, fontSize: 14 },
@@ -218,8 +218,8 @@ const s = StyleSheet.create({
   price:            { fontSize: 14, fontWeight: '700', color: '#111827' },
   stock:            { fontSize: 12, color: '#6b7280' },
   stockLow:         { color: '#dc2626', fontWeight: '600' },
-  stockBtn:         { backgroundColor: '#eff6ff', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6 },
-  stockBtnText:     { color: '#2563eb', fontWeight: '700', fontSize: 12 },
+  stockBtn:         { backgroundColor: '#f5f3ff', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6 },
+  stockBtnText:     { color: '#7c3aed', fontWeight: '700', fontSize: 12 },
   modal:            { flex: 1, backgroundColor: '#fff' },
   modalHeader:      { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingTop: 52, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
   modalTitle:       { fontSize: 18, fontWeight: '700', color: '#111827' },
@@ -229,8 +229,8 @@ const s = StyleSheet.create({
   input:            { borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, color: '#111827', backgroundColor: '#f9fafb' },
   checkRow:         { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 16 },
   checkbox:         { width: 20, height: 20, borderWidth: 2, borderColor: '#d1d5db', borderRadius: 4 },
-  checkboxOn:       { backgroundColor: '#2563eb', borderColor: '#2563eb' },
-  saveBtn:          { backgroundColor: '#2563eb', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 24 },
+  checkboxOn:       { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
+  saveBtn:          { backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 24 },
   saveBtnDisabled:  { opacity: 0.5 },
   saveBtnText:      { color: '#fff', fontWeight: '700', fontSize: 15 },
   productInfoBanner:{ backgroundColor: '#f3f4f6', borderRadius: 10, padding: 12, fontSize: 13, color: '#374151', marginBottom: 4 },

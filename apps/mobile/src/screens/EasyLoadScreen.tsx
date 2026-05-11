@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+﻿import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   RefreshControl, Alert, Modal, TextInput,
@@ -223,7 +223,7 @@ const s = StyleSheet.create({
   center:         { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingTop: 52, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
   title:          { fontSize: 20, fontWeight: '700', color: '#111827' },
-  addBtn:         { backgroundColor: '#2563eb', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8 },
+  addBtn:         { backgroundColor: '#7c3aed', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8 },
   addBtnText:     { color: '#fff', fontWeight: '700', fontSize: 14 },
   empty:          { textAlign: 'center', color: '#9ca3af', marginTop: 48, fontSize: 14, paddingHorizontal: 32 },
   card:           { backgroundColor: '#fff', marginHorizontal: 12, marginTop: 10, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#e5e7eb' },
@@ -235,7 +235,7 @@ const s = StyleSheet.create({
   actionRow:      { flexDirection: 'row', gap: 10 },
   topupBtn:       { flex: 1, backgroundColor: '#f0fdf4', borderRadius: 8, paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: '#bbf7d0' },
   topupText:      { color: '#16a34a', fontWeight: '700', fontSize: 13 },
-  loadBtn:        { flex: 1, backgroundColor: '#2563eb', borderRadius: 8, paddingVertical: 10, alignItems: 'center' },
+  loadBtn:        { flex: 1, backgroundColor: '#7c3aed', borderRadius: 8, paddingVertical: 10, alignItems: 'center' },
   loadText:       { color: '#fff', fontWeight: '700', fontSize: 13 },
   modal:          { flex: 1, backgroundColor: '#fff' },
   modalHeader:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingTop: 52, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
@@ -251,7 +251,7 @@ const s = StyleSheet.create({
   infoText:       { fontSize: 13, color: '#374151' },
   infoBal:        { fontSize: 15, fontWeight: '700', color: '#111827', marginTop: 4 },
   previewBal:     { fontSize: 14, color: '#16a34a', fontWeight: '600', marginTop: 8 },
-  saveBtn:        { backgroundColor: '#2563eb', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 24 },
+  saveBtn:        { backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 24 },
   saveBtnDisabled:{ opacity: 0.5 },
   saveBtnText:    { color: '#fff', fontWeight: '700', fontSize: 15 },
 })

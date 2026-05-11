@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+﻿import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   RefreshControl, ActivityIndicator, Alert, Modal, TextInput,
@@ -362,7 +362,7 @@ const s = StyleSheet.create({
   previewBoxRed:   { backgroundColor: '#fef2f2' },
   previewBoxLabel: { fontSize: 13, color: '#374151' },
   previewBoxValue: { fontSize: 15, fontWeight: '800' },
-  saveBtn:         { backgroundColor: '#2563eb', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 24 },
+  saveBtn:         { backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 24 },
   saveBtnDisabled: { opacity: 0.5 },
   saveBtnText:     { color: '#fff', fontWeight: '700', fontSize: 15 },
 })

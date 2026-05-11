@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+﻿import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   RefreshControl, Alert, Modal, TextInput,
@@ -213,7 +213,7 @@ const s = StyleSheet.create({
   emptyEmoji:   { fontSize: 48, marginBottom: 12 },
   emptyTitle:   { fontSize: 18, fontWeight: '700', color: '#111827', marginBottom: 6 },
   emptySub:     { fontSize: 14, color: '#6b7280', textAlign: 'center', marginBottom: 24 },
-  openBtn:      { backgroundColor: '#2563eb', paddingHorizontal: 28, paddingVertical: 13, borderRadius: 12 },
+  openBtn:      { backgroundColor: '#7c3aed', paddingHorizontal: 28, paddingVertical: 13, borderRadius: 12 },
   openBtnText:  { color: '#fff', fontWeight: '700', fontSize: 15 },
   closedBanner: { margin: 12, backgroundColor: '#f3f4f6', borderRadius: 10, padding: 12, alignItems: 'center' },
   closedText:   { fontSize: 14, color: '#374151', fontWeight: '600' },
@@ -226,7 +226,7 @@ const s = StyleSheet.create({
   red:          { color: '#dc2626' },
   totalRow:     { borderBottomWidth: 0, marginTop: 4, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#e5e7eb' },
   totalLabel:   { fontSize: 14, fontWeight: '700', color: '#111827' },
-  totalVal:     { fontSize: 16, fontWeight: '800', color: '#2563eb' },
+  totalVal:     { fontSize: 16, fontWeight: '800', color: '#7c3aed' },
   actions:      { flexDirection: 'row', gap: 12, margin: 12 },
   expenseBtn:   { flex: 1, backgroundColor: '#fff', borderRadius: 10, paddingVertical: 13, alignItems: 'center', borderWidth: 1, borderColor: '#e5e7eb' },
   expenseBtnText: { color: '#374151', fontWeight: '700', fontSize: 14 },
@@ -240,6 +240,6 @@ const s = StyleSheet.create({
   closeBtnX:    { fontSize: 20, color: '#6b7280', padding: 4 },
   label:        { fontSize: 12, fontWeight: '600', color: '#6b7280', marginBottom: 4, marginTop: 14 },
   input:        { borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, color: '#111827', backgroundColor: '#f9fafb' },
-  saveBtn:      { backgroundColor: '#2563eb', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 24 },
+  saveBtn:      { backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 24 },
   saveBtnText:  { color: '#fff', fontWeight: '700', fontSize: 15 },
 })

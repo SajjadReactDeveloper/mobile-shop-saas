@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+﻿import React, { useEffect, useState, useCallback } from 'react'
 import { View, Text, ScrollView, StyleSheet, RefreshControl } from 'react-native'
 import { api } from '../lib/api'
 import { DashboardScreenSkeleton } from '../components/Skeleton'
@@ -39,7 +39,7 @@ export function DashboardScreen() {
   if (loading) return <DashboardScreenSkeleton />
 
   const cards = [
-    { label: "Today's Revenue",  value: `PKR ${(todaySummary?.totalRevenue ?? 0).toLocaleString()}`,  sub: `${todaySummary?.totalSales ?? 0} transactions`, color: '#2563eb', bg: '#eff6ff' },
+    { label: "Today's Revenue",  value: `PKR ${(todaySummary?.totalRevenue ?? 0).toLocaleString()}`,  sub: `${todaySummary?.totalSales ?? 0} transactions`, color: '#7c3aed', bg: '#f5f3ff' },
     { label: 'Gross Profit',     value: `PKR ${(todaySummary?.grossProfit ?? 0).toLocaleString()}`,   sub: 'Today',                                          color: '#16a34a', bg: '#f0fdf4' },
     { label: 'Products',         value: String(stats?.products ?? '—'),                               sub: 'Active items',                                   color: '#7c3aed', bg: '#f5f3ff' },
     { label: 'Pending Repairs',  value: String(stats?.pendingRepairs ?? '—'),                         sub: 'In progress',                                    color: '#d97706', bg: '#fffbeb' },
@@ -49,7 +49,7 @@ export function DashboardScreen() {
   return (
     <ScrollView
       style={s.container}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563eb" />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7c3aed" />}
     >
       {/* Header */}
       <View style={s.header}>

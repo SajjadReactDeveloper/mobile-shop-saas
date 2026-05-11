@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+﻿import React, { useState } from 'react'
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert,
 } from 'react-native'
@@ -139,10 +139,10 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 14, color: '#6b7280', textAlign: 'center', marginTop: 4, marginBottom: 20 },
   tabs: { flexDirection: 'row', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8, marginBottom: 16, overflow: 'hidden' },
   tab: { flex: 1, paddingVertical: 10, alignItems: 'center', backgroundColor: '#fff' },
-  tabActive: { backgroundColor: '#2563eb' },
+  tabActive: { backgroundColor: '#7c3aed' },
   tabText: { fontSize: 14, fontWeight: '500', color: '#6b7280' },
   tabTextActive: { color: '#fff' },
   input: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 8, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, marginBottom: 12, color: '#111827' },
-  btn: { backgroundColor: '#2563eb', borderRadius: 8, paddingVertical: 14, alignItems: 'center', marginTop: 4 },
+  btn: { backgroundColor: '#7c3aed', borderRadius: 8, paddingVertical: 14, alignItems: 'center', marginTop: 4 },
   btnText: { color: '#fff', fontWeight: '600', fontSize: 15 },
 })
