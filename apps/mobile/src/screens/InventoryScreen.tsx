@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   TextInput, Modal, RefreshControl, Alert,
@@ -7,21 +7,21 @@ import { api } from '../lib/api'
 import { ListItemsSkeleton } from '../components/Skeleton'
 
 interface Product {
-  id: string
-  name: string
-  brand?: string
-  category: string
-  sellingPrice: number
-  buyingPrice: number
-  stockQty: number
-  imeiTracked: boolean
-  lowStockAlert: number
+  id: string; name: string; brand?: string; category: string
+  sellingPrice: number; buyingPrice: number; stockQty: number
+  imeiTracked: boolean; lowStockAlert: number
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  MOBILE: '#dbeafe', ACCESSORY: '#ede9fe', SIM: '#dcfce7',
-  CHARGER: '#ffedd5', SPARE_PART: '#fef9c3', OTHER: '#f3f4f6',
+const CAT_COLORS: Record<string, { bg: string; text: string }> = {
+  MOBILE:     { bg: '#ede9fe', text: '#6d28d9' },
+  ACCESSORY:  { bg: '#f0fdf4', text: '#16a34a' },
+  SIM:        { bg: '#ecfeff', text: '#0891b2' },
+  CHARGER:    { bg: '#fff7ed', text: '#ea580c' },
+  SPARE_PART: { bg: '#fef9c3', text: '#854d0e' },
+  OTHER:      { bg: '#f3f4f6', text: '#4b5563' },
 }
+
+const CATEGORIES = ['MOBILE', 'ACCESSORY', 'SIM', 'CHARGER', 'SPARE_PART', 'OTHER']
 
 export function InventoryScreen() {
   const [products, setProducts] = useState<Product[]>([])
@@ -30,49 +30,39 @@ export function InventoryScreen() {
   const [search, setSearch] = useState('')
   const [showAdd, setShowAdd] = useState(false)
   const [showStock, setShowStock] = useState<Product | null>(null)
-
-  // Add product form
-  const [form, setForm] = useState({ name: '', brand: '', sellingPrice: '', buyingPrice: '', stockQty: '0', imeiTracked: false })
-  // Add stock form
+  const [form, setForm] = useState({ name: '', brand: '', category: 'OTHER', sellingPrice: '', buyingPrice: '', stockQty: '0', imeiTracked: false })
   const [stockForm, setStockForm] = useState({ qty: '1', unitPrice: '', supplier: '' })
   const [saving, setSaving] = useState(false)
 
   const load = useCallback(async () => {
-    try {
-      const r = await api.get('/inventory')
-      setProducts(r.data)
-    } catch { /* ignore */ }
+    try { const r = await api.get('/inventory'); setProducts(r.data) }
+    catch { /* ignore */ }
     finally { setLoading(false) }
   }, [])
 
   useEffect(() => { void load() }, [load])
-
-  const onRefresh = async () => {
-    setRefreshing(true)
-    await load()
-    setRefreshing(false)
-  }
+  const onRefresh = async () => { setRefreshing(true); await load(); setRefreshing(false) }
 
   const addProduct = async () => {
-    if (!form.name || !form.sellingPrice || !form.buyingPrice) return Alert.alert('Fill required fields')
+    if (!form.name || !form.sellingPrice || !form.buyingPrice) return Alert.alert('Required', 'Name, buying price, and selling price are required.')
     setSaving(true)
     try {
       await api.post('/inventory', {
-        name: form.name, brand: form.brand || undefined,
-        category: 'OTHER', buyingPrice: Number(form.buyingPrice),
-        sellingPrice: Number(form.sellingPrice), stockQty: Number(form.stockQty),
-        imeiTracked: form.imeiTracked, lowStockAlert: 5,
+        name: form.name, brand: form.brand || undefined, category: form.category,
+        buyingPrice: Number(form.buyingPrice), sellingPrice: Number(form.sellingPrice),
+        stockQty: Number(form.stockQty), imeiTracked: form.imeiTracked, lowStockAlert: 5,
       })
       setShowAdd(false)
-      setForm({ name: '', brand: '', sellingPrice: '', buyingPrice: '', stockQty: '0', imeiTracked: false })
+      setForm({ name: '', brand: '', category: 'OTHER', sellingPrice: '', buyingPrice: '', stockQty: '0', imeiTracked: false })
       await load()
-    } catch (e: any) {
-      Alert.alert('Error', e?.response?.data?.message ?? 'Failed to add product')
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { message?: string } } }
+      Alert.alert('Error', err?.response?.data?.message ?? 'Failed to add product')
     } finally { setSaving(false) }
   }
 
   const addStock = async () => {
-    if (!showStock || !stockForm.qty || !stockForm.unitPrice) return Alert.alert('Fill required fields')
+    if (!showStock || !stockForm.qty || !stockForm.unitPrice) return Alert.alert('Required', 'Quantity and unit price are required.')
     setSaving(true)
     try {
       await api.post(`/inventory/${showStock.id}/stock`, {
@@ -82,8 +72,9 @@ export function InventoryScreen() {
       setShowStock(null)
       setStockForm({ qty: '1', unitPrice: '', supplier: '' })
       await load()
-    } catch (e: any) {
-      Alert.alert('Error', e?.response?.data?.message ?? 'Failed')
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { message?: string } } }
+      Alert.alert('Error', err?.response?.data?.message ?? 'Failed')
     } finally { setSaving(false) }
   }
 
@@ -98,78 +89,135 @@ export function InventoryScreen() {
     <View style={s.container}>
       {/* Header */}
       <View style={s.header}>
-        <Text style={s.title}>Inventory</Text>
+        <View>
+          <Text style={s.headerTitle}>Inventory</Text>
+          <Text style={s.headerSub}>{products.length} products</Text>
+        </View>
         <TouchableOpacity style={s.addBtn} onPress={() => setShowAdd(true)}>
-          <Text style={s.addBtnText}>+ Add</Text>
+          <Text style={s.addBtnText}>+ Add Product</Text>
         </TouchableOpacity>
       </View>
 
       {/* Search */}
       <View style={s.searchWrap}>
-        <TextInput style={s.searchInput} placeholder="Search products…" value={search} onChangeText={setSearch} />
+        <Text style={s.searchIcon}>🔍</Text>
+        <TextInput
+          style={s.searchInput} placeholder="Search products…" placeholderTextColor="#9ca3af"
+          value={search} onChangeText={setSearch}
+        />
       </View>
 
-      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-        {filtered.length === 0
-          ? <Text style={s.empty}>No products found</Text>
-          : filtered.map(p => {
-              const isLow = p.stockQty <= p.lowStockAlert
-              return (
-                <View key={p.id} style={s.card}>
-                  <View style={s.cardRow}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={s.productName}>{p.name}</Text>
-                      {p.brand ? <Text style={s.productSub}>{p.brand}</Text> : null}
-                      <View style={[s.catBadge, { backgroundColor: CATEGORY_COLORS[p.category] ?? '#f3f4f6' }]}>
-                        <Text style={s.catText}>{p.category.replace('_', ' ')}</Text>
-                      </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7c3aed" colors={['#7c3aed']} />}
+      >
+        {filtered.length === 0 ? (
+          <View style={s.emptyWrap}>
+            <Text style={s.emptyEmoji}>📦</Text>
+            <Text style={s.emptyText}>{search ? 'No products match your search' : 'No products yet — add your first product'}</Text>
+          </View>
+        ) : (
+          filtered.map(p => {
+            const isLow = p.stockQty <= p.lowStockAlert
+            const catStyle = CAT_COLORS[p.category] ?? CAT_COLORS.OTHER
+            return (
+              <View key={p.id} style={[s.card, isLow && s.cardLow]}>
+                <View style={s.cardTop}>
+                  <View style={s.cardInfo}>
+                    <View style={[s.catBadge, { backgroundColor: catStyle.bg }]}>
+                      <Text style={[s.catText, { color: catStyle.text }]}>{p.category.replace('_', ' ')}</Text>
                     </View>
-                    <View style={{ alignItems: 'flex-end', gap: 4 }}>
-                      <Text style={s.price}>PKR {Number(p.sellingPrice).toLocaleString()}</Text>
-                      <Text style={[s.stock, isLow && s.stockLow]}>{p.stockQty} in stock{isLow ? ' ⚠️' : ''}</Text>
-                      <TouchableOpacity style={s.stockBtn} onPress={() => { setShowStock(p); setStockForm({ qty: '1', unitPrice: String(p.buyingPrice), supplier: '' }) }}>
-                        <Text style={s.stockBtnText}>+ Stock</Text>
-                      </TouchableOpacity>
-                    </View>
+                    <Text style={s.productName} numberOfLines={1}>{p.name}</Text>
+                    {p.brand ? <Text style={s.productBrand}>{p.brand}</Text> : null}
+                  </View>
+                  <View style={s.cardPrices}>
+                    <Text style={s.sellPrice}>PKR {Number(p.sellingPrice).toLocaleString()}</Text>
+                    <Text style={s.buyPrice}>Cost: {Number(p.buyingPrice).toLocaleString()}</Text>
                   </View>
                 </View>
-              )
-            })
-        }
-        <View style={{ height: 20 }} />
+                <View style={s.cardBottom}>
+                  <View style={[s.stockPill, isLow && s.stockPillLow]}>
+                    <Text style={[s.stockText, isLow && s.stockTextLow]}>
+                      {isLow ? '⚠️ ' : ''}{p.stockQty} in stock
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={s.stockBtn}
+                    onPress={() => { setShowStock(p); setStockForm({ qty: '1', unitPrice: String(p.buyingPrice), supplier: '' }) }}
+                  >
+                    <Text style={s.stockBtnText}>+ Add Stock</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )
+          })
+        )}
+        <View style={{ height: 24 }} />
       </ScrollView>
 
       {/* Add Product Modal */}
       <Modal visible={showAdd} animationType="slide" presentationStyle="pageSheet">
         <View style={s.modal}>
+          <View style={s.modalHandle} />
           <View style={s.modalHeader}>
-            <Text style={s.modalTitle}>Add Product</Text>
-            <TouchableOpacity onPress={() => setShowAdd(false)}><Text style={s.closeBtn}>✕</Text></TouchableOpacity>
+            <Text style={s.modalTitle}>New Product</Text>
+            <TouchableOpacity onPress={() => setShowAdd(false)} style={s.closeBtn}>
+              <Text style={s.closeBtnText}>✕</Text>
+            </TouchableOpacity>
           </View>
-          <ScrollView style={s.modalBody}>
+          <ScrollView style={s.modalBody} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+            <Text style={s.sectionLabel}>PRODUCT DETAILS</Text>
             <Text style={s.label}>Product Name *</Text>
-            <TextInput style={s.input} value={form.name} onChangeText={v => setForm(f => ({ ...f, name: v }))} placeholder="Samsung Galaxy A15" />
+            <TextInput style={s.input} value={form.name} onChangeText={v => setForm(f => ({ ...f, name: v }))} placeholder="e.g. Samsung Galaxy A15" placeholderTextColor="#9ca3af" />
             <Text style={s.label}>Brand</Text>
-            <TextInput style={s.input} value={form.brand} onChangeText={v => setForm(f => ({ ...f, brand: v }))} placeholder="Samsung" />
+            <TextInput style={s.input} value={form.brand} onChangeText={v => setForm(f => ({ ...f, brand: v }))} placeholder="Samsung" placeholderTextColor="#9ca3af" />
+
+            <Text style={s.sectionLabel}>CATEGORY</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 4 }}>
+              <View style={{ flexDirection: 'row', gap: 8, paddingBottom: 4 }}>
+                {CATEGORIES.map(cat => (
+                  <TouchableOpacity
+                    key={cat}
+                    style={[s.catPill, form.category === cat && s.catPillActive]}
+                    onPress={() => setForm(f => ({ ...f, category: cat }))}
+                  >
+                    <Text style={[s.catPillText, form.category === cat && s.catPillTextActive]}>
+                      {cat.replace('_', ' ')}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+
+            <Text style={s.sectionLabel}>PRICING</Text>
             <View style={{ flexDirection: 'row', gap: 12 }}>
               <View style={{ flex: 1 }}>
                 <Text style={s.label}>Buying Price *</Text>
-                <TextInput style={s.input} keyboardType="numeric" value={form.buyingPrice} onChangeText={v => setForm(f => ({ ...f, buyingPrice: v }))} placeholder="0" />
+                <TextInput style={s.input} keyboardType="numeric" value={form.buyingPrice} onChangeText={v => setForm(f => ({ ...f, buyingPrice: v }))} placeholder="0" placeholderTextColor="#9ca3af" />
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={s.label}>Selling Price *</Text>
-                <TextInput style={s.input} keyboardType="numeric" value={form.sellingPrice} onChangeText={v => setForm(f => ({ ...f, sellingPrice: v }))} placeholder="0" />
+                <TextInput style={s.input} keyboardType="numeric" value={form.sellingPrice} onChangeText={v => setForm(f => ({ ...f, sellingPrice: v }))} placeholder="0" placeholderTextColor="#9ca3af" />
               </View>
             </View>
+
             <Text style={s.label}>Opening Stock</Text>
-            <TextInput style={s.input} keyboardType="numeric" value={form.stockQty} onChangeText={v => setForm(f => ({ ...f, stockQty: v }))} />
-            <TouchableOpacity style={[s.checkRow]} onPress={() => setForm(f => ({ ...f, imeiTracked: !f.imeiTracked }))}>
-              <View style={[s.checkbox, form.imeiTracked && s.checkboxOn]} />
-              <Text style={s.label}>IMEI Tracking (for phones)</Text>
+            <TextInput style={s.input} keyboardType="numeric" value={form.stockQty} onChangeText={v => setForm(f => ({ ...f, stockQty: v }))} placeholderTextColor="#9ca3af" />
+
+            <TouchableOpacity style={s.checkRow} onPress={() => setForm(f => ({ ...f, imeiTracked: !f.imeiTracked }))}>
+              <View style={[s.checkbox, form.imeiTracked && s.checkboxOn]}>
+                {form.imeiTracked && <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</Text>}
+              </View>
+              <View>
+                <Text style={s.checkLabel}>IMEI Tracking</Text>
+                <Text style={s.checkSub}>Enable for phones & tablets</Text>
+              </View>
             </TouchableOpacity>
+
             <TouchableOpacity style={[s.saveBtn, saving && s.saveBtnDisabled]} onPress={addProduct} disabled={saving}>
-              <Text style={s.saveBtnText}>{saving ? 'Saving…' : 'Add Product'}</Text>
+              <Text style={s.saveBtnText}>{saving ? 'Adding…' : 'Add Product'}</Text>
             </TouchableOpacity>
+            <View style={{ height: 40 }} />
           </ScrollView>
         </View>
       </Modal>
@@ -177,20 +225,28 @@ export function InventoryScreen() {
       {/* Add Stock Modal */}
       <Modal visible={!!showStock} animationType="slide" presentationStyle="pageSheet">
         <View style={s.modal}>
+          <View style={s.modalHandle} />
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Add Stock</Text>
-            <TouchableOpacity onPress={() => setShowStock(null)}><Text style={s.closeBtn}>✕</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowStock(null)} style={s.closeBtn}>
+              <Text style={s.closeBtnText}>✕</Text>
+            </TouchableOpacity>
           </View>
           <View style={s.modalBody}>
-            {showStock && <Text style={s.productInfoBanner}>{showStock.name} · {showStock.stockQty} in stock</Text>}
+            {showStock && (
+              <View style={s.infoBanner}>
+                <Text style={s.infoBannerText}>📦 {showStock.name}</Text>
+                <Text style={s.infoBannerSub}>{showStock.stockQty} currently in stock</Text>
+              </View>
+            )}
             <Text style={s.label}>Quantity *</Text>
-            <TextInput style={s.input} keyboardType="numeric" value={stockForm.qty} onChangeText={v => setStockForm(f => ({ ...f, qty: v }))} />
+            <TextInput style={s.input} keyboardType="numeric" value={stockForm.qty} onChangeText={v => setStockForm(f => ({ ...f, qty: v }))} placeholderTextColor="#9ca3af" />
             <Text style={s.label}>Unit Price (PKR) *</Text>
-            <TextInput style={s.input} keyboardType="numeric" value={stockForm.unitPrice} onChangeText={v => setStockForm(f => ({ ...f, unitPrice: v }))} />
-            <Text style={s.label}>Supplier</Text>
-            <TextInput style={s.input} value={stockForm.supplier} onChangeText={v => setStockForm(f => ({ ...f, supplier: v }))} placeholder="Optional" />
+            <TextInput style={s.input} keyboardType="numeric" value={stockForm.unitPrice} onChangeText={v => setStockForm(f => ({ ...f, unitPrice: v }))} placeholder="0" placeholderTextColor="#9ca3af" />
+            <Text style={s.label}>Supplier (optional)</Text>
+            <TextInput style={s.input} value={stockForm.supplier} onChangeText={v => setStockForm(f => ({ ...f, supplier: v }))} placeholder="Supplier name" placeholderTextColor="#9ca3af" />
             <TouchableOpacity style={[s.saveBtn, saving && s.saveBtnDisabled]} onPress={addStock} disabled={saving}>
-              <Text style={s.saveBtnText}>{saving ? 'Saving…' : 'Add Stock'}</Text>
+              <Text style={s.saveBtnText}>{saving ? 'Saving…' : 'Confirm Stock Entry'}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -200,38 +256,64 @@ export function InventoryScreen() {
 }
 
 const s = StyleSheet.create({
-  container:        { flex: 1, backgroundColor: '#f3f4f6' },
-  center:           { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header:           { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingTop: 52, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  title:            { fontSize: 20, fontWeight: '700', color: '#111827' },
-  addBtn:           { backgroundColor: '#7c3aed', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8 },
-  addBtnText:       { color: '#fff', fontWeight: '700', fontSize: 14 },
-  searchWrap:       { padding: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
-  searchInput:      { backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 9, fontSize: 14 },
-  empty:            { textAlign: 'center', color: '#9ca3af', marginTop: 48, fontSize: 14 },
-  card:             { backgroundColor: '#fff', marginHorizontal: 12, marginTop: 10, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#e5e7eb' },
-  cardRow:          { flexDirection: 'row', gap: 8 },
-  productName:      { fontSize: 14, fontWeight: '600', color: '#111827' },
-  productSub:       { fontSize: 12, color: '#6b7280', marginTop: 2 },
-  catBadge:         { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20, marginTop: 6 },
-  catText:          { fontSize: 10, fontWeight: '600', color: '#374151' },
-  price:            { fontSize: 14, fontWeight: '700', color: '#111827' },
-  stock:            { fontSize: 12, color: '#6b7280' },
-  stockLow:         { color: '#dc2626', fontWeight: '600' },
-  stockBtn:         { backgroundColor: '#f5f3ff', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6 },
-  stockBtnText:     { color: '#7c3aed', fontWeight: '700', fontSize: 12 },
-  modal:            { flex: 1, backgroundColor: '#fff' },
-  modalHeader:      { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingTop: 52, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  modalTitle:       { fontSize: 18, fontWeight: '700', color: '#111827' },
-  closeBtn:         { fontSize: 20, color: '#6b7280', padding: 4 },
-  modalBody:        { padding: 20 },
-  label:            { fontSize: 12, fontWeight: '600', color: '#6b7280', marginBottom: 4, marginTop: 12 },
-  input:            { borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, fontSize: 14, color: '#111827', backgroundColor: '#f9fafb' },
-  checkRow:         { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 16 },
-  checkbox:         { width: 20, height: 20, borderWidth: 2, borderColor: '#d1d5db', borderRadius: 4 },
-  checkboxOn:       { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
-  saveBtn:          { backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 24 },
-  saveBtnDisabled:  { opacity: 0.5 },
-  saveBtnText:      { color: '#fff', fontWeight: '700', fontSize: 15 },
-  productInfoBanner:{ backgroundColor: '#f3f4f6', borderRadius: 10, padding: 12, fontSize: 13, color: '#374151', marginBottom: 4 },
+  container:      { flex: 1, backgroundColor: '#faf9ff' },
+  header:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 52, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  headerTitle:    { fontSize: 22, fontWeight: '800', color: '#fff' },
+  headerSub:      { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
+  addBtn:         { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
+  addBtnText:     { color: '#fff', fontWeight: '700', fontSize: 13 },
+
+  searchWrap:     { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#ede9fe' },
+  searchIcon:     { fontSize: 16 },
+  searchInput:    { flex: 1, fontSize: 14, color: '#111827', paddingVertical: 4 },
+
+  emptyWrap:      { alignItems: 'center', paddingTop: 64, paddingHorizontal: 32 },
+  emptyEmoji:     { fontSize: 48, marginBottom: 12 },
+  emptyText:      { textAlign: 'center', color: '#6b7280', fontSize: 14, lineHeight: 20 },
+
+  card:           { backgroundColor: '#fff', marginHorizontal: 12, marginTop: 10, borderRadius: 16, padding: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
+  cardLow:        { borderWidth: 1.5, borderColor: '#fca5a5' },
+  cardTop:        { flexDirection: 'row', gap: 8, marginBottom: 10 },
+  cardInfo:       { flex: 1 },
+  catBadge:       { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20, marginBottom: 6 },
+  catText:        { fontSize: 10, fontWeight: '700' },
+  productName:    { fontSize: 15, fontWeight: '700', color: '#111827' },
+  productBrand:   { fontSize: 12, color: '#6b7280', marginTop: 2 },
+  cardPrices:     { alignItems: 'flex-end' },
+  sellPrice:      { fontSize: 15, fontWeight: '800', color: '#111827' },
+  buyPrice:       { fontSize: 11, color: '#9ca3af', marginTop: 2 },
+  cardBottom:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: '#f3f4f6', paddingTop: 10 },
+  stockPill:      { backgroundColor: '#f0fdf4', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
+  stockPillLow:   { backgroundColor: '#fef2f2' },
+  stockText:      { fontSize: 12, fontWeight: '600', color: '#16a34a' },
+  stockTextLow:   { color: '#dc2626' },
+  stockBtn:       { backgroundColor: '#f5f3ff', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20 },
+  stockBtnText:   { color: '#7c3aed', fontWeight: '700', fontSize: 12 },
+
+  // Modal
+  modal:          { flex: 1, backgroundColor: '#fff' },
+  modalHandle:    { width: 40, height: 4, borderRadius: 2, backgroundColor: '#e5e7eb', alignSelf: 'center', marginTop: 12 },
+  modalHeader:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
+  modalTitle:     { fontSize: 18, fontWeight: '800', color: '#111827' },
+  closeBtn:       { width: 32, height: 32, borderRadius: 16, backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center' },
+  closeBtnText:   { fontSize: 14, color: '#6b7280', fontWeight: '600' },
+  modalBody:      { padding: 20 },
+  sectionLabel:   { fontSize: 11, fontWeight: '700', color: '#7c3aed', letterSpacing: 1, marginTop: 16, marginBottom: 4 },
+  label:          { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 6, marginTop: 12 },
+  input:          { backgroundColor: '#f9fafb', borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, color: '#111827' },
+  catPill:        { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, backgroundColor: '#f3f4f6', borderWidth: 1.5, borderColor: '#e5e7eb' },
+  catPillActive:  { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
+  catPillText:    { fontSize: 12, fontWeight: '600', color: '#6b7280' },
+  catPillTextActive: { color: '#fff' },
+  checkRow:       { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16, backgroundColor: '#f9fafb', padding: 14, borderRadius: 12 },
+  checkbox:       { width: 22, height: 22, borderWidth: 2, borderColor: '#d1d5db', borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
+  checkboxOn:     { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
+  checkLabel:     { fontSize: 14, fontWeight: '600', color: '#111827' },
+  checkSub:       { fontSize: 11, color: '#6b7280', marginTop: 1 },
+  infoBanner:     { backgroundColor: '#f5f3ff', borderRadius: 12, padding: 14, marginBottom: 4 },
+  infoBannerText: { fontSize: 14, fontWeight: '700', color: '#5b21b6' },
+  infoBannerSub:  { fontSize: 12, color: '#7c3aed', marginTop: 2 },
+  saveBtn:        { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 24, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
+  saveBtnDisabled:{ opacity: 0.55 },
+  saveBtnText:    { color: '#fff', fontWeight: '700', fontSize: 15 },
 })

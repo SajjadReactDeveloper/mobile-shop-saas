@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   TextInput, Modal, Alert, FlatList,
@@ -7,12 +7,14 @@ import { api } from '../lib/api'
 import { POSScreenSkeleton } from '../components/Skeleton'
 
 type PaymentMethod = 'CASH' | 'EASYPAISA' | 'JAZZCASH' | 'BANK_TRANSFER' | 'CREDIT'
-
 interface Product { id: string; name: string; brand?: string; sellingPrice: number; stockQty: number; imeiTracked: boolean }
 interface Customer { id: string; name: string; phone?: string; balanceOwed: number }
 interface CartItem { product: Product; qty: number; unitPrice: number }
 
-const PAY_METHODS: PaymentMethod[] = ['CASH', 'EASYPAISA', 'JAZZCASH', 'BANK_TRANSFER', 'CREDIT']
+const PAY_LABELS: Record<PaymentMethod, string> = {
+  CASH: '💵 Cash', EASYPAISA: '💚 Easypaisa', JAZZCASH: '🔴 JazzCash',
+  BANK_TRANSFER: '🏦 Bank', CREDIT: '📒 Credit',
+}
 
 export function POSScreen() {
   const [products, setProducts] = useState<Product[]>([])
@@ -35,8 +37,7 @@ export function POSScreen() {
         api.get('/inventory').then(r => r.data),
         api.get('/customers').then(r => r.data),
       ])
-      setProducts(p)
-      setCustomers(c)
+      setProducts(p); setCustomers(c)
     } catch { /* ignore */ }
     finally { setLoading(false) }
   }, [])
@@ -44,7 +45,10 @@ export function POSScreen() {
   useEffect(() => { void load() }, [load])
 
   const filteredProducts = search.length > 1
-    ? products.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || (p.brand ?? '').toLowerCase().includes(search.toLowerCase()))
+    ? products.filter(p =>
+        p.name.toLowerCase().includes(search.toLowerCase()) ||
+        (p.brand ?? '').toLowerCase().includes(search.toLowerCase())
+      )
     : []
 
   const filteredCustomers = customers.filter(c =>
@@ -52,7 +56,7 @@ export function POSScreen() {
   )
 
   const addToCart = (product: Product) => {
-    if (product.stockQty === 0) return
+    if (product.stockQty === 0) return Alert.alert('Out of Stock', `${product.name} is out of stock`)
     setCart(prev => {
       const ex = prev.find(i => i.product.id === product.id)
       if (ex && !product.imeiTracked) return prev.map(i => i.product.id === product.id ? { ...i, qty: i.qty + 1 } : i)
@@ -75,8 +79,8 @@ export function POSScreen() {
   const selectedCustomer = customers.find(c => c.id === customerId)
 
   const checkout = async () => {
-    if (cart.length === 0) return Alert.alert('Cart is empty')
-    if (payMethod === 'CREDIT' && !customerId) return Alert.alert('Select a customer for credit sales')
+    if (cart.length === 0) return Alert.alert('Empty Cart', 'Add at least one product to checkout')
+    if (payMethod === 'CREDIT' && !customerId) return Alert.alert('Customer Required', 'Select a customer for credit sales')
     setPlacing(true)
     try {
       const r = await api.post('/sales', {
@@ -87,15 +91,11 @@ export function POSScreen() {
         customerId: customerId || undefined,
       })
       setShowSuccess(r.data.invoiceNumber)
-      setCart([])
-      setDiscount('')
-      setAmountPaid('')
-      setCustomerId('')
-      setCustomerSearch('')
-      setPayMethod('CASH')
+      setCart([]); setDiscount(''); setAmountPaid(''); setCustomerId(''); setCustomerSearch(''); setPayMethod('CASH')
       await load()
-    } catch (e: any) {
-      Alert.alert('Sale Failed', e?.response?.data?.message ?? 'Something went wrong')
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { message?: string } } }
+      Alert.alert('Sale Failed', err?.response?.data?.message ?? 'Something went wrong')
     } finally { setPlacing(false) }
   }
 
@@ -103,123 +103,213 @@ export function POSScreen() {
 
   return (
     <View style={s.container}>
-      <View style={s.header}><Text style={s.title}>POS / Sale</Text></View>
+      {/* Header */}
+      <View style={s.header}>
+        <View>
+          <Text style={s.headerTitle}>Point of Sale</Text>
+          <Text style={s.headerSub}>{cart.length} item{cart.length !== 1 ? 's' : ''} in cart</Text>
+        </View>
+        {cart.length > 0 && (
+          <TouchableOpacity onPress={() => setCart([])} style={s.clearBtn}>
+            <Text style={s.clearBtnText}>Clear</Text>
+          </TouchableOpacity>
+        )}
+      </View>
 
       {/* Product search */}
       <View style={s.searchWrap}>
-        <TextInput style={s.searchInput} placeholder="Search product to add…" value={search} onChangeText={setSearch} />
+        <Text style={s.searchIcon}>🔍</Text>
+        <TextInput
+          style={s.searchInput} placeholder="Search product to add to cart…"
+          placeholderTextColor="#9ca3af" value={search} onChangeText={setSearch}
+        />
+        {search.length > 0 && (
+          <TouchableOpacity onPress={() => setSearch('')}>
+            <Text style={{ color: '#9ca3af', fontSize: 18, paddingRight: 4 }}>✕</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
-      {/* Dropdown results */}
+      {/* Dropdown */}
       {filteredProducts.length > 0 && (
         <View style={s.dropdown}>
           {filteredProducts.slice(0, 5).map(p => (
-            <TouchableOpacity key={p.id} style={s.dropItem} onPress={() => addToCart(p)} disabled={p.stockQty === 0}>
-              <Text style={[s.dropName, p.stockQty === 0 && s.dimmed]}>{p.name}</Text>
-              <Text style={s.dropPrice}>PKR {Number(p.sellingPrice).toLocaleString()} · {p.stockQty} left</Text>
+            <TouchableOpacity
+              key={p.id} style={[s.dropItem, p.stockQty === 0 && s.dropItemDimmed]}
+              onPress={() => addToCart(p)} disabled={p.stockQty === 0}
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={s.dropName} numberOfLines={1}>{p.name}</Text>
+                <Text style={s.dropStock}>{p.stockQty} in stock</Text>
+              </View>
+              <Text style={s.dropPrice}>PKR {Number(p.sellingPrice).toLocaleString()}</Text>
             </TouchableOpacity>
           ))}
         </View>
       )}
 
-      <ScrollView style={s.scroll}>
-        {/* Cart */}
-        {cart.length === 0
-          ? <Text style={s.empty}>Search for a product to start</Text>
-          : cart.map(item => (
-            <View key={item.product.id} style={s.cartItem}>
-              <Text style={s.cartName} numberOfLines={1}>{item.product.name}</Text>
-              <View style={s.cartRow}>
-                <View style={s.qtyRow}>
-                  <TouchableOpacity style={s.qtyBtn} onPress={() => updateQty(item.product.id, -1)}><Text style={s.qtyBtnText}>−</Text></TouchableOpacity>
-                  <Text style={s.qtyNum}>{item.qty}</Text>
-                  <TouchableOpacity style={s.qtyBtn} onPress={() => updateQty(item.product.id, 1)}><Text style={s.qtyBtnText}>+</Text></TouchableOpacity>
+      <ScrollView style={s.scroll} showsVerticalScrollIndicator={false}>
+        {/* Cart items */}
+        {cart.length === 0 ? (
+          <View style={s.emptyCart}>
+            <Text style={s.emptyCartEmoji}>🛒</Text>
+            <Text style={s.emptyCartText}>Search above to add products</Text>
+          </View>
+        ) : (
+          <View style={s.cartWrap}>
+            <Text style={s.cartHeader}>Cart Items</Text>
+            {cart.map(item => (
+              <View key={item.product.id} style={s.cartItem}>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.cartName} numberOfLines={1}>{item.product.name}</Text>
+                  <Text style={s.cartUnitPrice}>PKR {Number(item.unitPrice).toLocaleString()} each</Text>
                 </View>
-                <Text style={s.cartPrice}>PKR {(item.qty * item.unitPrice).toLocaleString()}</Text>
-                <TouchableOpacity onPress={() => setCart(c => c.filter(i => i.product.id !== item.product.id))}>
-                  <Text style={s.removeBtn}>✕</Text>
-                </TouchableOpacity>
+                <View style={s.qtyControls}>
+                  <TouchableOpacity style={s.qtyBtn} onPress={() => updateQty(item.product.id, -1)}>
+                    <Text style={s.qtyBtnText}>−</Text>
+                  </TouchableOpacity>
+                  <Text style={s.qtyNum}>{item.qty}</Text>
+                  <TouchableOpacity style={s.qtyBtn} onPress={() => updateQty(item.product.id, 1)}>
+                    <Text style={s.qtyBtnText}>+</Text>
+                  </TouchableOpacity>
+                </View>
+                <Text style={s.cartLineTotal}>PKR {(item.qty * item.unitPrice).toLocaleString()}</Text>
               </View>
-            </View>
-          ))
-        }
+            ))}
+          </View>
+        )}
 
         {/* Customer */}
-        <View style={s.section}>
-          <Text style={s.sectionTitle}>Customer (optional)</Text>
-          {selectedCustomer ? (
-            <View style={s.selectedCustomer}>
-              <Text style={s.selectedCustomerName}>{selectedCustomer.name}</Text>
-              {Number(selectedCustomer.balanceOwed) > 0 && <Text style={s.owes}>Owes PKR {Number(selectedCustomer.balanceOwed).toLocaleString()}</Text>}
-              <TouchableOpacity onPress={() => { setCustomerId(''); setCustomerSearch('') }}>
-                <Text style={s.clearCustomer}>Clear</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <TouchableOpacity style={s.customerPickBtn} onPress={() => setShowCustomers(true)}>
-              <Text style={s.customerPickText}>{customerSearch || 'Select customer…'}</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* Totals */}
         {cart.length > 0 && (
           <View style={s.section}>
-            <View style={s.totalRow}><Text style={s.totalLabel}>Subtotal</Text><Text>PKR {subtotal.toLocaleString()}</Text></View>
-            <View style={s.totalRow}>
-              <Text style={s.totalLabel}>Discount</Text>
-              <TextInput style={s.discountInput} keyboardType="numeric" value={discount} onChangeText={setDiscount} placeholder="0" />
-            </View>
-            <View style={s.totalRow}><Text style={[s.totalLabel, { fontWeight: '700', fontSize: 16 }]}>Total</Text><Text style={{ fontWeight: '700', fontSize: 16 }}>PKR {total.toLocaleString()}</Text></View>
-
-            {/* Payment method */}
-            <Text style={[s.sectionTitle, { marginTop: 12 }]}>Payment</Text>
-            <View style={s.payGrid}>
-              {PAY_METHODS.map(m => (
-                <TouchableOpacity key={m} style={[s.payBtn, payMethod === m && s.payBtnActive]} onPress={() => setPayMethod(m)}>
-                  <Text style={[s.payBtnText, payMethod === m && s.payBtnTextActive]}>{m.replace('_', ' ')}</Text>
+            <Text style={s.sectionTitle}>CUSTOMER (OPTIONAL)</Text>
+            {selectedCustomer ? (
+              <View style={s.selectedCustomer}>
+                <View style={s.customerAvatar}>
+                  <Text style={s.customerAvatarText}>{selectedCustomer.name.charAt(0).toUpperCase()}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.customerName}>{selectedCustomer.name}</Text>
+                  {Number(selectedCustomer.balanceOwed) > 0 && (
+                    <Text style={s.customerOwes}>Owes PKR {Number(selectedCustomer.balanceOwed).toLocaleString()}</Text>
+                  )}
+                </View>
+                <TouchableOpacity onPress={() => { setCustomerId(''); setCustomerSearch('') }}>
+                  <Text style={s.clearCustomer}>✕ Clear</Text>
                 </TouchableOpacity>
-              ))}
+              </View>
+            ) : (
+              <TouchableOpacity style={s.pickCustomerBtn} onPress={() => setShowCustomers(true)}>
+                <Text style={s.pickCustomerText}>👤 Select customer…</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
+        {/* Totals & payment */}
+        {cart.length > 0 && (
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>ORDER SUMMARY</Text>
+            <View style={s.totalRow}>
+              <Text style={s.totalLabel}>Subtotal</Text>
+              <Text style={s.totalValue}>PKR {subtotal.toLocaleString()}</Text>
             </View>
+            <View style={[s.totalRow, { alignItems: 'center' }]}>
+              <Text style={s.totalLabel}>Discount (PKR)</Text>
+              <TextInput
+                style={s.discountInput} keyboardType="numeric"
+                value={discount} onChangeText={setDiscount} placeholder="0"
+                placeholderTextColor="#9ca3af"
+              />
+            </View>
+            <View style={[s.totalRow, s.totalRowBold]}>
+              <Text style={s.totalLabelBold}>Total</Text>
+              <Text style={s.totalValueBold}>PKR {total.toLocaleString()}</Text>
+            </View>
+
+            <Text style={[s.sectionTitle, { marginTop: 16 }]}>PAYMENT METHOD</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={{ flexDirection: 'row', gap: 8, paddingBottom: 4 }}>
+                {(Object.keys(PAY_LABELS) as PaymentMethod[]).map(m => (
+                  <TouchableOpacity
+                    key={m}
+                    style={[s.payBtn, payMethod === m && s.payBtnActive]}
+                    onPress={() => setPayMethod(m)}
+                  >
+                    <Text style={[s.payBtnText, payMethod === m && s.payBtnTextActive]}>
+                      {PAY_LABELS[m]}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
 
             {payMethod === 'CASH' && (
-              <View style={s.totalRow}>
+              <View style={[s.totalRow, { alignItems: 'center', marginTop: 8 }]}>
                 <Text style={s.totalLabel}>Cash Received</Text>
-                <TextInput style={s.discountInput} keyboardType="numeric" value={amountPaid} onChangeText={setAmountPaid} placeholder={String(total)} />
+                <TextInput
+                  style={s.discountInput} keyboardType="numeric"
+                  value={amountPaid} onChangeText={setAmountPaid}
+                  placeholder={String(total)} placeholderTextColor="#9ca3af"
+                />
               </View>
             )}
             {payMethod === 'CASH' && change >= 0 && Number(amountPaid) > 0 && (
-              <View style={s.totalRow}><Text style={s.changeLabel}>Change</Text><Text style={s.changeVal}>PKR {change.toLocaleString()}</Text></View>
+              <View style={s.changeBox}>
+                <Text style={s.changeLabel}>Change to return</Text>
+                <Text style={s.changeValue}>PKR {change.toLocaleString()}</Text>
+              </View>
             )}
 
-            <TouchableOpacity style={[s.checkoutBtn, placing && s.checkoutBtnDisabled]} onPress={checkout} disabled={placing}>
-              <Text style={s.checkoutText}>{placing ? 'Processing…' : 'Complete Sale'}</Text>
+            <TouchableOpacity
+              style={[s.checkoutBtn, placing && s.checkoutBtnDisabled]}
+              onPress={checkout} disabled={placing}
+            >
+              <Text style={s.checkoutText}>{placing ? 'Processing…' : `✓ Complete Sale · PKR ${total.toLocaleString()}`}</Text>
             </TouchableOpacity>
           </View>
         )}
-        <View style={{ height: 20 }} />
+        <View style={{ height: 24 }} />
       </ScrollView>
 
       {/* Customer picker modal */}
       <Modal visible={showCustomers} animationType="slide" presentationStyle="pageSheet">
         <View style={s.modal}>
+          <View style={s.modalHandle} />
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Select Customer</Text>
-            <TouchableOpacity onPress={() => setShowCustomers(false)}><Text style={s.closeBtn}>✕</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowCustomers(false)} style={s.closeBtn}>
+              <Text style={s.closeBtnText}>✕</Text>
+            </TouchableOpacity>
           </View>
           <View style={{ padding: 16 }}>
-            <TextInput style={s.searchInput} placeholder="Search name or phone…" value={customerSearch} onChangeText={setCustomerSearch} autoFocus />
+            <TextInput
+              style={s.searchInput2} placeholder="Search name or phone…"
+              placeholderTextColor="#9ca3af"
+              value={customerSearch} onChangeText={setCustomerSearch} autoFocus
+            />
           </View>
           <FlatList
             data={filteredCustomers}
             keyExtractor={c => c.id}
             renderItem={({ item: c }) => (
-              <TouchableOpacity style={s.custItem} onPress={() => { setCustomerId(c.id); setCustomerSearch(c.name); setShowCustomers(false) }}>
-                <Text style={s.custName}>{c.name}</Text>
-                <Text style={s.custPhone}>{c.phone ?? ''}</Text>
-                {Number(c.balanceOwed) > 0 && <Text style={s.custOwes}>Owes PKR {Number(c.balanceOwed).toLocaleString()}</Text>}
+              <TouchableOpacity
+                style={s.custItem}
+                onPress={() => { setCustomerId(c.id); setCustomerSearch(c.name); setShowCustomers(false) }}
+              >
+                <View style={s.custAvatar}>
+                  <Text style={s.custAvatarText}>{c.name.charAt(0).toUpperCase()}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.custName}>{c.name}</Text>
+                  <Text style={s.custPhone}>{c.phone ?? 'No phone'}</Text>
+                </View>
+                {Number(c.balanceOwed) > 0 && (
+                  <Text style={s.custOwes}>Owes PKR {Number(c.balanceOwed).toLocaleString()}</Text>
+                )}
               </TouchableOpacity>
             )}
+            ListEmptyComponent={<Text style={s.emptyCartText}>No customers found</Text>}
           />
         </View>
       </Modal>
@@ -228,11 +318,14 @@ export function POSScreen() {
       <Modal visible={!!showSuccess} animationType="fade" transparent>
         <View style={s.overlay}>
           <View style={s.successCard}>
-            <Text style={s.successEmoji}>✅</Text>
+            <View style={s.successIconWrap}>
+              <Text style={{ fontSize: 40 }}>✅</Text>
+            </View>
             <Text style={s.successTitle}>Sale Complete!</Text>
-            <Text style={s.successInv}>{showSuccess}</Text>
+            <Text style={s.successInv}>Invoice #{showSuccess}</Text>
+            <Text style={s.successAmount}>PKR {total.toLocaleString()}</Text>
             <TouchableOpacity style={s.successBtn} onPress={() => setShowSuccess(null)}>
-              <Text style={s.successBtnText}>New Sale</Text>
+              <Text style={s.successBtnText}>New Sale →</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -242,62 +335,81 @@ export function POSScreen() {
 }
 
 const s = StyleSheet.create({
-  container:      { flex: 1, backgroundColor: '#f3f4f6' },
-  center:         { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header:         { padding: 20, paddingTop: 52, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  title:          { fontSize: 20, fontWeight: '700', color: '#111827' },
-  searchWrap:     { padding: 12, backgroundColor: '#fff' },
-  searchInput:    { backgroundColor: '#f9fafb', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 9, fontSize: 14 },
-  dropdown:       { backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#e5e7eb', zIndex: 10 },
-  dropItem:       { paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
+  container:      { flex: 1, backgroundColor: '#faf9ff' },
+  header:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 52, paddingBottom: 14, backgroundColor: '#7c3aed' },
+  headerTitle:    { fontSize: 22, fontWeight: '800', color: '#fff' },
+  headerSub:      { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
+  clearBtn:       { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20 },
+  clearBtnText:   { color: '#fff', fontWeight: '600', fontSize: 13 },
+  searchWrap:     { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#ede9fe' },
+  searchIcon:     { fontSize: 16 },
+  searchInput:    { flex: 1, fontSize: 14, color: '#111827', paddingVertical: 4 },
+  dropdown:       { backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#ede9fe', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4 },
+  dropItem:       { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f5f3ff' },
+  dropItemDimmed: { opacity: 0.4 },
   dropName:       { fontSize: 14, fontWeight: '600', color: '#111827' },
-  dropPrice:      { fontSize: 12, color: '#6b7280', marginTop: 2 },
-  dimmed:         { opacity: 0.4 },
+  dropStock:      { fontSize: 11, color: '#9ca3af', marginTop: 2 },
+  dropPrice:      { fontSize: 14, fontWeight: '700', color: '#7c3aed' },
   scroll:         { flex: 1 },
-  empty:          { textAlign: 'center', color: '#9ca3af', marginTop: 48, fontSize: 14 },
-  cartItem:       { backgroundColor: '#fff', marginHorizontal: 12, marginTop: 8, borderRadius: 10, padding: 12, borderWidth: 1, borderColor: '#e5e7eb' },
-  cartName:       { fontSize: 13, fontWeight: '600', color: '#111827', marginBottom: 8 },
-  cartRow:        { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  qtyRow:         { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f3f4f6', borderRadius: 8, overflow: 'hidden' },
-  qtyBtn:         { paddingHorizontal: 12, paddingVertical: 6 },
-  qtyBtnText:     { fontSize: 18, color: '#374151', fontWeight: '600' },
-  qtyNum:         { minWidth: 28, textAlign: 'center', fontSize: 14, fontWeight: '700' },
-  cartPrice:      { flex: 1, textAlign: 'right', fontSize: 14, fontWeight: '700', color: '#111827' },
-  removeBtn:      { color: '#d1d5db', fontSize: 16, paddingLeft: 4 },
-  section:        { backgroundColor: '#fff', marginHorizontal: 12, marginTop: 8, borderRadius: 12, padding: 14, borderWidth: 1, borderColor: '#e5e7eb' },
-  sectionTitle:   { fontSize: 12, fontWeight: '700', color: '#6b7280', marginBottom: 8, textTransform: 'uppercase', letterSpacing: 0.5 },
-  selectedCustomer: { backgroundColor: '#f5f3ff', borderRadius: 8, padding: 10, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  selectedCustomerName: { flex: 1, fontSize: 14, fontWeight: '600', color: '#1d4ed8' },
-  owes:           { fontSize: 11, color: '#dc2626' },
-  clearCustomer:  { color: '#6b7280', fontSize: 12 },
-  customerPickBtn:{ borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8, padding: 10, backgroundColor: '#f9fafb' },
-  customerPickText: { fontSize: 14, color: '#6b7280' },
-  totalRow:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6 },
-  totalLabel:     { fontSize: 14, color: '#374151' },
-  discountInput:  { borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, fontSize: 14, width: 100, textAlign: 'right' },
-  payGrid:        { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
-  payBtn:         { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8, borderWidth: 1, borderColor: '#e5e7eb', backgroundColor: '#f9fafb' },
+  emptyCart:      { alignItems: 'center', paddingTop: 64 },
+  emptyCartEmoji: { fontSize: 56, marginBottom: 12 },
+  emptyCartText:  { textAlign: 'center', color: '#9ca3af', fontSize: 14 },
+  cartWrap:       { margin: 12, backgroundColor: '#fff', borderRadius: 16, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
+  cartHeader:     { fontSize: 12, fontWeight: '700', color: '#6b7280', padding: 14, paddingBottom: 0, textTransform: 'uppercase', letterSpacing: 0.5 },
+  cartItem:       { flexDirection: 'row', alignItems: 'center', padding: 12, paddingHorizontal: 14, borderTopWidth: 1, borderTopColor: '#f9fafb', gap: 10 },
+  cartName:       { fontSize: 13, fontWeight: '700', color: '#111827' },
+  cartUnitPrice:  { fontSize: 11, color: '#9ca3af', marginTop: 1 },
+  qtyControls:    { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f5f3ff', borderRadius: 10, overflow: 'hidden' },
+  qtyBtn:         { paddingHorizontal: 10, paddingVertical: 7 },
+  qtyBtnText:     { fontSize: 18, color: '#7c3aed', fontWeight: '700' },
+  qtyNum:         { minWidth: 24, textAlign: 'center', fontSize: 14, fontWeight: '800', color: '#111827' },
+  cartLineTotal:  { fontSize: 14, fontWeight: '800', color: '#111827', minWidth: 80, textAlign: 'right' },
+  section:        { backgroundColor: '#fff', marginHorizontal: 12, marginTop: 10, borderRadius: 16, padding: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 2 },
+  sectionTitle:   { fontSize: 10, fontWeight: '700', color: '#7c3aed', letterSpacing: 1, marginBottom: 10 },
+  selectedCustomer: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#f5f3ff', borderRadius: 12, padding: 10 },
+  customerAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#7c3aed', alignItems: 'center', justifyContent: 'center' },
+  customerAvatarText: { color: '#fff', fontWeight: '700', fontSize: 14 },
+  customerName:   { fontSize: 14, fontWeight: '700', color: '#111827' },
+  customerOwes:   { fontSize: 11, color: '#dc2626', marginTop: 1 },
+  clearCustomer:  { fontSize: 12, color: '#6b7280', fontWeight: '500' },
+  pickCustomerBtn: { borderWidth: 1.5, borderColor: '#ede9fe', borderRadius: 12, padding: 12, backgroundColor: '#faf9ff' },
+  pickCustomerText: { fontSize: 14, color: '#9ca3af' },
+  totalRow:       { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 },
+  totalRowBold:   { borderTopWidth: 1.5, borderTopColor: '#f3f4f6', marginTop: 4, paddingTop: 10 },
+  totalLabel:     { fontSize: 14, color: '#6b7280' },
+  totalValue:     { fontSize: 14, color: '#111827', fontWeight: '600' },
+  totalLabelBold: { fontSize: 16, fontWeight: '700', color: '#111827' },
+  totalValueBold: { fontSize: 18, fontWeight: '800', color: '#7c3aed' },
+  discountInput:  { borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6, fontSize: 14, width: 110, textAlign: 'right', color: '#111827', backgroundColor: '#f9fafb' },
+  payBtn:         { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20, borderWidth: 1.5, borderColor: '#e5e7eb', backgroundColor: '#f9fafb' },
   payBtnActive:   { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
-  payBtnText:     { fontSize: 12, color: '#374151', fontWeight: '600' },
+  payBtnText:     { fontSize: 13, color: '#6b7280', fontWeight: '600' },
   payBtnTextActive: { color: '#fff' },
-  changeLabel:    { fontSize: 14, color: '#16a34a', fontWeight: '600' },
-  changeVal:      { fontSize: 14, color: '#16a34a', fontWeight: '700' },
-  checkoutBtn:    { backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 12 },
-  checkoutBtnDisabled: { opacity: 0.5 },
+  changeBox:      { backgroundColor: '#f0fdf4', borderRadius: 12, padding: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
+  changeLabel:    { fontSize: 13, color: '#16a34a', fontWeight: '600' },
+  changeValue:    { fontSize: 15, color: '#16a34a', fontWeight: '800' },
+  checkoutBtn:    { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 14, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
+  checkoutBtnDisabled: { opacity: 0.55 },
   checkoutText:   { color: '#fff', fontWeight: '700', fontSize: 15 },
   modal:          { flex: 1, backgroundColor: '#fff' },
-  modalHeader:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingTop: 52, borderBottomWidth: 1, borderBottomColor: '#e5e7eb' },
-  modalTitle:     { fontSize: 18, fontWeight: '700', color: '#111827' },
-  closeBtn:       { fontSize: 20, color: '#6b7280', padding: 4 },
-  custItem:       { padding: 16, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
-  custName:       { fontSize: 14, fontWeight: '600', color: '#111827' },
-  custPhone:      { fontSize: 12, color: '#6b7280', marginTop: 2 },
-  custOwes:       { fontSize: 12, color: '#dc2626', marginTop: 2 },
-  overlay:        { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  successCard:    { backgroundColor: '#fff', borderRadius: 20, padding: 32, alignItems: 'center', width: 280 },
-  successEmoji:   { fontSize: 48, marginBottom: 12 },
-  successTitle:   { fontSize: 20, fontWeight: '700', color: '#111827', marginBottom: 4 },
-  successInv:     { fontSize: 14, color: '#6b7280', marginBottom: 20 },
-  successBtn:     { backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 12, paddingHorizontal: 32 },
+  modalHandle:    { width: 40, height: 4, borderRadius: 2, backgroundColor: '#e5e7eb', alignSelf: 'center', marginTop: 12 },
+  modalHeader:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 16, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
+  modalTitle:     { fontSize: 18, fontWeight: '800', color: '#111827' },
+  closeBtn:       { width: 32, height: 32, borderRadius: 16, backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center' },
+  closeBtnText:   { fontSize: 14, color: '#6b7280', fontWeight: '600' },
+  searchInput2:   { backgroundColor: '#f9fafb', borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, color: '#111827' },
+  custItem:       { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#f9fafb', gap: 12 },
+  custAvatar:     { width: 40, height: 40, borderRadius: 20, backgroundColor: '#f5f3ff', alignItems: 'center', justifyContent: 'center' },
+  custAvatarText: { fontSize: 16, fontWeight: '700', color: '#7c3aed' },
+  custName:       { fontSize: 14, fontWeight: '700', color: '#111827' },
+  custPhone:      { fontSize: 12, color: '#6b7280', marginTop: 1 },
+  custOwes:       { fontSize: 12, color: '#dc2626', fontWeight: '600' },
+  overlay:        { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center' },
+  successCard:    { backgroundColor: '#fff', borderRadius: 28, padding: 32, alignItems: 'center', width: 300, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 20, elevation: 10 },
+  successIconWrap:{ width: 80, height: 80, borderRadius: 40, backgroundColor: '#f0fdf4', alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
+  successTitle:   { fontSize: 22, fontWeight: '800', color: '#111827', marginBottom: 4 },
+  successInv:     { fontSize: 13, color: '#9ca3af', marginBottom: 4 },
+  successAmount:  { fontSize: 24, fontWeight: '800', color: '#7c3aed', marginBottom: 20 },
+  successBtn:     { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 13, paddingHorizontal: 36 },
   successBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 })
