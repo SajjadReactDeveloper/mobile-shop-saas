@@ -6,7 +6,7 @@ import { api } from '@/lib/api'
 import {
   ShoppingCart, Search, Plus, Minus, Trash2, X,
   CheckCircle, ChevronDown, Loader2, Receipt, Clock,
-  User,
+  User, Printer,
 } from 'lucide-react'
 
 type PaymentMethod = 'CASH' | 'EASYPAISA' | 'JAZZCASH' | 'BANK_TRANSFER' | 'CREDIT'
@@ -140,8 +140,25 @@ function InvoiceModal({ sale, onClose }: { sale: Sale; onClose: () => void }) {
           </div>
         </div>
 
-        <div className="px-6 pb-6">
-          <button onClick={onClose} className={btn + ' w-full bg-blue-600 text-white hover:bg-blue-700'}>
+        <div className="px-6 pb-6 flex gap-2">
+          <button
+            onClick={() => {
+              const w = window.open('', '_blank', 'width=400,height=600')
+              if (!w) return
+              w.document.write(`<html><head><title>${sale.invoiceNumber}</title><style>body{font-family:monospace;font-size:13px;padding:20px;width:300px}h2{text-align:center;margin:0}hr{border:none;border-top:1px dashed #ccc;margin:10px 0}.row{display:flex;justify-content:space-between}.total{font-weight:bold;font-size:15px}</style></head><body>
+                <h2>Mobile Shop</h2><p style="text-align:center;margin:4px 0">${sale.invoiceNumber}</p><p style="text-align:center;font-size:11px">${new Date(sale.createdAt).toLocaleString('en-PK')}</p>
+                <hr/>${sale.items.map(i => `<div class="row"><span>${i.product.name} x${i.qty}</span><span>PKR ${(i.qty * i.unitPrice).toLocaleString()}</span></div>`).join('')}
+                <hr/><div class="row total"><span>Total</span><span>PKR ${Number(sale.total).toLocaleString()}</span></div>
+                <div class="row"><span>Paid</span><span>PKR ${Number(sale.amountPaid).toLocaleString()}</span></div>
+                <div class="row"><span>Method</span><span>${sale.paymentMethod}</span></div><hr/><p style="text-align:center;font-size:11px">Thank you!</p>
+              </body></html>`)
+              w.document.close()
+              w.print()
+            }}
+            className={btn + ' bg-gray-100 text-gray-700 hover:bg-gray-200 flex items-center gap-1.5'}>
+            <Printer className="w-4 h-4" /> Print
+          </button>
+          <button onClick={onClose} className={btn + ' flex-1 bg-blue-600 text-white hover:bg-blue-700'}>
             New Sale
           </button>
         </div>
