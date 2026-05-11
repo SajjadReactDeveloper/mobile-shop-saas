@@ -49,17 +49,19 @@ export function StatCardsSkeleton() {
 /* ─── List items skeleton (Customers, Repairs, Inventory) ─── */
 export function ListItemsSkeleton({ rows = 6 }: { rows?: number }) {
   return (
-    <View style={sk.listContainer}>
-      {Array.from({ length: rows }).map((_, i) => (
-        <View key={i} style={sk.listRow}>
-          <Sk w={42} h={42} radius={21} />
-          <View style={{ flex: 1, gap: 8, marginLeft: 12 }}>
-            <Sk w="55%" h={14} />
-            <Sk w="38%" h={11} radius={6} />
+    <View style={sk.fullScreen}>
+      <View style={sk.listContainer}>
+        {Array.from({ length: rows }).map((_, i) => (
+          <View key={i} style={sk.listRow}>
+            <Sk w={42} h={42} radius={21} />
+            <View style={{ flex: 1, gap: 8, marginLeft: 12 }}>
+              <Sk w="55%" h={14} />
+              <Sk w="38%" h={11} radius={6} />
+            </View>
+            <Sk w={56} h={22} radius={11} />
           </View>
-          <Sk w={56} h={22} radius={11} />
-        </View>
-      ))}
+        ))}
+      </View>
     </View>
   )
 }
@@ -67,7 +69,7 @@ export function ListItemsSkeleton({ rows = 6 }: { rows?: number }) {
 /* ─── Account card skeleton (EasyLoad, Easypaisa) ─── */
 export function AccountCardsSkeleton({ rows = 3 }: { rows?: number }) {
   return (
-    <View style={{ gap: 12 }}>
+    <View style={[sk.fullScreen, { gap: 12 }]}>
       {Array.from({ length: rows }).map((_, i) => (
         <View key={i} style={sk.accountCard}>
           {/* header */}
@@ -99,7 +101,7 @@ export function AccountCardsSkeleton({ rows = 3 }: { rows?: number }) {
 /* ─── Dashboard skeleton ─── */
 export function DashboardScreenSkeleton() {
   return (
-    <View style={sk.screen}>
+    <View style={[sk.screen, sk.fullScreen]}>
       {/* greeting */}
       <View style={{ gap: 8, marginBottom: 20 }}>
         <Sk w="50%" h={20} />
@@ -127,7 +129,7 @@ export function DashboardScreenSkeleton() {
 /* ─── POS skeleton ─── */
 export function POSScreenSkeleton() {
   return (
-    <View style={sk.screen}>
+    <View style={[sk.screen, sk.fullScreen]}>
       <Sk w="100%" h={40} radius={12} style={{ marginBottom: 16 }} />
       {Array.from({ length: 5 }).map((_, i) => (
         <View key={i} style={sk.listRow}>
@@ -145,7 +147,7 @@ export function POSScreenSkeleton() {
 /* ─── Settings skeleton ─── */
 export function SettingsScreenSkeleton() {
   return (
-    <View style={sk.screen}>
+    <View style={[sk.screen, sk.fullScreen]}>
       {/* tabs */}
       <View style={{ flexDirection: 'row', gap: 8, marginBottom: 20 }}>
         <Sk w={80} h={34} radius={10} />
@@ -165,7 +167,8 @@ export function SettingsScreenSkeleton() {
 }
 
 const sk = StyleSheet.create({
-  screen:         { flex: 1, paddingHorizontal: 16, paddingTop: 16 },
+  fullScreen:     { flex: 1, backgroundColor: '#faf9ff', paddingHorizontal: 16, paddingTop: 16 },
+  screen:         { paddingHorizontal: 16, paddingTop: 16 },
   statsGrid:      { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 20 },
   statCard:       { width: (SCREEN_W - 52) / 2, backgroundColor: '#f9fafb', borderRadius: 16, padding: 14 },
   listContainer:  { backgroundColor: '#fff', borderRadius: 16, overflow: 'hidden' },

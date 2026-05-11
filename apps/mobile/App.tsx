@@ -174,7 +174,7 @@ const s = StyleSheet.create({
   splashLogo:  { width: 88, height: 88, borderRadius: 26, backgroundColor: '#f5f3ff', alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
   splashTitle: { fontSize: 24, fontWeight: '800', color: '#7c3aed' },
 
-  root:        { flex: 1, backgroundColor: '#7c3aed' }, // purple = spacer + nav-bar area match headers
+  root:        { flex: 1, backgroundColor: '#faf9ff' }, // light base; purple spacer + header backgrounds supply the colour
   content:     { flex: 1 },
   screenWrap:  { ...StyleSheet.absoluteFillObject },
   screenHidden: { opacity: 0, pointerEvents: 'none' } as object,
