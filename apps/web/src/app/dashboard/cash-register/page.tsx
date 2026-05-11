@@ -68,7 +68,7 @@ function TodaySession({ register }: { register: CashRegister }) {
   const expectedClosing = Number(register.openingBalance) + grossIncome - Number(register.expenses)
 
   const incomeRows = [
-    { label: 'Sales', amount: register.salesCash, icon: ShoppingCart, color: 'text-blue-600 bg-blue-50' },
+    { label: 'Sales', amount: register.salesCash, icon: ShoppingCart, color: 'text-violet-600 bg-violet-50' },
     { label: 'Easy Load', amount: register.easyLoadCash, icon: PhoneCall, color: 'text-purple-600 bg-purple-50' },
     { label: 'Easypaisa', amount: register.easypaisaCash, icon: Wallet, color: 'text-green-600 bg-green-50' },
     { label: 'Repairs', amount: register.repairCash, icon: Wrench, color: 'text-orange-600 bg-orange-50' },
@@ -118,7 +118,7 @@ function TodaySession({ register }: { register: CashRegister }) {
         {/* Closing */}
         <div className="flex justify-between items-center pt-4 mt-1 border-t-2 border-gray-200">
           <span className="text-sm font-bold text-gray-900">{register.isClosed ? 'Closing Balance' : 'Expected Closing'}</span>
-          <span className="text-xl font-extrabold text-blue-600">
+          <span className="text-xl font-extrabold text-violet-600">
             PKR {(register.isClosed ? Number(register.closingBalance) : expectedClosing).toLocaleString()}
           </span>
         </div>
@@ -168,7 +168,7 @@ function TodaySession({ register }: { register: CashRegister }) {
             </div>
             <h2 className="font-bold text-gray-900 text-lg">Close the Day?</h2>
             <p className="text-sm text-gray-500 mt-2 mb-2">Expected closing balance:</p>
-            <p className="text-2xl font-extrabold text-blue-600 mb-4">PKR {expectedClosing.toLocaleString()}</p>
+            <p className="text-2xl font-extrabold text-violet-600 mb-4">PKR {expectedClosing.toLocaleString()}</p>
             <p className="text-xs text-gray-400 mb-5">This action cannot be undone by cashiers.</p>
             <div className="flex gap-3">
               <Button variant="secondary" className="flex-1" onClick={() => setModal(null)}>Cancel</Button>
@@ -216,9 +216,9 @@ function HistoryTab() {
                 <div className="text-xs text-gray-400 mb-1">Income</div>
                 <div className="text-sm font-bold text-emerald-700">PKR {grossIncome.toLocaleString()}</div>
               </div>
-              <div className="bg-blue-50 rounded-xl p-3">
+              <div className="bg-violet-50 rounded-xl p-3">
                 <div className="text-xs text-gray-400 mb-1">Closing</div>
-                <div className="text-sm font-bold text-blue-700">PKR {closing.toLocaleString()}</div>
+                <div className="text-sm font-bold text-violet-700">PKR {closing.toLocaleString()}</div>
               </div>
             </div>
           </Card>

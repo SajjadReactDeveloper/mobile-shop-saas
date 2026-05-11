@@ -31,7 +31,7 @@ const groups: { key: string; label: string }[] = [
 
 const tierColors: Record<string, string> = {
   FREE:     'bg-slate-700 text-slate-300',
-  PRO:      'bg-blue-500/20 text-blue-300',
+  PRO:      'bg-violet-500/20 text-violet-300',
   BUSINESS: 'bg-violet-500/20 text-violet-300',
 }
 
@@ -57,7 +57,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* ── Brand ── */}
       <div className="px-4 py-4 flex items-center gap-3 border-b border-white/5">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-900/40 shrink-0">
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center shadow-lg shadow-violet-900/40 shrink-0">
           <Smartphone className="w-4 h-4 text-white" />
         </div>
         <div className="min-w-0 flex-1">
@@ -87,15 +87,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       onClick={() => setSidebarOpen(false)}
                       className={`group relative flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 ${
                         active
-                          ? 'bg-blue-500/15 text-blue-300'
+                          ? 'bg-violet-500/15 text-violet-300'
                           : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
                       }`}
                     >
                       {/* active left bar */}
                       {active && (
-                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-blue-400 rounded-full" />
+                        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-violet-400 rounded-full" />
                       )}
-                      <Icon className={`w-4 h-4 shrink-0 transition-colors ${active ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
+                      <Icon className={`w-4 h-4 shrink-0 transition-colors ${active ? 'text-violet-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
                       <span className="flex-1 truncate">{label}</span>
                     </Link>
                   )
@@ -161,7 +161,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Menu className="w-5 h-5" />
           </button>
           <div className="flex items-center gap-2 flex-1">
-            <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+            <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-purple-700 rounded-lg flex items-center justify-center">
               <Smartphone className="w-3.5 h-3.5 text-white" />
             </div>
             <span className="font-bold text-gray-900 text-sm">{user?.shop?.name ?? 'Mobile Shop'}</span>

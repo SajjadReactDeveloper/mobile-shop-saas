@@ -57,7 +57,7 @@ export default function RegisterPage() {
                 value={form[field.name as keyof typeof form]}
                 onChange={handleChange}
                 required={field.name !== 'city'}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
               />
             </div>
           ))}
@@ -65,7 +65,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="w-full py-2.5 bg-violet-600 text-white rounded-xl font-semibold hover:bg-violet-700 disabled:opacity-50 transition-colors"
           >
             {loading ? 'Creating shop...' : 'Start Free Trial'}
           </button>
@@ -73,7 +73,7 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-gray-600">
           Already have an account?{' '}
-          <Link href="/auth/login" className="text-blue-600 font-medium hover:underline">
+          <Link href="/auth/login" className="text-violet-600 font-semibold hover:underline">
             Sign in
           </Link>
         </p>

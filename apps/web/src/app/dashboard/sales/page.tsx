@@ -39,7 +39,7 @@ function ImeiPicker({ productId, selected, onSelect }: { productId: string; sele
   return (
     <div className="mt-1">
       <select
-        className="w-full px-2 py-1 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        className="w-full px-2 py-1 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
         value={selected ?? ''} onChange={e => onSelect(e.target.value)} required>
         <option value="">Select IMEI…</option>
         {available.map(i => <option key={i.id} value={i.imei}>{i.imei}</option>)}
@@ -131,7 +131,7 @@ function RecentSales() {
   return (
     <div className="space-y-2">
       {sales.slice(0, 30).map(sale => (
-        <div key={sale.id} className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100 hover:border-blue-100 transition-colors">
+        <div key={sale.id} className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100 hover:border-violet-100 transition-colors">
           <div>
             <div className="text-sm font-semibold text-gray-900 font-mono">{sale.invoiceNumber}</div>
             <div className="text-xs text-gray-400 mt-0.5">{sale.customer?.name ?? 'Walk-in'} · {sale.paymentMethod}</div>
@@ -253,20 +253,20 @@ export default function SalesPage() {
             <div className="relative">
               <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400 pointer-events-none" />
               <input ref={searchRef} autoFocus
-                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 shadow-sm"
                 placeholder="Search product to add to cart…"
                 value={search} onChange={e => setSearch(e.target.value)} />
               {filtered.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl z-20 max-h-72 overflow-y-auto">
                   {filtered.map(p => (
                     <button key={p.id} onClick={() => addToCart(p)} disabled={p.stockQty === 0}
-                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-blue-50 transition-colors text-left disabled:opacity-40 border-b border-gray-50 last:border-0">
+                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-violet-50 transition-colors text-left disabled:opacity-40 border-b border-gray-50 last:border-0">
                       <div>
                         <div className="text-sm font-semibold text-gray-900">{p.name}</div>
                         {(p.brand || p.model) && <div className="text-xs text-gray-400">{[p.brand, p.model].filter(Boolean).join(' ')}</div>}
                       </div>
                       <div className="text-right shrink-0 ml-4">
-                        <div className="text-sm font-bold text-blue-600">PKR {Number(p.sellingPrice).toLocaleString()}</div>
+                        <div className="text-sm font-bold text-violet-600">PKR {Number(p.sellingPrice).toLocaleString()}</div>
                         <div className={`text-xs ${p.stockQty === 0 ? 'text-red-500' : 'text-gray-400'}`}>
                           {p.stockQty === 0 ? 'Out of stock' : `${p.stockQty} left`}
                         </div>
@@ -340,22 +340,22 @@ export default function SalesPage() {
                 <User className="w-3.5 h-3.5" /> Customer (optional)
               </p>
               {selectedCustomer ? (
-                <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-100 rounded-xl">
+                <div className="flex items-center justify-between p-3 bg-violet-50 border border-violet-100 rounded-xl">
                   <div>
-                    <div className="text-sm font-bold text-blue-900">{selectedCustomer.name}</div>
-                    {selectedCustomer.phone && <div className="text-xs text-blue-500">{selectedCustomer.phone}</div>}
+                    <div className="text-sm font-bold text-violet-900">{selectedCustomer.name}</div>
+                    {selectedCustomer.phone && <div className="text-xs text-violet-500">{selectedCustomer.phone}</div>}
                     {Number(selectedCustomer.balanceOwed) > 0 && (
                       <div className="text-xs text-red-500 mt-0.5">Owes PKR {Number(selectedCustomer.balanceOwed).toLocaleString()}</div>
                     )}
                   </div>
-                  <button onClick={() => { setCustomerId(''); setCustomerSearch('') }} className="text-blue-400 hover:text-blue-600 p-1 rounded-lg hover:bg-blue-100 transition-colors">
+                  <button onClick={() => { setCustomerId(''); setCustomerSearch('') }} className="text-violet-400 hover:text-violet-600 p-1 rounded-lg hover:bg-violet-100 transition-colors">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
                 <div className="relative">
                   <input
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500"
                     placeholder="Search by name or phone…"
                     value={customerSearch}
                     onChange={e => { setCustomerSearch(e.target.value); setShowCustomerDrop(true) }}
@@ -365,7 +365,7 @@ export default function SalesPage() {
                     <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 max-h-44 overflow-y-auto">
                       {filteredCustomers.map(c => (
                         <button key={c.id} onMouseDown={() => { setCustomerId(c.id); setCustomerSearch(c.name); setShowCustomerDrop(false) }}
-                          className="w-full flex justify-between items-center px-3 py-2.5 hover:bg-blue-50 text-left border-b border-gray-50 last:border-0 transition-colors">
+                          className="w-full flex justify-between items-center px-3 py-2.5 hover:bg-violet-50 text-left border-b border-gray-50 last:border-0 transition-colors">
                           <div>
                             <div className="text-sm font-semibold text-gray-800">{c.name}</div>
                             {c.phone && <div className="text-xs text-gray-400">{c.phone}</div>}
@@ -407,7 +407,7 @@ export default function SalesPage() {
                 <div className="grid grid-cols-3 gap-1.5">
                   {PAYMENT_METHODS.map(m => (
                     <button key={m.key} onClick={() => setPaymentMethod(m.key)}
-                      className={`py-2 px-1 rounded-xl text-xs font-semibold border-2 transition-all flex flex-col items-center gap-1 ${paymentMethod === m.key ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-200' : 'border-gray-200 text-gray-600 hover:border-blue-300 hover:bg-blue-50'}`}>
+                      className={`py-2 px-1 rounded-xl text-xs font-semibold border-2 transition-all flex flex-col items-center gap-1 ${paymentMethod === m.key ? 'bg-violet-600 border-violet-600 text-white shadow-md shadow-violet-200' : 'border-gray-200 text-gray-600 hover:border-violet-300 hover:bg-violet-50'}`}>
                       <span className="text-base">{m.icon}</span>
                       {m.label}
                     </button>
@@ -423,7 +423,7 @@ export default function SalesPage() {
                   </p>
                   <input type="number" min="0" placeholder={String(total)} value={amountPaid}
                     onChange={e => setAmountPaid(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500" />
                   {paymentMethod === 'CASH' && paid > 0 && paid >= total && (
                     <div className="flex justify-between mt-2 px-3 py-2 bg-emerald-50 rounded-lg text-sm font-semibold text-emerald-700">
                       <span>Change</span><span>PKR {change.toLocaleString()}</span>

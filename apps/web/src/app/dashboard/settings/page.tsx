@@ -131,8 +131,8 @@ function StaffTab() {
                 <div className="flex items-center gap-2">
                   <div className="relative">
                     <select value={user.role} onChange={e => updateRole.mutate({ id: user.id, role: e.target.value as UserRole })}
-                      className={`text-xs font-semibold px-3 py-1.5 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 pr-7 border-0 ${
-                        user.role === 'OWNER' ? 'bg-purple-50 text-purple-700' : user.role === 'CASHIER' ? 'bg-blue-50 text-blue-700' : 'bg-orange-50 text-orange-700'
+                      className={`text-xs font-semibold px-3 py-1.5 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-500 pr-7 border-0 ${
+                        user.role === 'OWNER' ? 'bg-purple-50 text-purple-700' : user.role === 'CASHIER' ? 'bg-violet-50 text-violet-700' : 'bg-orange-50 text-orange-700'
                       }`}>
                       <option value="CASHIER">Cashier</option>
                       <option value="TECHNICIAN">Technician</option>
@@ -199,9 +199,9 @@ function BillingTab({ shop }: { shop: Shop }) {
         {TIERS.map(t => {
           const isCurrent = tier === t.id
           return (
-            <div key={t.id} className={`bg-white rounded-2xl border-2 p-6 flex flex-col gap-4 relative ${isCurrent ? 'border-blue-500 shadow-lg shadow-blue-100' : t.highlight ? 'border-gray-200 shadow-sm' : 'border-gray-200'}`}>
+            <div key={t.id} className={`bg-white rounded-2xl border-2 p-6 flex flex-col gap-4 relative ${isCurrent ? 'border-violet-500 shadow-lg shadow-violet-100' : t.highlight ? 'border-gray-200 shadow-sm' : 'border-gray-200'}`}>
               {t.highlight && !isCurrent && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Most Popular</div>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-violet-600 text-white text-xs font-bold px-3 py-1 rounded-full">Most Popular</div>
               )}
               {isCurrent && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full">Current Plan</div>

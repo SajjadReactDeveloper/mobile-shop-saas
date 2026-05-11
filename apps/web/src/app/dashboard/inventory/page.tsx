@@ -68,7 +68,7 @@ function AddProductModal({ onClose }: { onClose: () => void }) {
         <Input label="Low Stock Alert at" type="number" min="0" value={form.lowStockAlert} onChange={e => set('lowStockAlert', e.target.value)} />
       </div>
       <label className="flex items-start gap-3 cursor-pointer p-3 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
-        <input type="checkbox" checked={form.imeiTracked} onChange={e => set('imeiTracked', e.target.checked)} className="w-4 h-4 mt-0.5 rounded accent-blue-600" />
+        <input type="checkbox" checked={form.imeiTracked} onChange={e => set('imeiTracked', e.target.checked)} className="w-4 h-4 mt-0.5 rounded accent-violet-600" />
         <div>
           <div className="text-sm font-semibold text-gray-800">Enable IMEI Tracking</div>
           <div className="text-xs text-gray-500 mt-0.5">For phones — each unit will require an IMEI number at stock-in</div>
@@ -105,8 +105,8 @@ function AddStockModal({ product, onClose }: { product: Product; onClose: () => 
   }
   return (
     <form onSubmit={submit} className="space-y-4">
-      <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-between">
-        <span className="text-sm font-semibold text-blue-900">{product.name}</span>
+      <div className="p-3 bg-violet-50 border border-violet-100 rounded-xl flex items-center justify-between">
+        <span className="text-sm font-semibold text-violet-900">{product.name}</span>
         <Badge color="blue">Stock: {product.stockQty}</Badge>
       </div>
       <div className="grid grid-cols-2 gap-3">
@@ -201,7 +201,7 @@ export default function InventoryPage() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400 pointer-events-none" />
           <input
-            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
             placeholder="Search products…"
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -236,7 +236,7 @@ export default function InventoryPage() {
                     <Td>
                       <div className="font-semibold text-gray-900">{p.name}</div>
                       {(p.brand || p.model) && <div className="text-xs text-gray-400">{[p.brand, p.model].filter(Boolean).join(' · ')}</div>}
-                      {p.imeiTracked && <span className="text-xs text-blue-600 font-medium">IMEI tracked</span>}
+                      {p.imeiTracked && <span className="text-xs text-violet-600 font-medium">IMEI tracked</span>}
                     </Td>
                     <Td><Badge color={CAT_COLOR[p.category]}>{p.category.replace('_', ' ')}</Badge></Td>
                     <Td className="text-right text-gray-500">PKR {Number(p.buyingPrice).toLocaleString()}</Td>
@@ -248,7 +248,7 @@ export default function InventoryPage() {
                     <Td>
                       <div className="flex items-center justify-center gap-1">
                         <button onClick={() => { setSelected(p); setModal('stock') }} title="Add Stock"
-                          className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                          className="p-1.5 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition-colors">
                           <PlusCircle className="w-4 h-4" />
                         </button>
                         {p.imeiTracked && (

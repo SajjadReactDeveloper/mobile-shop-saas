@@ -57,18 +57,18 @@ function NewJobModal({ onClose }: { onClose: () => void }) {
       <div>
         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Customer *</p>
         {selected ? (
-          <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-100 rounded-xl">
+          <div className="flex items-center justify-between p-3 bg-violet-50 border border-violet-100 rounded-xl">
             <div>
-              <div className="text-sm font-bold text-blue-900">{selected.name}</div>
-              {selected.phone && <div className="text-xs text-blue-500">{selected.phone}</div>}
+              <div className="text-sm font-bold text-violet-900">{selected.name}</div>
+              {selected.phone && <div className="text-xs text-violet-500">{selected.phone}</div>}
             </div>
-            <button type="button" onClick={() => { set('customerId', ''); setCustomerSearch('') }} className="text-blue-400 hover:text-blue-600 p-1 rounded-lg hover:bg-blue-100 transition-colors">
+            <button type="button" onClick={() => { set('customerId', ''); setCustomerSearch('') }} className="text-violet-400 hover:text-violet-600 p-1 rounded-lg hover:bg-violet-100 transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
         ) : (
           <div className="relative">
-            <input className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <input className="w-full px-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500"
               placeholder="Search customer…" value={customerSearch}
               onChange={e => { setCustomerSearch(e.target.value); setShowDrop(true) }}
               onFocus={() => setShowDrop(true)} onBlur={() => setTimeout(() => setShowDrop(false), 150)} />
@@ -76,7 +76,7 @@ function NewJobModal({ onClose }: { onClose: () => void }) {
               <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-20 max-h-40 overflow-y-auto">
                 {filtered.map(c => (
                   <button key={c.id} type="button" onMouseDown={() => { set('customerId', c.id); setCustomerSearch(c.name); setShowDrop(false) }}
-                    className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-blue-50 text-left border-b border-gray-50 last:border-0 transition-colors">
+                    className="w-full flex items-center gap-2 px-3 py-2.5 hover:bg-violet-50 text-left border-b border-gray-50 last:border-0 transition-colors">
                     <span className="text-sm font-semibold text-gray-800">{c.name}</span>
                     {c.phone && <span className="text-xs text-gray-400">{c.phone}</span>}
                   </button>
@@ -184,10 +184,10 @@ function JobDetail({ jobId, onBack }: { jobId: string; onBack: () => void }) {
             const active = s === job.status
             return (
               <div key={s} className="flex items-center gap-1 shrink-0">
-                {i > 0 && <div className={`h-0.5 w-5 rounded-full ${done ? 'bg-blue-400' : 'bg-gray-200'}`} />}
+                {i > 0 && <div className={`h-0.5 w-5 rounded-full ${done ? 'bg-violet-400' : 'bg-gray-200'}`} />}
                 <div className="flex flex-col items-center gap-1">
-                  <div className={`w-3 h-3 rounded-full border-2 transition-colors ${active ? 'bg-blue-600 border-blue-600 scale-125' : done ? 'bg-blue-400 border-blue-400' : 'bg-white border-gray-300'}`} />
-                  <span className={`text-[10px] whitespace-nowrap ${active ? 'text-blue-600 font-bold' : done ? 'text-gray-500' : 'text-gray-300'}`}>
+                  <div className={`w-3 h-3 rounded-full border-2 transition-colors ${active ? 'bg-violet-600 border-violet-600 scale-125' : done ? 'bg-violet-400 border-violet-400' : 'bg-white border-gray-300'}`} />
+                  <span className={`text-[10px] whitespace-nowrap ${active ? 'text-violet-600 font-bold' : done ? 'text-gray-500' : 'text-gray-300'}`}>
                     {STATUS_META[s].label}
                   </span>
                 </div>
@@ -224,7 +224,7 @@ function JobDetail({ jobId, onBack }: { jobId: string; onBack: () => void }) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <span className="text-sm font-bold text-gray-800">Parts Used</span>
           {!isTerminal && (
-            <button onClick={() => setShowAddPart(true)} className="text-xs text-blue-600 font-semibold flex items-center gap-1 hover:text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-50 transition-colors">
+            <button onClick={() => setShowAddPart(true)} className="text-xs text-violet-600 font-semibold flex items-center gap-1 hover:text-violet-700 px-2 py-1 rounded-lg hover:bg-violet-50 transition-colors">
               <Plus className="w-3.5 h-3.5" /> Add Part
             </button>
           )}

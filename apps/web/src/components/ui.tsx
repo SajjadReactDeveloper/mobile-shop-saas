@@ -11,7 +11,7 @@ type BtnSize = 'sm' | 'md' | 'lg'
 
 const btnBase = 'inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none cursor-pointer'
 const btnVariants: Record<BtnVariant, string> = {
-  primary:   'bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.97] focus-visible:ring-blue-500 shadow-sm shadow-blue-200',
+  primary:   'bg-violet-600 text-white hover:bg-violet-700 active:scale-[0.97] focus-visible:ring-violet-500 shadow-sm shadow-violet-200',
   secondary: 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 active:scale-[0.97] focus-visible:ring-gray-300 shadow-sm',
   danger:    'bg-red-600 text-white hover:bg-red-700 active:scale-[0.97] focus-visible:ring-red-500 shadow-sm shadow-red-200',
   ghost:     'text-gray-600 hover:bg-gray-100 hover:text-gray-900 active:scale-[0.97] focus-visible:ring-gray-300',
@@ -45,7 +45,7 @@ export function Button({ variant = 'primary', size = 'md', loading, children, cl
 /* ─────────────────────────────────────────────
    Input / Textarea / Select
 ───────────────────────────────────────────── */
-const inputBase = 'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 disabled:opacity-50 disabled:bg-gray-50'
+const inputBase = 'w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:border-violet-400 disabled:opacity-50 disabled:bg-gray-50'
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
@@ -243,7 +243,7 @@ export function Td({ children, className = '' }: { children: React.ReactNode; cl
    Spinner / Loading
 ───────────────────────────────────────────── */
 export function Spinner({ className = '' }: { className?: string }) {
-  return <Loader2 className={`animate-spin text-blue-500 ${className}`} />
+  return <Loader2 className={`animate-spin text-violet-500 ${className}`} />
 }
 
 export function PageLoader() {
@@ -275,7 +275,7 @@ export function Tabs({ tabs, active, onChange }: TabsProps) {
           {t.label}
           {t.count !== undefined && (
             <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
-              active === t.key ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-500'
+              active === t.key ? 'bg-violet-100 text-violet-700' : 'bg-gray-200 text-gray-500'
             }`}>
               {t.count}
             </span>

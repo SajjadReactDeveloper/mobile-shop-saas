@@ -44,7 +44,7 @@ export default function DashboardPage() {
   const sales   = todaySummary?.totalSales ?? 0
 
   const quickLinks = [
-    { href: '/dashboard/sales',         icon: ShoppingCart, label: 'New Sale',        color: 'bg-blue-600 text-white' },
+    { href: '/dashboard/sales',         icon: ShoppingCart, label: 'New Sale',        color: 'bg-violet-600 text-white' },
     { href: '/dashboard/inventory',     icon: Package,      label: 'Add Product',     color: 'bg-purple-600 text-white' },
     { href: '/dashboard/repairs',       icon: Wrench,       label: 'New Repair',      color: 'bg-orange-500 text-white' },
     { href: '/dashboard/cash-register', icon: DollarSign,   label: 'Cash Register',   color: 'bg-emerald-600 text-white' },
@@ -85,7 +85,7 @@ export default function DashboardPage() {
           value={`PKR ${profit.toLocaleString()}`}
           sub="Gross margin"
           icon={TrendingUp}
-          color="text-blue-600 bg-blue-50"
+          color="text-violet-600 bg-violet-50"
         />
         <Stat
           label="Total Products"
@@ -117,7 +117,7 @@ export default function DashboardPage() {
                 <div className="text-xs text-gray-500">{lowStock?.length ?? 0} items need restocking</div>
               </div>
             </div>
-            <Link href="/dashboard/inventory" className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">
+            <Link href="/dashboard/inventory" className="text-xs font-semibold text-violet-600 hover:underline flex items-center gap-1">
               View all <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
@@ -147,7 +147,7 @@ export default function DashboardPage() {
                 <div className="text-xs text-gray-500">{pendingRepairs?.length ?? stats?.pendingRepairs ?? 0} jobs in progress</div>
               </div>
             </div>
-            <Link href="/dashboard/repairs" className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">
+            <Link href="/dashboard/repairs" className="text-xs font-semibold text-violet-600 hover:underline flex items-center gap-1">
               View all <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
@@ -174,15 +174,15 @@ export default function DashboardPage() {
         <Card>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                <PhoneCall className="w-4 h-4 text-blue-600" />
+              <div className="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center">
+                <PhoneCall className="w-4 h-4 text-violet-600" />
               </div>
               <div>
                 <div className="text-sm font-bold text-gray-900">Easy Load — Today</div>
                 <div className="text-xs text-gray-500">Balance per network</div>
               </div>
             </div>
-            <Link href="/dashboard/easy-load" className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">
+            <Link href="/dashboard/easy-load" className="text-xs font-semibold text-violet-600 hover:underline flex items-center gap-1">
               Manage <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
@@ -203,7 +203,7 @@ export default function DashboardPage() {
       {/* Wallet quick view */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Link href="/dashboard/customers" className="group">
-          <Card className="hover:border-blue-200 hover:shadow-md transition-all cursor-pointer">
+          <Card className="hover:border-violet-200 hover:shadow-md transition-all cursor-pointer">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 bg-cyan-50 rounded-lg flex items-center justify-center">
                 <Users className="w-4 h-4 text-cyan-600" />
@@ -216,7 +216,7 @@ export default function DashboardPage() {
           </Card>
         </Link>
         <Link href="/dashboard/easypaisa" className="group">
-          <Card className="hover:border-blue-200 hover:shadow-md transition-all cursor-pointer">
+          <Card className="hover:border-violet-200 hover:shadow-md transition-all cursor-pointer">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 bg-green-50 rounded-lg flex items-center justify-center">
                 <Wallet className="w-4 h-4 text-green-600" />
@@ -229,7 +229,7 @@ export default function DashboardPage() {
           </Card>
         </Link>
         <Link href="/dashboard/cash-register" className="group">
-          <Card className="hover:border-blue-200 hover:shadow-md transition-all cursor-pointer">
+          <Card className="hover:border-violet-200 hover:shadow-md transition-all cursor-pointer">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center">
                 <DollarSign className="w-4 h-4 text-emerald-600" />
@@ -242,7 +242,7 @@ export default function DashboardPage() {
           </Card>
         </Link>
         <Link href="/dashboard/reports" className="group">
-          <Card className="hover:border-blue-200 hover:shadow-md transition-all cursor-pointer">
+          <Card className="hover:border-violet-200 hover:shadow-md transition-all cursor-pointer">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 bg-purple-50 rounded-lg flex items-center justify-center">
                 <TrendingUp className="w-4 h-4 text-purple-600" />

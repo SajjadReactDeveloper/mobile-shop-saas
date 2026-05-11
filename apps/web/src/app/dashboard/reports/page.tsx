@@ -74,7 +74,7 @@ export default function ReportsPage() {
   })
 
   const sources = overview ? [
-    { label: 'Sales Profit',         value: overview.sales.grossProfit,    color: 'bg-blue-500',   count: overview.sales.count },
+    { label: 'Sales Profit',         value: overview.sales.grossProfit,    color: 'bg-violet-500',   count: overview.sales.count },
     { label: 'Repair Revenue',       value: overview.repairs.revenue,      color: 'bg-orange-400', count: overview.repairs.count },
     { label: 'Easy Load Profit',     value: overview.easyLoad.profit,      color: 'bg-emerald-500',count: overview.easyLoad.count },
     { label: 'Easypaisa Commission', value: overview.easypaisa.commission, color: 'bg-purple-500', count: overview.easypaisa.count },
@@ -99,13 +99,13 @@ export default function ReportsPage() {
           <div className="flex items-center gap-2">
             <div className="relative">
               <Calendar className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
-              <input type="date" className="pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              <input type="date" className="pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500"
                 value={custom.from} onChange={e => setCustom(c => ({ ...c, from: e.target.value }))} />
             </div>
             <span className="text-gray-400 text-sm">→</span>
             <div className="relative">
               <Calendar className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
-              <input type="date" className="pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              <input type="date" className="pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500"
                 value={custom.to} onChange={e => setCustom(c => ({ ...c, to: e.target.value }))} />
             </div>
           </div>
@@ -117,7 +117,7 @@ export default function ReportsPage() {
           {/* KPI */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <Stat icon={TrendingUp} label="Total Profit" value={`PKR ${overview.totalProfit.toLocaleString()}`} sub="All sources" color="text-emerald-600 bg-emerald-50" />
-            <Stat icon={TrendingUp} label="Sales Revenue" value={`PKR ${overview.sales.revenue.toLocaleString()}`} sub={`${overview.sales.count} transactions`} color="text-blue-600 bg-blue-50" />
+            <Stat icon={TrendingUp} label="Sales Revenue" value={`PKR ${overview.sales.revenue.toLocaleString()}`} sub={`${overview.sales.count} transactions`} color="text-violet-600 bg-violet-50" />
             <Stat icon={Package} label="Inventory Value" value={`PKR ${overview.inventoryValuation.toLocaleString()}`} sub="At buying price" color="text-purple-600 bg-purple-50" />
             <Stat icon={Users} label="Receivables" value={`PKR ${(receivables?.total ?? 0).toLocaleString()}`} sub={`${receivables?.customers.length ?? 0} customers`} color="text-red-600 bg-red-50" />
           </div>
@@ -167,7 +167,7 @@ export default function ReportsPage() {
                         </div>
                       </div>
                       <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden ml-8">
-                        <div className="h-full bg-blue-500 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
+                        <div className="h-full bg-violet-500 rounded-full transition-all duration-500" style={{ width: `${pct}%` }} />
                       </div>
                     </div>
                   )
