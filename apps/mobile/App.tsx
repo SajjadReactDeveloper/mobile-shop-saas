@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useState } from 'react'
-import { View, TouchableOpacity, Text, StyleSheet, ScrollView } from 'react-native'
+import { View, TouchableOpacity, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
 import { getToken, clearToken } from './src/lib/api'
 import { LoginScreen } from './src/screens/LoginScreen'
 import { DashboardScreen } from './src/screens/DashboardScreen'
@@ -32,10 +32,16 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('dashboard')
 
   useEffect(() => {
-    getToken().then((t) => setAuthed(!!t))
+    getToken()
+      .then((t) => setAuthed(!!t))
+      .catch(() => setAuthed(false))   // never stay on blank screen if storage fails
   }, [])
 
-  if (authed === null) return null
+  if (authed === null) return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f9fa' }}>
+      <ActivityIndicator size="large" color="#7c3aed" />
+    </View>
+  )
 
   if (!authed) {
     return (
