@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useRef, useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Platform } from 'react-native'
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { getToken, clearToken, setAuthExpiredCallback } from './src/lib/api'
 import { LoginScreen }        from './src/screens/LoginScreen'
 import { SignupScreen }        from './src/screens/SignupScreen'
@@ -14,7 +15,6 @@ import { EasypaisaScreen }     from './src/screens/EasypaisaScreen'
 import { CustomersScreen }     from './src/screens/CustomersScreen'
 import { CashRegisterScreen }  from './src/screens/CashRegisterScreen'
 import { SettingsScreen }      from './src/screens/SettingsScreen'
-import { STATUS_TOP }          from './src/lib/constants'
 
 type MainScreen = 'dashboard' | 'pos' | 'inventory' | 'more'
 type SubScreen  = 'customers' | 'repairs' | 'easyload' | 'easypaisa' | 'cash' | 'settings'
@@ -34,14 +34,26 @@ const ALL_SCREENS: AnyScreen[] = [
   'customers', 'repairs', 'easyload', 'easypaisa', 'cash', 'settings',
 ]
 
+/* ─── Root: just provides the safe-area context ─── */
 export default function App() {
-  const [authed, setAuthed]           = useState<boolean | null>(null)
-  const [authScreen, setAuthScreen]   = useState<AuthScreen>('login')
-  const [screen, setScreen]           = useState<AnyScreen>('dashboard')
-  const [mounted, setMounted]         = useState<Set<AnyScreen>>(new Set(['dashboard']))
-  const prevMain = useRef<MainScreen>('dashboard')   // tracks last active main tab
+  return (
+    <SafeAreaProvider>
+      <AppContent />
+    </SafeAreaProvider>
+  )
+}
 
-  /* ─── Auth init & expired-token listener ─── */
+/* ─── Inner component — has access to real safe-area insets ─── */
+function AppContent() {
+  const insets = useSafeAreaInsets()
+
+  const [authed, setAuthed]         = useState<boolean | null>(null)
+  const [authScreen, setAuthScreen] = useState<AuthScreen>('login')
+  const [screen, setScreen]         = useState<AnyScreen>('dashboard')
+  const [mounted, setMounted]       = useState<Set<AnyScreen>>(new Set(['dashboard']))
+  const prevMain = useRef<MainScreen>('dashboard')
+
+  /* ─── Auth init ─── */
   useEffect(() => {
     getToken()
       .then(t => setAuthed(!!t))
@@ -53,18 +65,15 @@ export default function App() {
     })
   }, [])
 
-  /* ─── Navigation helpers ─── */
+  /* ─── Navigation ─── */
   const navigate = (s: AnyScreen) => {
     setMounted(prev => { const n = new Set(prev); n.add(s); return n })
     setScreen(s)
-    // Track last active main tab for back-from-sub-screen
     if (['dashboard', 'pos', 'inventory', 'more'].includes(s)) {
       prevMain.current = s as MainScreen
     }
   }
-
   const goBack = () => navigate(prevMain.current)
-
   const logout = () => {
     void clearToken()
     setAuthed(false)
@@ -73,13 +82,11 @@ export default function App() {
     setMounted(new Set(['dashboard']))
   }
 
-  /* ─── Loading splash ─── */
+  /* ─── Splash ─── */
   if (authed === null) {
     return (
       <View style={s.splash}>
-        <View style={s.splashLogo}>
-          <Text style={{ fontSize: 40 }}>📱</Text>
-        </View>
+        <View style={s.splashLogo}><Text style={{ fontSize: 40 }}>📱</Text></View>
         <Text style={s.splashTitle}>Mobile Shop</Text>
         <ActivityIndicator color="#7c3aed" size="large" style={{ marginTop: 20 }} />
       </View>
@@ -99,14 +106,22 @@ export default function App() {
     )
   }
 
-  const isMain    = (id: AnyScreen): id is MainScreen  => MAIN_TABS.some(t => t.id === id)
+  const isMain    = (id: AnyScreen): id is MainScreen => MAIN_TABS.some(t => t.id === id)
   const activeMain: MainScreen = isMain(screen) ? screen : prevMain.current
 
   return (
     <View style={s.root}>
       <StatusBar style="light" />
 
-      {/* ── Lazy-mounted screens — keep alive once visited ── */}
+      {/*
+        Status-bar safe-area spacer.
+        height = exact top inset from useSafeAreaInsets() — reliable on every
+        Android device even with edgeToEdgeEnabled + newArch.
+        Purple so it blends seamlessly with every screen's violet header.
+      */}
+      <View style={{ height: insets.top, backgroundColor: '#7c3aed' }} />
+
+      {/* ── Lazy-mounted screens ── */}
       <View style={s.content}>
         {ALL_SCREENS.map(id => {
           if (!mounted.has(id)) return null
@@ -128,8 +143,11 @@ export default function App() {
         })}
       </View>
 
-      {/* ── Bottom tab bar (4 tabs) ── */}
-      <View style={s.tabBar}>
+      {/*
+        Tab bar — height expands to include the system navigation-bar inset so
+        tab content never sits behind Android's home-gesture indicator.
+      */}
+      <View style={[s.tabBar, { paddingBottom: insets.bottom }]}>
         {MAIN_TABS.map(tab => {
           const active = activeMain === tab.id
           return (
@@ -151,35 +169,29 @@ export default function App() {
   )
 }
 
-const TAB_BAR_HEIGHT = Platform.OS === 'ios' ? 82 : 64
-
 const s = StyleSheet.create({
-  splash:         { flex: 1, backgroundColor: '#faf9ff', alignItems: 'center', justifyContent: 'center' },
-  splashLogo:     { width: 88, height: 88, borderRadius: 26, backgroundColor: '#f5f3ff', alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
-  splashTitle:    { fontSize: 24, fontWeight: '800', color: '#7c3aed' },
+  splash:      { flex: 1, backgroundColor: '#faf9ff', alignItems: 'center', justifyContent: 'center' },
+  splashLogo:  { width: 88, height: 88, borderRadius: 26, backgroundColor: '#f5f3ff', alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
+  splashTitle: { fontSize: 24, fontWeight: '800', color: '#7c3aed' },
 
-  root:           { flex: 1, backgroundColor: '#faf9ff' },
-  content:        { flex: 1 },
-  screenWrap:     { ...StyleSheet.absoluteFillObject },
-  screenHidden:   { opacity: 0, pointerEvents: 'none' } as object,
+  root:        { flex: 1, backgroundColor: '#7c3aed' }, // purple = spacer + nav-bar area match headers
+  content:     { flex: 1 },
+  screenWrap:  { ...StyleSheet.absoluteFillObject },
+  screenHidden: { opacity: 0, pointerEvents: 'none' } as object,
 
-  tabBar:         {
+  tabBar: {
     flexDirection: 'row',
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#ede9fe',
-    height: TAB_BAR_HEIGHT,
-    paddingBottom: Platform.OS === 'ios' ? 20 : 0,
-    paddingTop: 0,
+    paddingTop: 6,
     shadowColor: '#7c3aed',
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.07,
     shadowRadius: 10,
     elevation: 12,
   },
-  // Each tab item shows its active state via a top border — avoids all the
-  // absolute-positioning maths that made the old indicator misalign.
-  tabItem:        { flex: 1, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 8, borderTopWidth: 3, borderTopColor: 'transparent' },
+  tabItem:        { flex: 1, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 2, borderTopWidth: 3, borderTopColor: 'transparent' },
   tabItemActive:  { borderTopColor: '#7c3aed' },
   tabIconWrap:    { width: 36, height: 28, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
   tabIconWrapActive: { backgroundColor: '#f5f3ff' },

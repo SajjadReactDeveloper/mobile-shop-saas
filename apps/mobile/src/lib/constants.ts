@@ -1,14 +1,9 @@
-import { Platform, StatusBar } from 'react-native'
-
 /**
- * Top padding to use in screen headers so content clears the status bar.
+ * Visual top padding for screen headers.
  *
- * On Android the app runs edge-to-edge (status bar is always translucent /
- * content draws behind it).  StatusBar.currentHeight gives the bar height in
- * logical pixels, but can be 0 on some emulators or early render cycles, so
- * we enforce a floor of 28 dp and add 20 dp of breathing room so the header
- * title always clears the status-bar icons on every modern device.
+ * The actual status-bar safe area is now handled by the purple spacer
+ * rendered in App.tsx using useSafeAreaInsets().top — so this constant
+ * only adds comfortable breathing room between the spacer bottom and the
+ * first line of header text.  14 dp works well on all device sizes.
  */
-export const STATUS_TOP = Platform.OS === 'ios'
-  ? 56
-  : Math.max(StatusBar.currentHeight ?? 0, 28) + 20
+export const STATUS_TOP = 14

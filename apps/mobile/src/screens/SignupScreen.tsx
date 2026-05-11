@@ -3,11 +3,13 @@ import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   KeyboardAvoidingView, Platform, ScrollView, Alert,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { api, saveToken } from '../lib/api'
 
 interface Props { onBack: () => void; onSignup: () => void }
 
 export function SignupScreen({ onBack, onSignup }: Props) {
+  const insets = useSafeAreaInsets()
   const [form, setForm] = useState({ name: '', shopName: '', city: '', email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const set = (k: keyof typeof form) => (v: string) => setForm(f => ({ ...f, [k]: v }))
@@ -47,7 +49,7 @@ export function SignupScreen({ onBack, onSignup }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       {/* Violet hero */}
-      <View style={s.hero}>
+      <View style={[s.hero, { paddingTop: insets.top + 16 }]}>
         <TouchableOpacity style={s.back} onPress={onBack}>
           <Text style={s.backText}>← Back</Text>
         </TouchableOpacity>
@@ -120,7 +122,7 @@ export function SignupScreen({ onBack, onSignup }: Props) {
 
 const s = StyleSheet.create({
   flex:         { flex: 1, backgroundColor: '#7c3aed' },
-  hero:         { backgroundColor: '#7c3aed', paddingTop: 56, paddingHorizontal: 24, paddingBottom: 28 },
+  hero:         { backgroundColor: '#7c3aed', paddingHorizontal: 24, paddingBottom: 28 },
   back:         { marginBottom: 16 },
   backText:     { color: 'rgba(255,255,255,0.8)', fontSize: 15, fontWeight: '500' },
   logoWrap:     { width: 56, height: 56, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center', marginBottom: 12 },

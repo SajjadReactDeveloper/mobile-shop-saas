@@ -3,6 +3,7 @@ import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   KeyboardAvoidingView, Platform, ScrollView, Alert,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { api, saveToken } from '../lib/api'
 
 interface Props {
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function LoginScreen({ onLogin, onSignup }: Props) {
+  const insets = useSafeAreaInsets()
   const [tab, setTab] = useState<'email' | 'phone'>('email')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -69,7 +71,7 @@ export function LoginScreen({ onLogin, onSignup }: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       {/* Violet hero */}
-      <View style={s.hero}>
+      <View style={[s.hero, { paddingTop: insets.top + 20 }]}>
         <View style={s.logoWrap}>
           <Text style={s.logoEmoji}>📱</Text>
         </View>
@@ -177,7 +179,7 @@ export function LoginScreen({ onLogin, onSignup }: Props) {
 
 const s = StyleSheet.create({
   flex:             { flex: 1, backgroundColor: '#7c3aed' },
-  hero:             { alignItems: 'center', paddingTop: 64, paddingBottom: 36, paddingHorizontal: 24 },
+  hero:             { alignItems: 'center', paddingBottom: 36, paddingHorizontal: 24 },
   logoWrap:         { width: 72, height: 72, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
   logoEmoji:        { fontSize: 36 },
   heroTitle:        { fontSize: 28, fontWeight: '800', color: '#fff', letterSpacing: -0.5 },
