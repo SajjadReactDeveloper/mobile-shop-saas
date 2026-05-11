@@ -182,16 +182,17 @@ const s = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
     backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#ede9fe',
-    paddingTop: 6,
+    // No borderTopWidth here — each tabItem carries its own top border so the
+    // active indicator sits perfectly flush at the very top with no offset.
     shadowColor: '#7c3aed',
     shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.07,
+    shadowOpacity: 0.08,
     shadowRadius: 10,
     elevation: 12,
   },
-  tabItem:        { flex: 1, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 2, borderTopWidth: 3, borderTopColor: 'transparent' },
+  // Inactive tabs show a subtle 3 dp grey line; active tab shows purple.
+  // Because the border lives on the item (not the bar), it is always flush.
+  tabItem:        { flex: 1, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 8, borderTopWidth: 3, borderTopColor: '#ede9fe' },
   tabItemActive:  { borderTopColor: '#7c3aed' },
   tabIconWrap:    { width: 36, height: 28, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
   tabIconWrapActive: { backgroundColor: '#f5f3ff' },
