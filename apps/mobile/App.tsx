@@ -1,57 +1,92 @@
 import { StatusBar } from 'expo-status-bar'
-import { useEffect, useState } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
-import { getToken, clearToken } from './src/lib/api'
-import { LoginScreen } from './src/screens/LoginScreen'
-import { SignupScreen } from './src/screens/SignupScreen'
-import { DashboardScreen } from './src/screens/DashboardScreen'
-import { InventoryScreen } from './src/screens/InventoryScreen'
-import { POSScreen } from './src/screens/POSScreen'
-import { RepairsScreen } from './src/screens/RepairsScreen'
-import { EasyLoadScreen } from './src/screens/EasyLoadScreen'
-import { EasypaisaScreen } from './src/screens/EasypaisaScreen'
-import { CustomersScreen } from './src/screens/CustomersScreen'
-import { CashRegisterScreen } from './src/screens/CashRegisterScreen'
-import { SettingsScreen } from './src/screens/SettingsScreen'
+import { useEffect, useRef, useState } from 'react'
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Platform } from 'react-native'
+import { getToken, clearToken, setAuthExpiredCallback } from './src/lib/api'
+import { LoginScreen }        from './src/screens/LoginScreen'
+import { SignupScreen }        from './src/screens/SignupScreen'
+import { DashboardScreen }     from './src/screens/DashboardScreen'
+import { InventoryScreen }     from './src/screens/InventoryScreen'
+import { POSScreen }           from './src/screens/POSScreen'
+import { MoreScreen }          from './src/screens/MoreScreen'
+import { RepairsScreen }       from './src/screens/RepairsScreen'
+import { EasyLoadScreen }      from './src/screens/EasyLoadScreen'
+import { EasypaisaScreen }     from './src/screens/EasypaisaScreen'
+import { CustomersScreen }     from './src/screens/CustomersScreen'
+import { CashRegisterScreen }  from './src/screens/CashRegisterScreen'
+import { SettingsScreen }      from './src/screens/SettingsScreen'
+import { STATUS_TOP }          from './src/lib/constants'
 
-type Screen = 'dashboard' | 'pos' | 'inventory' | 'customers' | 'repairs' | 'easyload' | 'easypaisa' | 'cash' | 'settings'
+type MainScreen = 'dashboard' | 'pos' | 'inventory' | 'more'
+type SubScreen  = 'customers' | 'repairs' | 'easyload' | 'easypaisa' | 'cash' | 'settings'
+type AnyScreen  = MainScreen | SubScreen
 type AuthScreen = 'login' | 'signup'
 
-const TABS: { id: Screen; label: string; icon: string }[] = [
-  { id: 'dashboard',  label: 'Home',      icon: '🏠' },
-  { id: 'pos',        label: 'Sale',       icon: '🛒' },
-  { id: 'inventory',  label: 'Stock',      icon: '📦' },
-  { id: 'customers',  label: 'Customers',  icon: '👤' },
-  { id: 'repairs',    label: 'Repairs',    icon: '🔧' },
-  { id: 'easyload',   label: 'Load',       icon: '📱' },
-  { id: 'easypaisa',  label: 'Easypaisa',  icon: '💚' },
-  { id: 'cash',       label: 'Cash',       icon: '💵' },
-  { id: 'settings',   label: 'Settings',   icon: '⚙️'  },
+const MAIN_TABS: { id: MainScreen; label: string; icon: string }[] = [
+  { id: 'dashboard',  label: 'Home',  icon: '🏠' },
+  { id: 'pos',        label: 'Sale',  icon: '🛒' },
+  { id: 'inventory',  label: 'Stock', icon: '📦' },
+  { id: 'more',       label: 'More',  icon: '⋯'  },
+]
+
+/** All screens that should be lazy-mounted and kept alive */
+const ALL_SCREENS: AnyScreen[] = [
+  'dashboard', 'pos', 'inventory', 'more',
+  'customers', 'repairs', 'easyload', 'easypaisa', 'cash', 'settings',
 ]
 
 export default function App() {
-  const [authed, setAuthed] = useState<boolean | null>(null)
-  const [authScreen, setAuthScreen] = useState<AuthScreen>('login')
-  const [screen, setScreen] = useState<Screen>('dashboard')
+  const [authed, setAuthed]           = useState<boolean | null>(null)
+  const [authScreen, setAuthScreen]   = useState<AuthScreen>('login')
+  const [screen, setScreen]           = useState<AnyScreen>('dashboard')
+  const [mounted, setMounted]         = useState<Set<AnyScreen>>(new Set(['dashboard']))
+  const prevMain = useRef<MainScreen>('dashboard')   // tracks last active main tab
 
+  /* ─── Auth init & expired-token listener ─── */
   useEffect(() => {
     getToken()
       .then(t => setAuthed(!!t))
       .catch(() => setAuthed(false))
+
+    setAuthExpiredCallback(() => {
+      setAuthed(false)
+      setAuthScreen('login')
+    })
   }, [])
 
+  /* ─── Navigation helpers ─── */
+  const navigate = (s: AnyScreen) => {
+    setMounted(prev => { const n = new Set(prev); n.add(s); return n })
+    setScreen(s)
+    // Track last active main tab for back-from-sub-screen
+    if (['dashboard', 'pos', 'inventory', 'more'].includes(s)) {
+      prevMain.current = s as MainScreen
+    }
+  }
+
+  const goBack = () => navigate(prevMain.current)
+
+  const logout = () => {
+    void clearToken()
+    setAuthed(false)
+    setAuthScreen('login')
+    setScreen('dashboard')
+    setMounted(new Set(['dashboard']))
+  }
+
+  /* ─── Loading splash ─── */
   if (authed === null) {
     return (
-      <View style={s.loader}>
-        <View style={s.loaderLogo}>
-          <Text style={{ fontSize: 36 }}>📱</Text>
+      <View style={s.splash}>
+        <View style={s.splashLogo}>
+          <Text style={{ fontSize: 40 }}>📱</Text>
         </View>
-        <ActivityIndicator size="large" color="#7c3aed" style={{ marginTop: 24 }} />
-        <Text style={s.loaderText}>Mobile Shop</Text>
+        <Text style={s.splashTitle}>Mobile Shop</Text>
+        <ActivityIndicator color="#7c3aed" size="large" style={{ marginTop: 20 }} />
       </View>
     )
   }
 
+  /* ─── Auth screens ─── */
   if (!authed) {
     return (
       <>
@@ -64,69 +99,90 @@ export default function App() {
     )
   }
 
-  const logout = () => { void clearToken(); setAuthed(false); setAuthScreen('login') }
+  const isMain    = (id: AnyScreen): id is MainScreen  => MAIN_TABS.some(t => t.id === id)
+  const activeMain: MainScreen = isMain(screen) ? screen : prevMain.current
 
   return (
     <View style={s.root}>
       <StatusBar style="light" />
 
+      {/* ── Lazy-mounted screens — keep alive once visited ── */}
       <View style={s.content}>
-        {screen === 'dashboard'  && <DashboardScreen />}
-        {screen === 'pos'        && <POSScreen />}
-        {screen === 'inventory'  && <InventoryScreen />}
-        {screen === 'customers'  && <CustomersScreen />}
-        {screen === 'repairs'    && <RepairsScreen />}
-        {screen === 'easyload'   && <EasyLoadScreen />}
-        {screen === 'easypaisa'  && <EasypaisaScreen />}
-        {screen === 'cash'       && <CashRegisterScreen />}
-        {screen === 'settings'   && <SettingsScreen onLogout={logout} />}
+        {ALL_SCREENS.map(id => {
+          if (!mounted.has(id)) return null
+          const visible = screen === id
+          return (
+            <View key={id} style={[s.screenWrap, !visible && s.screenHidden]}>
+              {id === 'dashboard'  && <DashboardScreen onNavigate={navigate} />}
+              {id === 'pos'        && <POSScreen />}
+              {id === 'inventory'  && <InventoryScreen />}
+              {id === 'more'       && <MoreScreen onNavigate={s => navigate(s)} onLogout={logout} />}
+              {id === 'customers'  && <CustomersScreen onBack={goBack} />}
+              {id === 'repairs'    && <RepairsScreen onBack={goBack} />}
+              {id === 'easyload'   && <EasyLoadScreen onBack={goBack} />}
+              {id === 'easypaisa'  && <EasypaisaScreen onBack={goBack} />}
+              {id === 'cash'       && <CashRegisterScreen onBack={goBack} />}
+              {id === 'settings'   && <SettingsScreen onLogout={logout} onBack={goBack} />}
+            </View>
+          )
+        })}
       </View>
 
-      {/* Tab bar */}
-      <View style={s.tabBarOuter}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={s.tabBar}
-        >
-          {TABS.map(tab => {
-            const active = screen === tab.id
-            return (
-              <TouchableOpacity
-                key={tab.id}
-                style={[s.tab, active && s.tabActive]}
-                onPress={() => setScreen(tab.id)}
-                activeOpacity={0.7}
-              >
-                {active && <View style={s.tabPill} />}
+      {/* ── Bottom tab bar (4 tabs) ── */}
+      <View style={s.tabBar}>
+        {MAIN_TABS.map(tab => {
+          const active = activeMain === tab.id
+          return (
+            <TouchableOpacity
+              key={tab.id}
+              style={s.tabItem}
+              onPress={() => navigate(tab.id)}
+              activeOpacity={0.7}
+            >
+              {active && <View style={s.tabIndicator} />}
+              <View style={[s.tabIconWrap, active && s.tabIconWrapActive]}>
                 <Text style={s.tabIcon}>{tab.icon}</Text>
-                <Text style={[s.tabLabel, active && s.tabLabelActive]}>{tab.label}</Text>
-              </TouchableOpacity>
-            )
-          })}
-        </ScrollView>
+              </View>
+              <Text style={[s.tabLabel, active && s.tabLabelActive]}>{tab.label}</Text>
+            </TouchableOpacity>
+          )
+        })}
       </View>
     </View>
   )
 }
 
+const TAB_BAR_HEIGHT = Platform.OS === 'ios' ? 82 : 64
+
 const s = StyleSheet.create({
-  // Loading
-  loader:       { flex: 1, backgroundColor: '#faf9ff', justifyContent: 'center', alignItems: 'center' },
-  loaderLogo:   { width: 80, height: 80, borderRadius: 24, backgroundColor: '#f5f3ff', alignItems: 'center', justifyContent: 'center' },
-  loaderText:   { fontSize: 18, fontWeight: '700', color: '#7c3aed', marginTop: 16 },
+  splash:         { flex: 1, backgroundColor: '#faf9ff', alignItems: 'center', justifyContent: 'center' },
+  splashLogo:     { width: 88, height: 88, borderRadius: 26, backgroundColor: '#f5f3ff', alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
+  splashTitle:    { fontSize: 24, fontWeight: '800', color: '#7c3aed' },
 
-  // App shell
-  root:         { flex: 1, backgroundColor: '#faf9ff' },
-  content:      { flex: 1 },
+  root:           { flex: 1, backgroundColor: '#faf9ff' },
+  content:        { flex: 1 },
+  screenWrap:     { ...StyleSheet.absoluteFillObject },
+  screenHidden:   { opacity: 0, pointerEvents: 'none' } as object,
 
-  // Tab bar
-  tabBarOuter:  { backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#ede9fe', paddingBottom: 18, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 8 },
-  tabBar:       { flexDirection: 'row', paddingTop: 6, paddingHorizontal: 4 },
-  tab:          { alignItems: 'center', paddingHorizontal: 12, minWidth: 62, paddingVertical: 4, borderRadius: 12, position: 'relative' },
-  tabActive:    { backgroundColor: '#f5f3ff' },
-  tabPill:      { position: 'absolute', top: 0, left: '25%', right: '25%', height: 2.5, backgroundColor: '#7c3aed', borderRadius: 2 },
-  tabIcon:      { fontSize: 19, marginBottom: 2 },
-  tabLabel:     { fontSize: 10, color: '#9ca3af', fontWeight: '500' },
+  tabBar:         {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#ede9fe',
+    height: TAB_BAR_HEIGHT,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 0,
+    paddingTop: 6,
+    shadowColor: '#7c3aed',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.07,
+    shadowRadius: 10,
+    elevation: 12,
+  },
+  tabItem:        { flex: 1, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 2 },
+  tabIndicator:   { position: 'absolute', top: -1, left: '20%', right: '20%', height: 3, backgroundColor: '#7c3aed', borderRadius: 3 },
+  tabIconWrap:    { width: 36, height: 28, alignItems: 'center', justifyContent: 'center', borderRadius: 10 },
+  tabIconWrapActive: { backgroundColor: '#f5f3ff' },
+  tabIcon:        { fontSize: 20 },
+  tabLabel:       { fontSize: 10, color: '#9ca3af', fontWeight: '500', marginTop: 2 },
   tabLabelActive: { color: '#7c3aed', fontWeight: '700' },
 })

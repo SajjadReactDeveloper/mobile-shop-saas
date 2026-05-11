@@ -5,6 +5,7 @@ import {
 } from 'react-native'
 import { api } from '../lib/api'
 import { ListItemsSkeleton } from '../components/Skeleton'
+import { STATUS_TOP } from '../lib/constants'
 
 type RepairStatus = 'RECEIVED' | 'DIAGNOSING' | 'AWAITING_PARTS' | 'IN_REPAIR' | 'READY' | 'DELIVERED' | 'CANCELLED'
 
@@ -40,7 +41,9 @@ const NEXT: Partial<Record<RepairStatus, RepairStatus>> = {
   IN_REPAIR: 'READY', READY: 'DELIVERED',
 }
 
-export function RepairsScreen() {
+interface Props { onBack: () => void }
+
+export function RepairsScreen({ onBack }: Props) {
   const [jobs, setJobs] = useState<RepairJob[]>([])
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
@@ -100,8 +103,9 @@ export function RepairsScreen() {
       setShowNew(false)
       setForm({ customerId: '', customerSearch: '', deviceBrand: '', deviceModel: '', faultDesc: '', advancePaid: '0', totalQuote: '' })
       await load()
-    } catch (e: any) {
-      Alert.alert('Error', e?.response?.data?.message ?? 'Failed')
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { message?: string } } }
+      Alert.alert('Error', err?.response?.data?.message ?? 'Failed')
     } finally { setSaving(false) }
   }
 
@@ -118,7 +122,10 @@ export function RepairsScreen() {
   return (
     <View style={s.container}>
       <View style={s.header}>
-        <View>
+        <TouchableOpacity onPress={onBack} style={s.backBtn} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <Text style={s.backText}>‹</Text>
+        </TouchableOpacity>
+        <View style={{ flex: 1 }}>
           <Text style={s.title}>Repairs</Text>
           <Text style={s.subtitle}>{active.length} active jobs</Text>
         </View>
@@ -237,7 +244,9 @@ export function RepairsScreen() {
 const s = StyleSheet.create({
   container:      { flex: 1, backgroundColor: '#faf9ff' },
   center:         { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 52, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  header:         { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  backBtn:        { marginRight: 10 },
+  backText:       { fontSize: 30, color: '#fff', fontWeight: '300', lineHeight: 34 },
   title:          { fontSize: 22, fontWeight: '800', color: '#fff' },
   subtitle:       { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
   addBtn:         { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },

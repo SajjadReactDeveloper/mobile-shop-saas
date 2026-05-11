@@ -5,6 +5,7 @@ import {
 } from 'react-native'
 import { api } from '../lib/api'
 import { AccountCardsSkeleton } from '../components/Skeleton'
+import { STATUS_TOP } from '../lib/constants'
 
 interface CashExpense { id: string; description: string; amount: number; createdAt: string }
 
@@ -22,7 +23,9 @@ interface CashRegister {
   expenseItems: CashExpense[]
 }
 
-export function CashRegisterScreen() {
+interface Props { onBack: () => void }
+
+export function CashRegisterScreen({ onBack }: Props) {
   const [register, setRegister] = useState<CashRegister | null | undefined>(undefined)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -101,7 +104,12 @@ export function CashRegisterScreen() {
 
   return (
     <View style={s.container}>
-      <View style={s.header}><Text style={s.title}>Cash Register</Text></View>
+      <View style={s.header}>
+        <TouchableOpacity onPress={onBack} style={s.backBtn} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <Text style={s.backText}>‹</Text>
+        </TouchableOpacity>
+        <Text style={s.title}>Cash Register</Text>
+      </View>
 
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {register === null || register === undefined ? (
@@ -207,7 +215,9 @@ export function CashRegisterScreen() {
 const s = StyleSheet.create({
   container:    { flex: 1, backgroundColor: '#faf9ff' },
   center:       { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header:       { paddingHorizontal: 20, paddingTop: 52, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  header:       { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  backBtn:      { marginRight: 10 },
+  backText:     { fontSize: 30, color: '#fff', fontWeight: '300', lineHeight: 34 },
   title:        { fontSize: 22, fontWeight: '800', color: '#fff' },
   emptyWrap:    { alignItems: 'center', paddingTop: 72, paddingHorizontal: 32 },
   emptyEmoji:   { fontSize: 56, marginBottom: 16 },

@@ -3,6 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   TextInput, Modal, Alert, FlatList,
 } from 'react-native'
+import { STATUS_TOP } from '../lib/constants'
 import { api } from '../lib/api'
 import { POSScreenSkeleton } from '../components/Skeleton'
 
@@ -336,7 +337,7 @@ export function POSScreen() {
 
 const s = StyleSheet.create({
   container:      { flex: 1, backgroundColor: '#faf9ff' },
-  header:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 52, paddingBottom: 14, backgroundColor: '#7c3aed' },
+  header:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: STATUS_TOP, paddingBottom: 14, backgroundColor: '#7c3aed' },
   headerTitle:    { fontSize: 22, fontWeight: '800', color: '#fff' },
   headerSub:      { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
   clearBtn:       { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20 },

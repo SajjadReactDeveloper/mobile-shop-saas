@@ -5,6 +5,7 @@ import {
 } from 'react-native'
 import { api } from '../lib/api'
 import { SettingsScreenSkeleton } from '../components/Skeleton'
+import { STATUS_TOP } from '../lib/constants'
 
 type UserRole = 'OWNER' | 'CASHIER' | 'TECHNICIAN'
 type SubscriptionTier = 'FREE' | 'PRO' | 'BUSINESS'
@@ -30,9 +31,9 @@ const STATUS_LABEL: Record<SubscriptionStatus, string> = {
   TRIALING: 'Trial', ACTIVE: 'Active', PAST_DUE: 'Past Due', CANCELED: 'Canceled',
 }
 
-interface Props { onLogout: () => void }
+interface Props { onLogout: () => void; onBack: () => void }
 
-export function SettingsScreen({ onLogout }: Props) {
+export function SettingsScreen({ onLogout, onBack }: Props) {
   const [tab, setTab] = useState<'shop' | 'staff' | 'billing'>('shop')
   const [shop, setShop] = useState<Shop | null>(null)
   const [staff, setStaff] = useState<StaffUser[]>([])
@@ -93,7 +94,10 @@ export function SettingsScreen({ onLogout }: Props) {
     <View style={s.container}>
       {/* Header */}
       <View style={s.header}>
-        <View>
+        <TouchableOpacity onPress={onBack} style={s.backBtn} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <Text style={s.backText}>‹</Text>
+        </TouchableOpacity>
+        <View style={{ flex: 1 }}>
           <Text style={s.title}>Settings</Text>
           <Text style={s.subtitle}>Manage your shop</Text>
         </View>
@@ -240,7 +244,9 @@ export function SettingsScreen({ onLogout }: Props) {
 const s = StyleSheet.create({
   container:        { flex: 1, backgroundColor: '#faf9ff' },
   center:           { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header:           { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 52, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  header:           { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  backBtn:          { marginRight: 10 },
+  backText:         { fontSize: 30, color: '#fff', fontWeight: '300', lineHeight: 34 },
   title:            { fontSize: 22, fontWeight: '800', color: '#fff' },
   subtitle:         { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
   logoutBtn:        { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.4)', backgroundColor: 'rgba(255,255,255,0.15)' },

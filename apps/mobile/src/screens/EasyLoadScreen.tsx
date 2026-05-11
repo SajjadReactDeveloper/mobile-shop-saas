@@ -5,6 +5,7 @@ import {
 } from 'react-native'
 import { api } from '../lib/api'
 import { AccountCardsSkeleton } from '../components/Skeleton'
+import { STATUS_TOP } from '../lib/constants'
 
 type Network = 'JAZZ' | 'TELENOR' | 'ZONG' | 'UFONE' | 'WARID'
 
@@ -24,7 +25,9 @@ const NET_TEXT: Record<Network, string> = {
   UFONE: '#14532d', WARID: '#7c2d12',
 }
 
-export function EasyLoadScreen() {
+interface Props { onBack: () => void }
+
+export function EasyLoadScreen({ onBack }: Props) {
   const [accounts, setAccounts] = useState<EasyLoadAccount[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -95,7 +98,10 @@ export function EasyLoadScreen() {
   return (
     <View style={s.container}>
       <View style={s.header}>
-        <Text style={s.title}>Easy Load</Text>
+        <TouchableOpacity onPress={onBack} style={s.backBtn} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <Text style={s.backText}>‹</Text>
+        </TouchableOpacity>
+        <Text style={[s.title, { flex: 1 }]}>Easy Load</Text>
         <TouchableOpacity style={s.addBtn} onPress={() => setShowAdd(true)}>
           <Text style={s.addBtnText}>+ SIM</Text>
         </TouchableOpacity>
@@ -221,7 +227,9 @@ export function EasyLoadScreen() {
 const s = StyleSheet.create({
   container:      { flex: 1, backgroundColor: '#faf9ff' },
   center:         { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 52, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  header:         { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  backBtn:        { marginRight: 10 },
+  backText:       { fontSize: 30, color: '#fff', fontWeight: '300', lineHeight: 34 },
   title:          { fontSize: 22, fontWeight: '800', color: '#fff' },
   addBtn:         { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
   addBtnText:     { color: '#fff', fontWeight: '700', fontSize: 13 },

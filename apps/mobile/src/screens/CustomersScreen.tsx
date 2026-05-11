@@ -5,6 +5,7 @@ import {
 } from 'react-native'
 import { api } from '../lib/api'
 import { ListItemsSkeleton, Sk } from '../components/Skeleton'
+import { STATUS_TOP } from '../lib/constants'
 
 interface LedgerEntry { id: string; type: 'CREDIT' | 'PAYMENT'; amount: number; description: string; createdAt: string }
 interface Sale { id: string; invoiceNumber: string; total: number; createdAt: string }
@@ -13,7 +14,9 @@ interface Customer {
   balanceOwed: number; ledgerEntries?: LedgerEntry[]; sales?: Sale[]
 }
 
-export function CustomersScreen() {
+interface Props { onBack: () => void }
+
+export function CustomersScreen({ onBack }: Props) {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -252,7 +255,10 @@ export function CustomersScreen() {
   return (
     <View style={s.container}>
       <View style={s.header}>
-        <View>
+        <TouchableOpacity onPress={onBack} style={s.backBtn} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <Text style={s.backText}>‹</Text>
+        </TouchableOpacity>
+        <View style={{ flex: 1 }}>
           <Text style={s.title}>Customers</Text>
           <Text style={s.subtitle}>{customers.length} registered · PKR {totalUdhaar.toLocaleString()} udhaar</Text>
         </View>
@@ -344,7 +350,9 @@ export function CustomersScreen() {
 const s = StyleSheet.create({
   container:        { flex: 1, backgroundColor: '#faf9ff' },
   center:           { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header:           { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 52, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  header:           { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  backBtn:          { marginRight: 10 },
+  backText:         { fontSize: 30, color: '#fff', fontWeight: '300', lineHeight: 34 },
   title:            { fontSize: 22, fontWeight: '800', color: '#fff' },
   subtitle:         { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
   addBtn:           { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },

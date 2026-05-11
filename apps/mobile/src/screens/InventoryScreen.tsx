@@ -3,6 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   TextInput, Modal, RefreshControl, Alert,
 } from 'react-native'
+import { STATUS_TOP } from '../lib/constants'
 import { api } from '../lib/api'
 import { ListItemsSkeleton } from '../components/Skeleton'
 
@@ -257,7 +258,7 @@ export function InventoryScreen() {
 
 const s = StyleSheet.create({
   container:      { flex: 1, backgroundColor: '#faf9ff' },
-  header:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 52, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  header:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#7c3aed' },
   headerTitle:    { fontSize: 22, fontWeight: '800', color: '#fff' },
   headerSub:      { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
   addBtn:         { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },

@@ -5,6 +5,7 @@ import {
 } from 'react-native'
 import { api } from '../lib/api'
 import { AccountCardsSkeleton } from '../components/Skeleton'
+import { STATUS_TOP } from '../lib/constants'
 
 type TxnType = 'SEND' | 'RECEIVE' | 'CASH_IN' | 'CASH_OUT' | 'WITHDRAW'
 
@@ -27,7 +28,9 @@ const TXN_LABEL: Record<TxnType, string> = {
   CASH_OUT: 'Cash Out', WITHDRAW: 'Withdraw',
 }
 
-export function EasypaisaScreen() {
+interface Props { onBack: () => void }
+
+export function EasypaisaScreen({ onBack }: Props) {
   const [accounts, setAccounts] = useState<EasypaisaAccount[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -136,7 +139,10 @@ export function EasypaisaScreen() {
   return (
     <View style={s.container}>
       <View style={s.header}>
-        <View>
+        <TouchableOpacity onPress={onBack} style={s.backBtn} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <Text style={s.backText}>‹</Text>
+        </TouchableOpacity>
+        <View style={{ flex: 1 }}>
           <Text style={s.title}>Easypaisa</Text>
           <Text style={s.subtitle}>{accounts.length} wallet{accounts.length !== 1 ? 's' : ''}</Text>
         </View>
@@ -310,7 +316,9 @@ export function EasypaisaScreen() {
 const s = StyleSheet.create({
   container:       { flex: 1, backgroundColor: '#faf9ff' },
   center:          { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header:          { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 52, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  header:          { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  backBtn:         { marginRight: 10 },
+  backText:        { fontSize: 30, color: '#fff', fontWeight: '300', lineHeight: 34 },
   title:           { fontSize: 22, fontWeight: '800', color: '#fff' },
   subtitle:        { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
   addBtn:          { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
