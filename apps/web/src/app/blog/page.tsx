@@ -1,63 +1,8 @@
+import Link from 'next/link'
 import { MessageCircle, BookOpen, ArrowRight } from 'lucide-react'
 import { LandingNav } from '@/components/LandingNav'
 import { Footer } from '@/components/Footer'
-
-const posts = [
-  {
-    slug: 'why-mobile-shops-need-imei-tracking',
-    title: 'Why Every Mobile Shop Needs IMEI Tracking',
-    excerpt: 'Selling a phone without logging its IMEI is one of the most common — and costly — mistakes in the mobile business. Here\'s how to fix it.',
-    date: 'May 10, 2026',
-    readTime: '4 min read',
-    tag: 'Inventory',
-    tagColor: 'bg-blue-50 text-blue-700',
-  },
-  {
-    slug: 'easy-load-profit-guide',
-    title: 'How to Maximize Easy Load Profit: A Complete Guide',
-    excerpt: 'Most shop owners know their balance, but not their actual commission earned. We break down how to track per-network profit properly.',
-    date: 'May 5, 2026',
-    readTime: '6 min read',
-    tag: 'Easy Load',
-    tagColor: 'bg-green-50 text-green-700',
-  },
-  {
-    slug: 'udhaar-management-tips',
-    title: '5 Ways to Reduce Bad Udhaar in Your Shop',
-    excerpt: 'Credit sales are a reality of the Pakistani market. But without a system, udhaar quietly eats your profit. Here\'s how to stay on top of it.',
-    date: 'Apr 28, 2026',
-    readTime: '5 min read',
-    tag: 'Udhaar',
-    tagColor: 'bg-amber-50 text-amber-700',
-  },
-  {
-    slug: 'repair-job-workflow',
-    title: 'Building a Repair Workflow That Customers Love',
-    excerpt: 'A repair job that takes 2 days feels faster than one that takes 1 day — if you communicate better. Here\'s the status system we recommend.',
-    date: 'Apr 20, 2026',
-    readTime: '4 min read',
-    tag: 'Repairs',
-    tagColor: 'bg-rose-50 text-rose-700',
-  },
-  {
-    slug: 'daily-cash-register-habit',
-    title: 'The One Habit That Changes Your Shop: Closing Your Cash Register Daily',
-    excerpt: 'Shop owners who close their cash register every day catch problems the same day. Those who don\'t discover them weeks later — or never.',
-    date: 'Apr 12, 2026',
-    readTime: '3 min read',
-    tag: 'Cash Register',
-    tagColor: 'bg-violet-50 text-violet-700',
-  },
-  {
-    slug: 'easypaisa-jazzcash-agent-tips',
-    title: 'Running an Easypaisa/JazzCash Agent Counter: What No One Tells You',
-    excerpt: 'Float management, transaction limits, and daily balancing — the things that trip up new agents and how to handle them.',
-    date: 'Apr 3, 2026',
-    readTime: '7 min read',
-    tag: 'Easypaisa',
-    tagColor: 'bg-emerald-50 text-emerald-700',
-  },
-]
+import { posts } from '@/lib/blog-posts'
 
 export default function BlogPage() {
   return (
@@ -79,23 +24,27 @@ export default function BlogPage() {
 
       {/* Posts */}
       <section className="max-w-4xl mx-auto px-6 pb-24">
-        <div className="space-y-6">
+        <div className="space-y-5">
           {posts.map(post => (
-            <article key={post.slug} className="group border border-gray-100 rounded-2xl p-7 hover:border-violet-200 hover:shadow-md transition-all">
-              <div className="flex items-center gap-3 mb-3">
-                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${post.tagColor}`}>{post.tag}</span>
-                <span className="text-xs text-gray-400">{post.date}</span>
-                <span className="text-xs text-gray-400">·</span>
-                <span className="text-xs text-gray-400">{post.readTime}</span>
+            <Link key={post.slug} href={`/blog/${post.slug}`}
+              className="group flex flex-col sm:flex-row gap-5 border border-gray-100 rounded-2xl p-7 hover:border-violet-200 hover:shadow-md transition-all">
+              {/* Tag + meta */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${post.tagColor}`}>{post.tag}</span>
+                  <span className="text-xs text-gray-400">{post.date}</span>
+                  <span className="text-xs text-gray-400">·</span>
+                  <span className="text-xs text-gray-400">{post.readTime}</span>
+                </div>
+                <h2 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-violet-700 transition-colors leading-snug">
+                  {post.title}
+                </h2>
+                <p className="text-gray-500 text-sm leading-relaxed mb-4">{post.excerpt}</p>
+                <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-violet-600 group-hover:gap-2.5 transition-all">
+                  Read article <ArrowRight className="w-4 h-4" />
+                </span>
               </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-violet-700 transition-colors">
-                {post.title}
-              </h2>
-              <p className="text-gray-500 text-sm leading-relaxed mb-4">{post.excerpt}</p>
-              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-violet-600 group-hover:gap-2.5 transition-all">
-                Read article <ArrowRight className="w-4 h-4" />
-              </span>
-            </article>
+            </Link>
           ))}
         </div>
 
@@ -108,7 +57,7 @@ export default function BlogPage() {
             <input
               type="email"
               placeholder="your@email.com"
-              className="flex-1 px-4 py-3 rounded-xl text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-white/30"
+              className="flex-1 px-4 py-3 rounded-xl bg-white text-gray-900 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white/50 border-0"
             />
             <button className="bg-white text-violet-700 font-bold px-5 py-3 rounded-xl hover:bg-violet-50 transition-colors text-sm whitespace-nowrap">
               Subscribe
