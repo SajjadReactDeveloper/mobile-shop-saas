@@ -40,7 +40,7 @@ export default function RegisterPage() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-200">
               <Smartphone className="w-4.5 h-4.5 text-white" style={{ width: 18, height: 18 }} />
             </div>
-            <span className="font-bold text-gray-900">Mobile Shop SaaS</span>
+            <span className="font-bold text-gray-900">Flowchat</span>
           </div>
 
           <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Create your shop</h1>

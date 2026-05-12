@@ -29,7 +29,7 @@ async function bootstrap() {
 
   if (process.env.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
-      .setTitle('Mobile Shop SaaS API')
+      .setTitle('Flowchat API')
       .setDescription('API for mobile shop management platform')
       .setVersion('1.0')
       .addBearerAuth()

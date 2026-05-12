@@ -87,7 +87,7 @@ function InvoiceModal({ sale, onClose }: { sale: Sale; onClose: () => void }) {
         </div>
         <div style={{ textAlign: 'center', marginTop: 12, fontSize: 10, borderTop: '1px dashed #ccc', paddingTop: 8 }}>
           <div>Thank you for shopping! شکریہ</div>
-          <div style={{ color: '#888', marginTop: 2 }}>Mobile Shop SaaS</div>
+          <div style={{ color: '#888', marginTop: 2 }}>Flowchat</div>
         </div>
       </div>
 

@@ -92,7 +92,7 @@ export function MoreScreen({ onNavigate, onLogout }: Props) {
           <Text style={s.logoutText}>🚪  Log out</Text>
         </TouchableOpacity>
 
-        <Text style={s.versionText}>Mobile Shop SaaS · v1.0</Text>
+        <Text style={s.versionText}>Flowchat · v1.0</Text>
         <View style={{ height: 32 }} />
       </ScrollView>
     </View>

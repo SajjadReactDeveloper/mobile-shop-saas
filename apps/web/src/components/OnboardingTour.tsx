@@ -9,7 +9,7 @@ const STEPS = [
   {
     icon: Sparkles,
     iconBg: 'bg-gradient-to-br from-violet-500 to-purple-600',
-    title: 'Welcome to Mobile Shop SaaS! 🎉',
+    title: 'Welcome to Flowchat! 🎉',
     desc: 'Your shop is all set up. Let\'s take a quick 30-second tour to help you get started.',
     tip: null,
   },

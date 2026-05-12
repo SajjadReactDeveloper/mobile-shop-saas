@@ -88,7 +88,7 @@ export default function AdminPage() {
             <Smartphone className="w-4 h-4 text-white" />
           </div>
           <div>
-            <div className="font-bold text-sm text-white">Mobile Shop SaaS</div>
+            <div className="font-bold text-sm text-white">Flowchat</div>
             <div className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">Platform Admin</div>
           </div>
         </div>
