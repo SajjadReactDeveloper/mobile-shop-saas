@@ -11,12 +11,12 @@ export function LandingNav() {
     <nav className="border-b border-gray-100 sticky top-0 bg-white/90 backdrop-blur z-40">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-2.5">
+        <Link href="/" className="flex items-center gap-2.5">
           <div className="w-8 h-8 bg-violet-600 rounded-xl flex items-center justify-center shadow-md shadow-violet-200">
             <MessageCircle className="w-[18px] h-[18px] text-white" />
           </div>
           <span className="font-extrabold text-lg tracking-tight text-gray-900">Flowchat</span>
-        </div>
+        </Link>
 
         {/* Desktop links */}
         <div className="hidden sm:flex items-center gap-3">
