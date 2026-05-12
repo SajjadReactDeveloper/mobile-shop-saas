@@ -3,14 +3,17 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import { DollarSign, Plus, Lock, History, CheckCircle, ShoppingCart, PhoneCall, Wallet, Wrench } from 'lucide-react'
+import { DollarSign, Plus, Lock, History, CheckCircle, ShoppingCart, PhoneCall, Wallet, Wrench, TrendingUp } from 'lucide-react'
 import { Button, Card, Badge, Modal, Input, PageHeader, Empty, CardListSkeleton } from '@/components/ui'
 
-interface CashExpense { id: string; description: string; amount: number; createdAt: string }
+interface CashExpense  { id: string; description: string; amount: number; createdAt: string }
+interface QuickSale    { id: string; productName: string; buyingPrice: number; sellingPrice: number; qty: number; createdAt: string }
 interface CashRegister {
   id: string; date: string; openingBalance: number; closingBalance?: number
   salesCash: number; easyLoadCash: number; easypaisaCash: number; repairCash: number
-  expenses: number; isClosed: boolean; expenseItems: CashExpense[]
+  expenses: number; isClosed: boolean
+  expenseItems: CashExpense[]
+  quickSales: QuickSale[]
 }
 
 function OpenDayModal({ onClose }: { onClose: () => void }) {
@@ -55,9 +58,103 @@ function AddExpenseModal({ registerId, onClose }: { registerId: string; onClose:
   )
 }
 
+function AddQuickSaleModal({ registerId, onClose }: { registerId: string; onClose: () => void }) {
+  const qc = useQueryClient()
+  const [form, setForm] = useState({ productName: '', buyingPrice: '', sellingPrice: '', qty: '1' })
+  const mut = useMutation({
+    mutationFn: (d: object) => api.post(`/cash-register/${registerId}/quick-sale`, d).then(r => r.data),
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: ['cash-today'] }); onClose() },
+  })
+
+  const qty       = Math.max(1, Number(form.qty) || 1)
+  const buyP      = Number(form.buyingPrice)  || 0
+  const sellP     = Number(form.sellingPrice) || 0
+  const revenue   = sellP * qty
+  const profit    = (sellP - buyP) * qty
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault()
+    mut.mutate({
+      productName:  form.productName,
+      buyingPrice:  buyP,
+      sellingPrice: sellP,
+      qty,
+    })
+  }
+
+  return (
+    <form onSubmit={submit} className="space-y-4">
+      <Input
+        label="Product Name *"
+        required
+        value={form.productName}
+        onChange={e => setForm(f => ({ ...f, productName: e.target.value }))}
+        placeholder="e.g. Samsung A15 Cover"
+      />
+      <div className="grid grid-cols-2 gap-3">
+        <Input
+          label="Original Price (PKR) *"
+          required
+          type="number"
+          min="0"
+          value={form.buyingPrice}
+          onChange={e => setForm(f => ({ ...f, buyingPrice: e.target.value }))}
+          placeholder="0"
+        />
+        <Input
+          label="Sale Price (PKR) *"
+          required
+          type="number"
+          min="0"
+          value={form.sellingPrice}
+          onChange={e => setForm(f => ({ ...f, sellingPrice: e.target.value }))}
+          placeholder="0"
+        />
+      </div>
+      <Input
+        label="Quantity *"
+        required
+        type="number"
+        min="1"
+        value={form.qty}
+        onChange={e => setForm(f => ({ ...f, qty: e.target.value }))}
+        placeholder="1"
+      />
+
+      {/* Live summary */}
+      {sellP > 0 && (
+        <div className="grid grid-cols-2 gap-2">
+          <div className="bg-emerald-50 rounded-xl p-3 text-center">
+            <div className="text-xs text-gray-500 mb-0.5">Revenue</div>
+            <div className="text-sm font-bold text-emerald-700">PKR {revenue.toLocaleString()}</div>
+          </div>
+          <div className={`rounded-xl p-3 text-center ${profit >= 0 ? 'bg-violet-50' : 'bg-red-50'}`}>
+            <div className="text-xs text-gray-500 mb-0.5">Profit</div>
+            <div className={`text-sm font-bold ${profit >= 0 ? 'text-violet-700' : 'text-red-600'}`}>
+              {profit >= 0 ? '+' : ''}PKR {profit.toLocaleString()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {mut.error && (
+        <p className="text-xs text-red-500">
+          {(mut.error as { response?: { data?: { message?: string } } }).response?.data?.message ?? 'Failed'}
+        </p>
+      )}
+      <div className="flex gap-2 pt-2">
+        <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>Cancel</Button>
+        <Button type="submit" className="flex-1" loading={mut.isPending}>
+          <ShoppingCart className="w-4 h-4" /> Add Sale
+        </Button>
+      </div>
+    </form>
+  )
+}
+
 function TodaySession({ register }: { register: CashRegister }) {
   const qc = useQueryClient()
-  const [modal, setModal] = useState<'expense' | 'close' | null>(null)
+  const [modal, setModal] = useState<'expense' | 'quick-sale' | 'close' | null>(null)
 
   const closeDay = useMutation({
     mutationFn: () => api.post(`/cash-register/${register.id}/close`).then(r => r.data),
@@ -88,13 +185,11 @@ function TodaySession({ register }: { register: CashRegister }) {
           {new Date(register.date).toLocaleDateString('en-PK', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
         </div>
 
-        {/* Opening */}
         <div className="flex justify-between items-center py-2.5 border-b border-gray-100">
           <span className="text-sm text-gray-500">Opening Balance</span>
           <span className="text-sm font-semibold text-gray-900">PKR {Number(register.openingBalance).toLocaleString()}</span>
         </div>
 
-        {/* Income breakdown */}
         <div className="py-3 space-y-2">
           {incomeRows.map(({ label, amount, icon: Icon, color }) => (
             <div key={label} className="flex justify-between items-center">
@@ -109,13 +204,11 @@ function TodaySession({ register }: { register: CashRegister }) {
           ))}
         </div>
 
-        {/* Expenses */}
         <div className="flex justify-between items-center py-2.5 border-t border-gray-100">
           <span className="text-sm text-gray-500">Total Expenses</span>
           <span className="text-sm font-semibold text-red-600">− PKR {Number(register.expenses).toLocaleString()}</span>
         </div>
 
-        {/* Closing */}
         <div className="flex justify-between items-center pt-4 mt-1 border-t-2 border-gray-200">
           <span className="text-sm font-bold text-gray-900">{register.isClosed ? 'Closing Balance' : 'Expected Closing'}</span>
           <span className="text-xl font-extrabold text-violet-600">
@@ -123,6 +216,46 @@ function TodaySession({ register }: { register: CashRegister }) {
           </span>
         </div>
       </Card>
+
+      {/* Quick Sales list */}
+      {register.quickSales && register.quickSales.length > 0 && (
+        <Card padding={false}>
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 bg-violet-50 rounded-lg flex items-center justify-center">
+                <ShoppingCart className="w-3.5 h-3.5 text-violet-600" />
+              </div>
+              <span className="text-sm font-bold text-gray-800">Quick Sales</span>
+            </div>
+            <span className="text-xs text-gray-400">{register.quickSales.length} item{register.quickSales.length !== 1 ? 's' : ''}</span>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {register.quickSales.map(qs => {
+              const revenue = Number(qs.sellingPrice) * qs.qty
+              const profit  = (Number(qs.sellingPrice) - Number(qs.buyingPrice)) * qs.qty
+              return (
+                <div key={qs.id} className="flex items-center justify-between px-5 py-3.5">
+                  <div>
+                    <div className="text-sm font-medium text-gray-800">{qs.productName}</div>
+                    <div className="text-xs text-gray-400 mt-0.5">
+                      {qs.qty} × PKR {Number(qs.sellingPrice).toLocaleString()}
+                      {' · '}
+                      {new Date(qs.createdAt).toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0 ml-4">
+                    <div className="text-sm font-bold text-emerald-600">+ PKR {revenue.toLocaleString()}</div>
+                    <div className={`text-xs mt-0.5 flex items-center gap-0.5 justify-end ${profit >= 0 ? 'text-violet-500' : 'text-red-500'}`}>
+                      <TrendingUp className="w-3 h-3" />
+                      {profit >= 0 ? '+' : ''}PKR {profit.toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </Card>
+      )}
 
       {/* Expenses list */}
       {register.expenseItems.length > 0 && (
@@ -146,20 +279,26 @@ function TodaySession({ register }: { register: CashRegister }) {
 
       {!register.isClosed && (
         <div className="flex gap-3">
+          <Button variant="secondary" className="flex-1" onClick={() => setModal('quick-sale')}>
+            <ShoppingCart className="w-4 h-4" /> Add Sale
+          </Button>
           <Button variant="secondary" className="flex-1" onClick={() => setModal('expense')}>
             <Plus className="w-4 h-4" /> Add Expense
           </Button>
-          <Button variant="danger" className="flex-1" onClick={() => setModal('close')}>
+          <Button variant="danger" onClick={() => setModal('close')}>
             <Lock className="w-4 h-4" /> Close Day
           </Button>
         </div>
       )}
 
+      <Modal open={modal === 'quick-sale'} onClose={() => setModal(null)} title="Add Quick Sale" size="sm">
+        <AddQuickSaleModal registerId={register.id} onClose={() => setModal(null)} />
+      </Modal>
+
       <Modal open={modal === 'expense'} onClose={() => setModal(null)} title="Add Expense" size="sm">
         <AddExpenseModal registerId={register.id} onClose={() => setModal(null)} />
       </Modal>
 
-      {/* Close day confirm */}
       {modal === 'close' && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">

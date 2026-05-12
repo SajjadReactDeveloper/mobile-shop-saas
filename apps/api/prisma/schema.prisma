@@ -413,6 +413,7 @@ model CashRegister {
 
   shop             Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
   expenseItems     CashExpense[]
+  quickSales       QuickSale[]
 
   @@unique([shopId, date])
 }
@@ -422,6 +423,18 @@ model CashExpense {
   cashRegisterId String
   description    String
   amount         Decimal      @db.Decimal(10, 2)
+  createdAt      DateTime     @default(now())
+
+  cashRegister   CashRegister @relation(fields: [cashRegisterId], references: [id], onDelete: Cascade)
+}
+
+model QuickSale {
+  id             String       @id @default(cuid())
+  cashRegisterId String
+  productName    String
+  buyingPrice    Decimal      @db.Decimal(10, 2)
+  sellingPrice   Decimal      @db.Decimal(10, 2)
+  qty            Int
   createdAt      DateTime     @default(now())
 
   cashRegister   CashRegister @relation(fields: [cashRegisterId], references: [id], onDelete: Cascade)

@@ -40,6 +40,21 @@ export class CashRegisterController {
     return this.cashRegisterService.addExpense(id, user.shopId, body);
   }
 
+  @Post(':id/quick-sale')
+  addQuickSale(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body()
+    body: {
+      productName: string;
+      buyingPrice: number;
+      sellingPrice: number;
+      qty: number;
+    },
+  ) {
+    return this.cashRegisterService.addQuickSale(id, user.shopId, body);
+  }
+
   @Post(':id/close')
   closeDay(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
     return this.cashRegisterService.closeDay(id, user.shopId, user.id);

@@ -30,7 +30,10 @@ export class CashRegisterService {
     today.setHours(0, 0, 0, 0);
     return this.prisma.cashRegister.findUnique({
       where: { shopId_date: { shopId, date: today } },
-      include: { expenseItems: true },
+      include: {
+        expenseItems: { orderBy: { createdAt: 'asc' } },
+        quickSales: { orderBy: { createdAt: 'asc' } },
+      },
     });
   }
 
@@ -50,6 +53,32 @@ export class CashRegisterService {
       data: { expenses: { increment: data.amount } },
     });
     return this.prisma.cashExpense.create({
+      data: { cashRegisterId: registerId, ...data },
+    });
+  }
+
+  async addQuickSale(
+    registerId: string,
+    shopId: string,
+    data: {
+      productName: string;
+      buyingPrice: number;
+      sellingPrice: number;
+      qty: number;
+    },
+  ) {
+    const register = await this.prisma.cashRegister.findUniqueOrThrow({
+      where: { id: registerId, shopId },
+    });
+    if (register.isClosed)
+      throw new ForbiddenException('Day is already closed');
+
+    const revenue = data.sellingPrice * data.qty;
+    await this.prisma.cashRegister.update({
+      where: { id: registerId },
+      data: { salesCash: { increment: revenue } },
+    });
+    return this.prisma.quickSale.create({
       data: { cashRegisterId: registerId, ...data },
     });
   }
