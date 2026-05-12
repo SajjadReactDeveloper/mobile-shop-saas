@@ -63,7 +63,7 @@ function InvoiceModal({ sale, onClose }: { sale: Sale; onClose: () => void }) {
           <div style={{ fontSize: 10, color: '#555' }}>{new Date(sale.createdAt).toLocaleString('en-PK')}</div>
           {sale.customer && <div style={{ fontSize: 10 }}>Customer: {sale.customer.name}</div>}
         </div>
-        {sale.items.map((item, i) => (
+        {(sale.items ?? []).map((item, i) => (
           <div key={i} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
             <span>{item.product.name} x{item.qty}</span>
             <span>PKR {(item.qty * item.unitPrice).toLocaleString()}</span>
@@ -104,7 +104,7 @@ function InvoiceModal({ sale, onClose }: { sale: Sale; onClose: () => void }) {
 
         <div className="px-6 py-5">
           <div className="space-y-2 mb-4">
-            {sale.items.map((item, i) => (
+            {(sale.items ?? []).map((item, i) => (
               <div key={i} className="flex justify-between text-sm">
                 <span className="text-gray-600">{item.product.name} × {item.qty}</span>
                 <span className="font-semibold text-gray-900">PKR {(item.qty * item.unitPrice).toLocaleString()}</span>

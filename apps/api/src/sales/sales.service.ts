@@ -107,6 +107,10 @@ export class SalesService {
             createdById: userId,
             items: { create: dto.items },
           },
+          include: {
+            customer: true,
+            items: { include: { product: true } },
+          },
         });
 
         for (const item of dto.items) {

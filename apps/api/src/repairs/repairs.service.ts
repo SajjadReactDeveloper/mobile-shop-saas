@@ -12,9 +12,17 @@ export class RepairsService {
     private gateway: EventsGateway,
   ) {}
 
-  findAll(shopId: string, status?: RepairStatus) {
+  findAll(shopId: string, status?: RepairStatus | RepairStatus[]) {
+    const statuses = status
+      ? Array.isArray(status)
+        ? status
+        : [status]
+      : undefined;
     return this.prisma.repairJob.findMany({
-      where: { shopId, ...(status && { status }) },
+      where: {
+        shopId,
+        ...(statuses && { status: { in: statuses } }),
+      },
       include: { customer: true, technician: { select: { name: true } } },
       orderBy: { createdAt: 'desc' },
     });

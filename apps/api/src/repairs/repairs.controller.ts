@@ -34,7 +34,7 @@ export class RepairsController {
   @Get()
   getAll(
     @CurrentUser() user: AuthenticatedUser,
-    @Query('status') status?: RepairStatus,
+    @Query('status') status?: RepairStatus | RepairStatus[],
   ) {
     return this.repairsService.findAll(user.shopId, status);
   }
