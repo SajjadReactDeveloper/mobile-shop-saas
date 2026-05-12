@@ -3,9 +3,9 @@ import {
   ShoppingCart, Package, PhoneCall, Wallet,
   Wrench, Users, DollarSign, BarChart3,
   CheckCircle, Smartphone, Zap, Shield,
-  MessageCircle, Mail, Globe,
 } from 'lucide-react'
 import { LandingNav } from '@/components/LandingNav'
+import { Footer } from '@/components/Footer'
 
 const features = [
   { icon: ShoppingCart, title: 'POS & Sales', desc: 'Fast cart-based POS with IMEI tracking, discount, all payment methods, and instant invoice.' },
@@ -350,98 +350,7 @@ export default function HomePage() {
         </Link>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-950 text-gray-400">
-        {/* Main footer */}
-        <div className="max-w-6xl mx-auto px-6 py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-          {/* Brand */}
-          <div className="lg:col-span-1">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 bg-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-violet-900/40">
-                <MessageCircle className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-extrabold text-xl text-white tracking-tight">Flowchat</span>
-            </div>
-            <p className="text-sm leading-relaxed text-gray-500 max-w-xs">
-              Complete shop management for Pakistani mobile shops. Sales, inventory, repairs, easy load, udhaar — all in one place.
-            </p>
-            <div className="flex gap-3 mt-6">
-              {[
-                { icon: Globe,  href: '#' },
-                { icon: Mail,   href: 'mailto:hello@flowchat.pk' },
-              ].map(({ icon: Icon, href }) => (
-                <a key={href} href={href} className="w-9 h-9 rounded-lg bg-gray-800 hover:bg-violet-600 flex items-center justify-center transition-colors">
-                  <Icon className="w-4 h-4 text-gray-400 hover:text-white" />
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Product */}
-          <div>
-            <h4 className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Product</h4>
-            <ul className="space-y-3 text-sm">
-              {[
-                { label: 'POS & Sales',      href: '#' },
-                { label: 'Inventory',         href: '#' },
-                { label: 'Repair Jobs',       href: '#' },
-                { label: 'Easy Load',         href: '#' },
-                { label: 'Easypaisa',         href: '#' },
-                { label: 'Reports',           href: '#' },
-              ].map(l => (
-                <li key={l.label}><Link href={l.href} className="hover:text-violet-400 transition-colors">{l.label}</Link></li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h4 className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Company</h4>
-            <ul className="space-y-3 text-sm">
-              {[
-                { label: 'About',     href: '#' },
-                { label: 'Pricing',   href: '#pricing' },
-                { label: 'Blog',      href: '#' },
-                { label: 'Contact',   href: 'mailto:hello@flowchat.pk' },
-              ].map(l => (
-                <li key={l.label}><Link href={l.href} className="hover:text-violet-400 transition-colors">{l.label}</Link></li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Get Started */}
-          <div>
-            <h4 className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Get Started</h4>
-            <ul className="space-y-3 text-sm">
-              {[
-                { label: 'Sign In',           href: '/auth/login' },
-                { label: 'Create Free Shop',  href: '/auth/register' },
-                { label: 'Android App',       href: '#' },
-              ].map(l => (
-                <li key={l.label}><Link href={l.href} className="hover:text-violet-400 transition-colors">{l.label}</Link></li>
-              ))}
-            </ul>
-            <div className="mt-6 p-4 bg-gray-900 rounded-2xl border border-gray-800">
-              <p className="text-xs text-gray-400 mb-2">Start free today</p>
-              <Link href="/auth/register" className="block text-center text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white py-2.5 rounded-xl transition-colors">
-                Create Free Account
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div className="border-t border-gray-800">
-          <div className="max-w-6xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
-            <span>© {new Date().getFullYear()} Flowchat. All rights reserved.</span>
-            <div className="flex gap-5">
-              <Link href="#" className="hover:text-gray-400 transition-colors">Privacy Policy</Link>
-              <Link href="#" className="hover:text-gray-400 transition-colors">Terms of Service</Link>
-              <Link href="#" className="hover:text-gray-400 transition-colors">Support</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
