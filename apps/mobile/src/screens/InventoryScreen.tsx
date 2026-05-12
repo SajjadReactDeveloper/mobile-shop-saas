@@ -7,6 +7,7 @@ import * as ImagePicker from 'expo-image-picker'
 import { STATUS_TOP } from '../lib/constants'
 import { api } from '../lib/api'
 import { ListItemsSkeleton } from '../components/Skeleton'
+import { BarcodeScannerModal } from '../components/BarcodeScannerModal'
 
 interface Product {
   id: string; name: string; brand?: string; category: string
@@ -36,6 +37,8 @@ export function InventoryScreen() {
   const [imageUrl, setImageUrl] = useState<string | null>(null)
   const [imageUploading, setImageUploading] = useState(false)
   const [stockForm, setStockForm] = useState({ qty: '1', unitPrice: '', supplier: '' })
+  const [imeis, setImeis] = useState<string[]>([])
+  const [scanningImeiIdx, setScanningImeiIdx] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
 
   const load = useCallback(async () => {
@@ -88,16 +91,36 @@ export function InventoryScreen() {
     } finally { setSaving(false) }
   }
 
+  const updateStockQty = (v: string) => {
+    setStockForm(f => ({ ...f, qty: v }))
+    const n = Math.max(1, parseInt(v, 10) || 1)
+    setImeis(prev => {
+      const next = [...prev]
+      while (next.length < n) next.push('')
+      return next.slice(0, n)
+    })
+  }
+
   const addStock = async () => {
     if (!showStock || !stockForm.qty || !stockForm.unitPrice) return Alert.alert('Required', 'Quantity and unit price are required.')
+    const qty = Number(stockForm.qty)
+    if (showStock.imeiTracked) {
+      const filled = imeis.filter(i => i.trim().length > 0)
+      if (filled.length !== qty) {
+        return Alert.alert('IMEIs Required', `Please enter all ${qty} IMEI number${qty > 1 ? 's' : ''} before saving.`)
+      }
+    }
     setSaving(true)
     try {
       await api.post(`/inventory/${showStock.id}/stock`, {
-        qty: Number(stockForm.qty), unitPrice: Number(stockForm.unitPrice),
+        qty,
+        unitPrice: Number(stockForm.unitPrice),
         supplier: stockForm.supplier || undefined,
+        ...(showStock.imeiTracked ? { imeis } : {}),
       })
       setShowStock(null)
       setStockForm({ qty: '1', unitPrice: '', supplier: '' })
+      setImeis([])
       await load()
     } catch (e: unknown) {
       const err = e as { response?: { data?: { message?: string } } }
@@ -175,7 +198,11 @@ export function InventoryScreen() {
                   </View>
                   <TouchableOpacity
                     style={s.stockBtn}
-                    onPress={() => { setShowStock(p); setStockForm({ qty: '1', unitPrice: String(p.buyingPrice), supplier: '' }) }}
+                    onPress={() => {
+                      setShowStock(p)
+                      setStockForm({ qty: '1', unitPrice: String(p.buyingPrice), supplier: '' })
+                      setImeis(p.imeiTracked ? [''] : [])
+                    }}
                   >
                     <Text style={s.stockBtnText}>+ Add Stock</Text>
                   </TouchableOpacity>
@@ -283,25 +310,79 @@ export function InventoryScreen() {
               <Text style={s.closeBtnText}>✕</Text>
             </TouchableOpacity>
           </View>
-          <View style={s.modalBody}>
+          <ScrollView style={s.modalBody} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
             {showStock && (
               <View style={s.infoBanner}>
                 <Text style={s.infoBannerText}>📦 {showStock.name}</Text>
-                <Text style={s.infoBannerSub}>{showStock.stockQty} currently in stock</Text>
+                <Text style={s.infoBannerSub}>
+                  {showStock.stockQty} currently in stock
+                  {showStock.imeiTracked ? '  ·  📱 IMEI tracked' : ''}
+                </Text>
               </View>
             )}
             <Text style={s.label}>Quantity *</Text>
-            <TextInput style={s.input} keyboardType="numeric" value={stockForm.qty} onChangeText={v => setStockForm(f => ({ ...f, qty: v }))} placeholderTextColor="#9ca3af" />
+            <TextInput
+              style={s.input} keyboardType="numeric"
+              value={stockForm.qty} onChangeText={updateStockQty}
+              placeholderTextColor="#9ca3af"
+            />
             <Text style={s.label}>Unit Price (PKR) *</Text>
             <TextInput style={s.input} keyboardType="numeric" value={stockForm.unitPrice} onChangeText={v => setStockForm(f => ({ ...f, unitPrice: v }))} placeholder="0" placeholderTextColor="#9ca3af" />
             <Text style={s.label}>Supplier (optional)</Text>
             <TextInput style={s.input} value={stockForm.supplier} onChangeText={v => setStockForm(f => ({ ...f, supplier: v }))} placeholder="Supplier name" placeholderTextColor="#9ca3af" />
+
+            {/* IMEI entry section — only for IMEI-tracked products */}
+            {showStock?.imeiTracked && imeis.length > 0 && (
+              <>
+                <View style={s.imeiHeader}>
+                  <Text style={s.sectionLabel}>IMEI NUMBERS</Text>
+                  <Text style={s.imeiSubLabel}>{imeis.filter(i => i.length > 0).length}/{imeis.length} entered</Text>
+                </View>
+                {imeis.map((imei, idx) => (
+                  <View key={idx} style={s.imeiRow}>
+                    <View style={s.imeiNumBadge}>
+                      <Text style={s.imeiNum}>{idx + 1}</Text>
+                    </View>
+                    <TextInput
+                      style={[s.input, s.imeiInput, imei.length > 0 && s.imeiInputFilled]}
+                      value={imei}
+                      onChangeText={v => setImeis(prev => prev.map((x, i) => i === idx ? v : x))}
+                      placeholder="Type or scan IMEI…"
+                      placeholderTextColor="#9ca3af"
+                      keyboardType="numeric"
+                      maxLength={15}
+                    />
+                    <TouchableOpacity
+                      style={s.imeiScanBtn}
+                      onPress={() => setScanningImeiIdx(idx)}
+                    >
+                      <Text style={s.imeiScanBtnText}>📷</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </>
+            )}
+
             <TouchableOpacity style={[s.saveBtn, saving && s.saveBtnDisabled]} onPress={addStock} disabled={saving}>
               <Text style={s.saveBtnText}>{saving ? 'Saving…' : 'Confirm Stock Entry'}</Text>
             </TouchableOpacity>
-          </View>
+            <View style={{ height: 40 }} />
+          </ScrollView>
         </View>
       </Modal>
+
+      {/* IMEI barcode scanner */}
+      <BarcodeScannerModal
+        visible={scanningImeiIdx !== null}
+        onScan={value => {
+          if (scanningImeiIdx !== null) {
+            setImeis(prev => prev.map((x, i) => i === scanningImeiIdx ? value : x))
+          }
+          setScanningImeiIdx(null)
+        }}
+        onClose={() => setScanningImeiIdx(null)}
+        hint="Scan the IMEI barcode on the phone box"
+      />
     </View>
   )
 }
@@ -374,4 +455,15 @@ const s = StyleSheet.create({
   imagePickerText:   { color: '#7c3aed', fontWeight: '600', fontSize: 13 },
   removeImageBtn:    { width: 32, height: 32, borderRadius: 16, backgroundColor: '#fee2e2', alignItems: 'center', justifyContent: 'center' },
   removeImageText:   { color: '#dc2626', fontWeight: '700', fontSize: 13 },
+
+  // IMEI entry
+  imeiHeader:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, marginBottom: 4 },
+  imeiSubLabel:   { fontSize: 12, color: '#7c3aed', fontWeight: '600' },
+  imeiRow:        { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 },
+  imeiNumBadge:   { width: 28, height: 28, borderRadius: 14, backgroundColor: '#ede9fe', alignItems: 'center', justifyContent: 'center' },
+  imeiNum:        { fontSize: 12, fontWeight: '700', color: '#7c3aed' },
+  imeiInput:      { flex: 1, marginTop: 0 },
+  imeiInputFilled:{ borderColor: '#7c3aed', backgroundColor: '#faf9ff' },
+  imeiScanBtn:    { width: 44, height: 44, borderRadius: 12, backgroundColor: '#f5f3ff', alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: '#ede9fe' },
+  imeiScanBtnText:{ fontSize: 20 },
 })

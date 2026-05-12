@@ -7,6 +7,7 @@ import { STATUS_TOP } from '../lib/constants'
 import { api } from '../lib/api'
 import { printReceipt, shareReceipt } from '../lib/receipt'
 import { POSScreenSkeleton } from '../components/Skeleton'
+import { BarcodeScannerModal } from '../components/BarcodeScannerModal'
 
 type PaymentMethod = 'CASH' | 'EASYPAISA' | 'JAZZCASH' | 'BANK_TRANSFER' | 'CREDIT'
 interface Product { id: string; name: string; brand?: string; sellingPrice: number; stockQty: number; imeiTracked: boolean }
@@ -35,6 +36,7 @@ export function POSScreen() {
   const [lastSaleTotal, setLastSaleTotal] = useState(0)
   const [lastSalePaid, setLastSalePaid] = useState(0)
   const [showCustomers, setShowCustomers] = useState(false)
+  const [showScanner, setShowScanner] = useState(false)
 
   const load = useCallback(async () => {
     try {
@@ -68,6 +70,21 @@ export function POSScreen() {
       return [...prev, { product, qty: 1, unitPrice: product.sellingPrice }]
     })
     setSearch('')
+  }
+
+  const handleBarcodeScan = (value: string) => {
+    setShowScanner(false)
+    // Try exact match first (product name or brand contains the scanned value)
+    const exactMatch = products.find(
+      p => p.name.toLowerCase() === value.toLowerCase() ||
+           (p.brand ?? '').toLowerCase() === value.toLowerCase()
+    )
+    if (exactMatch) {
+      addToCart(exactMatch)
+    } else {
+      // Fall back to filling the search so user sees filtered results
+      setSearch(value)
+    }
   }
 
   const updateQty = (id: string, d: number) => setCart(prev =>
@@ -131,9 +148,13 @@ export function POSScreen() {
           style={s.searchInput} placeholder="Search product to add to cart…"
           placeholderTextColor="#9ca3af" value={search} onChangeText={setSearch}
         />
-        {search.length > 0 && (
+        {search.length > 0 ? (
           <TouchableOpacity onPress={() => setSearch('')}>
             <Text style={{ color: '#9ca3af', fontSize: 18, paddingRight: 4 }}>✕</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={s.scanBtn} onPress={() => setShowScanner(true)}>
+            <Text style={s.scanBtnText}>📷</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -280,6 +301,14 @@ export function POSScreen() {
         <View style={{ height: 24 }} />
       </ScrollView>
 
+      {/* Barcode scanner */}
+      <BarcodeScannerModal
+        visible={showScanner}
+        onScan={handleBarcodeScan}
+        onClose={() => setShowScanner(false)}
+        hint="Scan product barcode to add to cart"
+      />
+
       {/* Customer picker modal */}
       <Modal visible={showCustomers} animationType="slide" presentationStyle="pageSheet">
         <View style={s.modal}>
@@ -391,6 +420,8 @@ const s = StyleSheet.create({
   searchWrap:     { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#ede9fe' },
   searchIcon:     { fontSize: 16 },
   searchInput:    { flex: 1, fontSize: 14, color: '#111827', paddingVertical: 4 },
+  scanBtn:        { width: 34, height: 34, borderRadius: 10, backgroundColor: '#f5f3ff', alignItems: 'center', justifyContent: 'center' },
+  scanBtnText:    { fontSize: 18 },
   dropdown:       { backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#ede9fe', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4 },
   dropItem:       { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f5f3ff' },
   dropItemDimmed: { opacity: 0.4 },
