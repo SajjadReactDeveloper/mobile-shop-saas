@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Platform } from 'react-native'
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { getToken, clearToken, setAuthExpiredCallback } from './src/lib/api'
+import { OnboardingTour, ONBOARDING_KEY } from './src/components/OnboardingTour'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { LoginScreen }        from './src/screens/LoginScreen'
 import { SignupScreen }        from './src/screens/SignupScreen'
 import { DashboardScreen }     from './src/screens/DashboardScreen'
@@ -47,10 +49,11 @@ export default function App() {
 function AppContent() {
   const insets = useSafeAreaInsets()
 
-  const [authed, setAuthed]         = useState<boolean | null>(null)
-  const [authScreen, setAuthScreen] = useState<AuthScreen>('login')
-  const [screen, setScreen]         = useState<AnyScreen>('dashboard')
-  const [mounted, setMounted]       = useState<Set<AnyScreen>>(new Set(['dashboard']))
+  const [authed, setAuthed]             = useState<boolean | null>(null)
+  const [authScreen, setAuthScreen]     = useState<AuthScreen>('login')
+  const [screen, setScreen]             = useState<AnyScreen>('dashboard')
+  const [mounted, setMounted]           = useState<Set<AnyScreen>>(new Set(['dashboard']))
+  const [showOnboarding, setShowOnboarding] = useState(false)
   const prevMain = useRef<MainScreen>('dashboard')
 
   /* ─── Auth init ─── */
@@ -64,6 +67,14 @@ function AppContent() {
       setAuthScreen('login')
     })
   }, [])
+
+  /* ─── Show onboarding for new users ─── */
+  useEffect(() => {
+    if (!authed) return
+    AsyncStorage.getItem(ONBOARDING_KEY).then(done => {
+      if (!done) setShowOnboarding(true)
+    }).catch(() => { /* ignore */ })
+  }, [authed])
 
   /* ─── Navigation ─── */
   const navigate = (s: AnyScreen) => {
@@ -112,6 +123,7 @@ function AppContent() {
   return (
     <View style={s.root}>
       <StatusBar style="light" />
+      {showOnboarding && <OnboardingTour onDone={() => setShowOnboarding(false)} />}
 
       {/*
         Status-bar safe-area spacer.

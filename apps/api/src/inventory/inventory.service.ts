@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { EventsGateway } from '../gateway/events.gateway';
 import { ProductCategory } from '@prisma/client';
 
 interface CreateProductDto {
@@ -24,7 +25,10 @@ interface AddStockDto {
 
 @Injectable()
 export class InventoryService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private gateway: EventsGateway,
+  ) {}
 
   findAll(shopId: string, category?: ProductCategory, lowStock?: boolean) {
     return this.prisma.product.findMany({
@@ -84,40 +88,46 @@ export class InventoryService {
         );
     }
 
-    return this.prisma.$transaction(async (tx) => {
-      const purchase = await tx.purchase.create({
-        data: {
-          shopId,
-          supplier: dto.supplier,
-          total: dto.qty * dto.unitPrice,
-          items: {
-            create: {
-              productId,
-              qty: dto.qty,
-              unitPrice: dto.unitPrice,
-              imeis: dto.imeis ?? [],
+    return this.prisma
+      .$transaction(async (tx) => {
+        const purchase = await tx.purchase.create({
+          data: {
+            shopId,
+            supplier: dto.supplier,
+            total: dto.qty * dto.unitPrice,
+            items: {
+              create: {
+                productId,
+                qty: dto.qty,
+                unitPrice: dto.unitPrice,
+                imeis: dto.imeis ?? [],
+              },
             },
           },
-        },
-      });
-
-      await tx.product.update({
-        where: { id: productId },
-        data: { stockQty: { increment: dto.qty } },
-      });
-
-      if (product.imeiTracked && dto.imeis) {
-        await tx.imeiLog.createMany({
-          data: dto.imeis.map((imei) => ({
-            productId,
-            imei,
-            status: 'IN_STOCK',
-          })),
         });
-      }
 
-      return purchase;
-    });
+        await tx.product.update({
+          where: { id: productId },
+          data: { stockQty: { increment: dto.qty } },
+        });
+
+        if (product.imeiTracked && dto.imeis) {
+          await tx.imeiLog.createMany({
+            data: dto.imeis.map((imei) => ({
+              productId,
+              imei,
+              status: 'IN_STOCK',
+            })),
+          });
+        }
+
+        return purchase;
+      })
+      .then((purchase) => {
+        // notify connected clients that stock changed
+        this.gateway.emitToShop(shopId, 'stock:updated', { productId });
+        return purchase;
+      });
   }
 
   getImeis(productId: string, shopId: string) {

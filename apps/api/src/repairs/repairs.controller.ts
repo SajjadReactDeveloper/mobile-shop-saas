@@ -7,6 +7,7 @@ import {
   Param,
   Query,
   UseGuards,
+  NotFoundException,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { RepairsService } from './repairs.service';
@@ -16,12 +17,20 @@ import { RepairStatus } from '@prisma/client';
 import type { AuthenticatedUser } from '../auth/types/auth.types';
 
 @ApiTags('Repairs')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('repairs')
 export class RepairsController {
   constructor(private repairsService: RepairsService) {}
 
+  /** Public — no auth needed. Used for customer repair tracking links */
+  @Get('track/:jobNumber')
+  async trackRepair(@Param('jobNumber') jobNumber: string) {
+    const job = await this.repairsService.trackByJobNumber(jobNumber);
+    if (!job) throw new NotFoundException('Repair job not found');
+    return job;
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get()
   getAll(
     @CurrentUser() user: AuthenticatedUser,
@@ -30,11 +39,15 @@ export class RepairsController {
     return this.repairsService.findAll(user.shopId, status);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   getOne(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
     return this.repairsService.findOne(id, user.shopId);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(
     @CurrentUser() user: AuthenticatedUser,
@@ -54,6 +67,8 @@ export class RepairsController {
     return this.repairsService.create(user.shopId, body);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Patch(':id/status')
   updateStatus(
     @CurrentUser() user: AuthenticatedUser,
@@ -63,6 +78,8 @@ export class RepairsController {
     return this.repairsService.updateStatus(id, user.shopId, status);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post(':id/parts')
   addPart(
     @CurrentUser() user: AuthenticatedUser,

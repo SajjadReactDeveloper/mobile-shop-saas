@@ -1,6 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
+import {
+  SubscriptionStatus,
+  SubscriptionTier as PrismaTier,
+} from '@prisma/client';
 import Stripe from 'stripe';
 
 @Injectable()
@@ -76,6 +80,52 @@ export class SubscriptionsService {
       });
     }
 
+    if (event.type === 'customer.subscription.updated') {
+      const sub = event.data.object;
+      const rawStatus = (sub.status as string).toUpperCase();
+      const validStatuses: string[] = Object.values(SubscriptionStatus);
+      const status = validStatuses.includes(rawStatus)
+        ? (rawStatus as SubscriptionStatus)
+        : SubscriptionStatus.ACTIVE;
+      const rawTier = (
+        (sub.metadata?.tier as string | undefined) ?? 'PRO'
+      ).toUpperCase();
+      const validTiers: string[] = Object.values(PrismaTier);
+      const tier = validTiers.includes(rawTier)
+        ? (rawTier as PrismaTier)
+        : PrismaTier.PRO;
+      await this.prisma.subscription.updateMany({
+        where: { stripeSubId: sub.id as string },
+        data: {
+          status,
+          tier,
+          renewsAt: sub.current_period_end
+            ? new Date((sub.current_period_end as number) * 1000)
+            : undefined,
+        },
+      });
+    }
+
     return { received: true };
+  }
+
+  async createPortalSession(shopId: string, returnUrl: string) {
+    const sub = await this.prisma.subscription.findUnique({
+      where: { shopId },
+    });
+    if (!sub?.stripeSubId) return { url: null };
+
+    // Retrieve the Stripe subscription to get the customer ID
+    const stripeSub = await this.stripe.subscriptions.retrieve(sub.stripeSubId);
+    const customerId =
+      typeof stripeSub.customer === 'string'
+        ? stripeSub.customer
+        : stripeSub.customer.id;
+
+    const session = await this.stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: returnUrl,
+    });
+    return { url: session.url };
   }
 }

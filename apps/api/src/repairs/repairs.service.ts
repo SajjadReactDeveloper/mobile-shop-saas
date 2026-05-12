@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RepairStatus } from '@prisma/client';
 import { NotificationsService } from '../notifications/notifications.service';
+import { EventsGateway } from '../gateway/events.gateway';
 
 @Injectable()
 export class RepairsService {
   constructor(
     private prisma: PrismaService,
     private notifications: NotificationsService,
+    private gateway: EventsGateway,
   ) {}
 
   findAll(shopId: string, status?: RepairStatus) {
@@ -63,11 +65,34 @@ export class RepairsService {
     if (status === RepairStatus.READY && job.customer?.phone) {
       await this.notifications.sendWhatsApp(
         job.customer.phone,
-        `Your device (${job.deviceBrand} ${job.deviceModel}) is ready for pickup! Job #${job.jobNumber}`,
+        `✅ Your device (${job.deviceBrand} ${job.deviceModel}) is ready for pickup!\n\nJob #${job.jobNumber}\nPlease visit our shop to collect it. Thank you! 🙏`,
       );
     }
 
+    this.gateway.emitToShop(job.shopId, 'repair:updated', {
+      id: job.id,
+      jobNumber: job.jobNumber,
+      status: job.status,
+    });
+
     return job;
+  }
+
+  /** Public — no shopId check, returns only safe fields */
+  async trackByJobNumber(jobNumber: string) {
+    return this.prisma.repairJob.findFirst({
+      where: { jobNumber },
+      select: {
+        jobNumber: true,
+        deviceBrand: true,
+        deviceModel: true,
+        status: true,
+        faultDesc: true,
+        createdAt: true,
+        deliveredAt: true,
+        shop: { select: { name: true, city: true } },
+      },
+    });
   }
 
   async addPart(

@@ -179,6 +179,14 @@ function BillingTab({ shop }: { shop: Shop }) {
     if (data.url) window.location.assign(data.url as string)
   }
 
+  const handlePortal = async () => {
+    try {
+      const { data } = await api.post<{ url: string | null }>('/subscriptions/portal', { returnUrl: window.location.href })
+      if (data.url) window.location.assign(data.url)
+      else alert('No active subscription found. Please upgrade first.')
+    } catch { alert('Could not open billing portal. Please try again.') }
+  }
+
   return (
     <div className="space-y-5">
       <Card>
@@ -232,7 +240,14 @@ function BillingTab({ shop }: { shop: Shop }) {
         })}
       </div>
 
-      <p className="text-xs text-gray-400">Payments processed by Stripe. Cancel anytime from the Stripe customer portal.</p>
+      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200">
+        <div>
+          <p className="text-sm font-semibold text-gray-800">Manage Subscription</p>
+          <p className="text-xs text-gray-500">Update payment method, view invoices, or cancel</p>
+        </div>
+        <Button variant="secondary" size="sm" onClick={handlePortal}>Open Billing Portal</Button>
+      </div>
+      <p className="text-xs text-gray-400">Payments processed by Stripe. Cancel anytime.</p>
     </div>
   )
 }

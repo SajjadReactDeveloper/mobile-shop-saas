@@ -5,6 +5,7 @@ import {
 } from 'react-native'
 import { STATUS_TOP } from '../lib/constants'
 import { api } from '../lib/api'
+import { printReceipt, shareReceipt } from '../lib/receipt'
 import { POSScreenSkeleton } from '../components/Skeleton'
 
 type PaymentMethod = 'CASH' | 'EASYPAISA' | 'JAZZCASH' | 'BANK_TRANSFER' | 'CREDIT'
@@ -30,6 +31,9 @@ export function POSScreen() {
   const [loading, setLoading] = useState(true)
   const [placing, setPlacing] = useState(false)
   const [showSuccess, setShowSuccess] = useState<string | null>(null)
+  const [lastSaleCart, setLastSaleCart] = useState<CartItem[]>([])
+  const [lastSaleTotal, setLastSaleTotal] = useState(0)
+  const [lastSalePaid, setLastSalePaid] = useState(0)
   const [showCustomers, setShowCustomers] = useState(false)
 
   const load = useCallback(async () => {
@@ -91,7 +95,10 @@ export function POSScreen() {
         amountPaid: payMethod === 'CASH' && amountPaid ? Number(amountPaid) : total,
         customerId: customerId || undefined,
       })
-      setShowSuccess(r.data.invoiceNumber)
+      setLastSaleCart(cart)
+      setLastSaleTotal(total)
+      setLastSalePaid(payMethod === 'CASH' && amountPaid ? Number(amountPaid) : total)
+      setShowSuccess(r.data.invoiceNumber as string)
       setCart([]); setDiscount(''); setAmountPaid(''); setCustomerId(''); setCustomerSearch(''); setPayMethod('CASH')
       await load()
     } catch (e: unknown) {
@@ -324,7 +331,46 @@ export function POSScreen() {
             </View>
             <Text style={s.successTitle}>Sale Complete!</Text>
             <Text style={s.successInv}>Invoice #{showSuccess}</Text>
-            <Text style={s.successAmount}>PKR {total.toLocaleString()}</Text>
+            <Text style={s.successAmount}>PKR {lastSaleTotal.toLocaleString()}</Text>
+            {/* Print / Share receipt buttons */}
+            <View style={{ flexDirection: 'row', gap: 8, width: '100%', marginTop: 16, marginBottom: 4 }}>
+              <TouchableOpacity
+                style={[s.receiptBtn, { flex: 1 }]}
+                onPress={() => {
+                  if (!showSuccess) return
+                  void printReceipt({
+                    shopName: 'My Shop',
+                    invoiceNumber: showSuccess,
+                    date: new Date().toLocaleDateString('en-PK'),
+                    items: lastSaleCart.map(i => ({ name: i.product.name, qty: i.qty, unitPrice: i.unitPrice })),
+                    subtotal: lastSaleCart.reduce((s, i) => s + i.qty * i.unitPrice, 0),
+                    total: lastSaleTotal,
+                    paymentMethod: 'CASH',
+                    amountPaid: lastSalePaid,
+                  })
+                }}
+              >
+                <Text style={s.receiptBtnText}>🖨 Print</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[s.receiptBtn, { flex: 1 }]}
+                onPress={() => {
+                  if (!showSuccess) return
+                  void shareReceipt({
+                    shopName: 'My Shop',
+                    invoiceNumber: showSuccess,
+                    date: new Date().toLocaleDateString('en-PK'),
+                    items: lastSaleCart.map(i => ({ name: i.product.name, qty: i.qty, unitPrice: i.unitPrice })),
+                    subtotal: lastSaleCart.reduce((s, i) => s + i.qty * i.unitPrice, 0),
+                    total: lastSaleTotal,
+                    paymentMethod: 'CASH',
+                    amountPaid: lastSalePaid,
+                  })
+                }}
+              >
+                <Text style={s.receiptBtnText}>📤 Share</Text>
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity style={s.successBtn} onPress={() => setShowSuccess(null)}>
               <Text style={s.successBtnText}>New Sale →</Text>
             </TouchableOpacity>
@@ -411,6 +457,8 @@ const s = StyleSheet.create({
   successTitle:   { fontSize: 22, fontWeight: '800', color: '#111827', marginBottom: 4 },
   successInv:     { fontSize: 13, color: '#9ca3af', marginBottom: 4 },
   successAmount:  { fontSize: 24, fontWeight: '800', color: '#7c3aed', marginBottom: 20 },
-  successBtn:     { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 13, paddingHorizontal: 36 },
+  successBtn:     { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 13, paddingHorizontal: 36, marginTop: 4 },
   successBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  receiptBtn:     { backgroundColor: '#f5f3ff', borderRadius: 12, paddingVertical: 11, alignItems: 'center', borderWidth: 1, borderColor: '#ede9fe' },
+  receiptBtnText: { color: '#7c3aed', fontWeight: '600', fontSize: 13 },
 })

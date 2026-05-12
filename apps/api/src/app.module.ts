@@ -14,7 +14,7 @@ import { CashRegisterModule } from './cash-register/cash-register.module';
 import { ReportsModule } from './reports/reports.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
-import { EventsGateway } from './gateway/events.gateway';
+import { GatewayModule } from './gateway/gateway.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UploadModule } from './upload/upload.module';
 import { AppController } from './app.controller';
@@ -38,8 +38,9 @@ import { AppController } from './app.controller';
     NotificationsModule,
     SubscriptionsModule,
     UploadModule,
+    GatewayModule,
   ],
   controllers: [AppController],
-  providers: [EventsGateway],
+  providers: [],
 })
 export class AppModule {}

@@ -44,4 +44,26 @@ export class ReportsController {
   getReceivables(@CurrentUser() user: AuthenticatedUser) {
     return this.reportsService.receivables(user.shopId);
   }
+
+  @Get('daily-trend')
+  getDailyTrend(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query('from') from: string,
+    @Query('to') to: string,
+  ) {
+    const today = new Date().toISOString().split('T')[0];
+    const monthAgo = new Date(Date.now() - 29 * 864e5)
+      .toISOString()
+      .split('T')[0];
+    return this.reportsService.dailyTrend(
+      user.shopId,
+      from ?? monthAgo,
+      to ?? today,
+    );
+  }
+
+  @Get('restock-suggestions')
+  getRestockSuggestions(@CurrentUser() user: AuthenticatedUser) {
+    return this.reportsService.restockSuggestions(user.shopId);
+  }
 }

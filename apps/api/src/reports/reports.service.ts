@@ -129,4 +129,100 @@ export class ReportsService {
     const total = customers.reduce((s, c) => s + Number(c.balanceOwed), 0);
     return { total, customers };
   }
+
+  /** Returns one data-point per day between from→to for the trend chart */
+  async dailyTrend(shopId: string, from: string, to: string) {
+    const start = new Date(from);
+    const end = new Date(to);
+    end.setHours(23, 59, 59, 999);
+
+    const sales = await this.prisma.sale.findMany({
+      where: { shopId, createdAt: { gte: start, lte: end } },
+      include: {
+        items: { include: { product: { select: { buyingPrice: true } } } },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    const map = new Map<
+      string,
+      { revenue: number; profit: number; sales: number }
+    >();
+
+    for (const sale of sales) {
+      const day = sale.createdAt.toISOString().split('T')[0];
+      const revenue = Number(sale.total);
+      const cogs = sale.items.reduce(
+        (s, i) => s + Number(i.product.buyingPrice) * i.qty,
+        0,
+      );
+      const entry = map.get(day) ?? { revenue: 0, profit: 0, sales: 0 };
+      entry.revenue += revenue;
+      entry.profit += revenue - cogs;
+      entry.sales += 1;
+      map.set(day, entry);
+    }
+
+    // Fill every day in range (even days with no sales → 0)
+    const days: {
+      date: string;
+      revenue: number;
+      profit: number;
+      sales: number;
+    }[] = [];
+    const cur = new Date(start);
+    while (cur <= end) {
+      const day = cur.toISOString().split('T')[0];
+      days.push({
+        date: day,
+        ...(map.get(day) ?? { revenue: 0, profit: 0, sales: 0 }),
+      });
+      cur.setDate(cur.getDate() + 1);
+    }
+
+    return days;
+  }
+
+  /** Products that will run out within `days` days at current sales velocity */
+  async restockSuggestions(shopId: string, lookbackDays = 30) {
+    const since = new Date();
+    since.setDate(since.getDate() - lookbackDays);
+
+    const [products, recentItems] = await Promise.all([
+      this.prisma.product.findMany({
+        where: { shopId, isActive: true },
+        select: {
+          id: true,
+          name: true,
+          category: true,
+          stockQty: true,
+          imageUrl: true,
+        },
+      }),
+      this.prisma.saleItem.findMany({
+        where: { sale: { shopId, createdAt: { gte: since } } },
+        select: { productId: true, qty: true },
+      }),
+    ]);
+
+    const soldMap = new Map<string, number>();
+    for (const item of recentItems) {
+      soldMap.set(
+        item.productId,
+        (soldMap.get(item.productId) ?? 0) + item.qty,
+      );
+    }
+
+    return products
+      .map((p) => {
+        const totalSold = soldMap.get(p.id) ?? 0;
+        const dailyRate = totalSold / lookbackDays;
+        const daysLeft =
+          dailyRate > 0 ? Math.floor(p.stockQty / dailyRate) : null;
+        return { ...p, dailyRate: Math.round(dailyRate * 10) / 10, daysLeft };
+      })
+      .filter((p) => p.daysLeft !== null && p.daysLeft <= 14)
+      .sort((a, b) => (a.daysLeft ?? 999) - (b.daysLeft ?? 999))
+      .slice(0, 20);
+  }
 }

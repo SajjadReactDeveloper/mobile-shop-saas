@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { EventsGateway } from '../gateway/events.gateway';
 import { PaymentMethod } from '@prisma/client';
 
 interface SaleItemInput {
@@ -20,7 +21,10 @@ interface CreateSaleDto {
 
 @Injectable()
 export class SalesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private gateway: EventsGateway,
+  ) {}
 
   async findAll(shopId: string, from?: string, to?: string) {
     return this.prisma.sale.findMany({
@@ -58,85 +62,96 @@ export class SalesService {
     const invoiceCount = await this.prisma.sale.count({ where: { shopId } });
     const invoiceNumber = `INV-${String(invoiceCount + 1).padStart(5, '0')}`;
 
-    return this.prisma.$transaction(async (tx) => {
-      for (const item of dto.items) {
-        const product = await tx.product.findUniqueOrThrow({
-          where: { id: item.productId, shopId },
-        });
-        if (product.stockQty < item.qty) {
-          throw new BadRequestException(
-            `Insufficient stock for ${product.name}`,
-          );
-        }
-
-        if (product.imeiTracked) {
-          if (!item.imei)
-            throw new BadRequestException(`IMEI required for ${product.name}`);
-          const imeiRecord = await tx.imeiLog.findFirst({
-            where: {
-              productId: item.productId,
-              imei: item.imei,
-              status: 'IN_STOCK',
-            },
+    return this.prisma
+      .$transaction(async (tx) => {
+        for (const item of dto.items) {
+          const product = await tx.product.findUniqueOrThrow({
+            where: { id: item.productId, shopId },
           });
-          if (!imeiRecord)
+          if (product.stockQty < item.qty) {
             throw new BadRequestException(
-              `IMEI ${item.imei} not found or already sold`,
+              `Insufficient stock for ${product.name}`,
             );
+          }
+
+          if (product.imeiTracked) {
+            if (!item.imei)
+              throw new BadRequestException(
+                `IMEI required for ${product.name}`,
+              );
+            const imeiRecord = await tx.imeiLog.findFirst({
+              where: {
+                productId: item.productId,
+                imei: item.imei,
+                status: 'IN_STOCK',
+              },
+            });
+            if (!imeiRecord)
+              throw new BadRequestException(
+                `IMEI ${item.imei} not found or already sold`,
+              );
+          }
         }
-      }
 
-      const sale = await tx.sale.create({
-        data: {
-          shopId,
-          customerId: dto.customerId,
-          invoiceNumber,
-          subtotal,
-          discount,
-          total,
-          amountPaid: dto.amountPaid,
-          paymentMethod: dto.paymentMethod,
-          notes: dto.notes,
-          createdById: userId,
-          items: { create: dto.items },
-        },
-      });
-
-      for (const item of dto.items) {
-        await tx.product.update({
-          where: { id: item.productId },
-          data: { stockQty: { decrement: item.qty } },
+        const sale = await tx.sale.create({
+          data: {
+            shopId,
+            customerId: dto.customerId,
+            invoiceNumber,
+            subtotal,
+            discount,
+            total,
+            amountPaid: dto.amountPaid,
+            paymentMethod: dto.paymentMethod,
+            notes: dto.notes,
+            createdById: userId,
+            items: { create: dto.items },
+          },
         });
 
-        if (item.imei) {
-          await tx.imeiLog.updateMany({
-            where: { productId: item.productId, imei: item.imei },
-            data: { status: 'SOLD', saleId: sale.id },
+        for (const item of dto.items) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stockQty: { decrement: item.qty } },
           });
-        }
-      }
 
-      if (dto.customerId && dto.paymentMethod === PaymentMethod.CREDIT) {
-        const creditAmount = total - dto.amountPaid;
-        if (creditAmount > 0) {
-          await tx.customer.update({
-            where: { id: dto.customerId },
-            data: { balanceOwed: { increment: creditAmount } },
-          });
-          await tx.ledgerEntry.create({
-            data: {
-              customerId: dto.customerId,
-              amount: creditAmount,
-              type: 'CREDIT',
-              description: `Sale ${invoiceNumber}`,
-              saleId: sale.id,
-            },
-          });
+          if (item.imei) {
+            await tx.imeiLog.updateMany({
+              where: { productId: item.productId, imei: item.imei },
+              data: { status: 'SOLD', saleId: sale.id },
+            });
+          }
         }
-      }
 
-      return sale;
-    });
+        if (dto.customerId && dto.paymentMethod === PaymentMethod.CREDIT) {
+          const creditAmount = total - dto.amountPaid;
+          if (creditAmount > 0) {
+            await tx.customer.update({
+              where: { id: dto.customerId },
+              data: { balanceOwed: { increment: creditAmount } },
+            });
+            await tx.ledgerEntry.create({
+              data: {
+                customerId: dto.customerId,
+                amount: creditAmount,
+                type: 'CREDIT',
+                description: `Sale ${invoiceNumber}`,
+                saleId: sale.id,
+              },
+            });
+          }
+        }
+
+        return sale;
+      })
+      .then((sale) => {
+        this.gateway.emitToShop(shopId, 'sale:created', {
+          id: sale.id,
+          invoiceNumber: sale.invoiceNumber,
+          total: sale.total,
+        });
+        return sale;
+      });
   }
 
   async dailySummary(shopId: string, date: string) {

@@ -221,6 +221,17 @@ function JobDetail({ jobId, onBack }: { jobId: string; onBack: () => void }) {
           </div>
           <p className="text-sm text-gray-500">{job.deviceBrand} {job.deviceModel}</p>
         </div>
+        <button
+          onClick={() => {
+            const url = `${window.location.origin}/repair/${job.jobNumber}`
+            void navigator.clipboard.writeText(url)
+            alert(`Tracking link copied!\n${url}`)
+          }}
+          title="Copy customer tracking link"
+          className="px-3 py-1.5 text-xs font-semibold text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 rounded-lg transition-colors flex items-center gap-1.5"
+        >
+          🔗 Share Link
+        </button>
       </div>
 
       {/* Status timeline */}

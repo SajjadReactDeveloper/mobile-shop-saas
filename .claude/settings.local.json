@@ -20,7 +20,28 @@
       "Bash(node -e \"console.log\\(require\\('./node_modules/@react-native-async-storage/async-storage/package.json'\\).version\\)\")",
       "Bash(pnpm install *)",
       "Bash(Remove-Item -Recurse -Force \"E:\\\\Saas Projects\\\\Mobile Shop\\\\apps\\\\mobile\\\\node_modules\" -ErrorAction SilentlyContinue)",
-      "Bash(Write-Host \"Done\")"
+      "Bash(Write-Host \"Done\")",
+      "Bash(pnpm run *)",
+      "Bash(npx eslint *)",
+      "Bash(curl -s -X POST https://mobile-shop-saas.onrender.com/api/v1/auth/register -H 'Content-Type: application/json' -d '{\"name\":\"Test Owner\",\"shopName\":\"Demo Mobile Shop\",\"city\":\"Lahore\",\"email\":\"testdemo@mobileshop.pk\",\"password\":\"Test1234!\"}')",
+      "Bash(python -m json.tool)",
+      "Bash(curl -s -X POST https://mobile-shop-saas.onrender.com/api/v1/auth/register -H \"Content-Type: application/json\" -d '{\"name\":\"Test Owner\",\"shopName\":\"Demo Mobile Shop\",\"city\":\"Lahore\",\"email\":\"testdemo@mobileshop.pk\",\"password\":\"Test1234!\"}')",
+      "Read(//tmp/**)",
+      "Bash(curl -s -H 'Authorization: Bearer __TRACKED_VAR__' https://mobile-shop-saas.onrender.com/api/v1/shop)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('Product 3:', d.get\\('name','?'\\), '| ID:', d.get\\('id','?'\\)\\)\")",
+      "Bash(curl -s -X POST https://mobile-shop-saas.onrender.com/api/v1/repairs -H 'Authorization: Bearer __TRACKED_VAR__' -H 'Content-Type: application/json' -d '{\"customerId\":\"__TRACKED_VAR__\",\"deviceModel\":\"Samsung A55\",\"faultDescription\":\"Battery draining fast\",\"advancePaid\":500,\"totalQuote\":3000}')",
+      "Bash(curl -s -H 'Authorization: Bearer __TRACKED_VAR__' https://mobile-shop-saas.onrender.com/api/v1/repairs)",
+      "Bash(python -c \"import sys,json; prods=json.load\\(sys.stdin\\); [print\\(f'{p[\\\\\"name\\\\\"]} | Stock: {p[\\\\\"stockQty\\\\\"]} | Price: PKR {p[\\\\\"sellingPrice\\\\\"]}'\\) for p in prods]\")",
+      "Bash(curl -s -X POST https://mobile-shop-saas.onrender.com/api/v1/repairs -H 'Authorization: Bearer __TRACKED_VAR__' -H 'Content-Type: application/json' -d '{\"customerId\":\"__TRACKED_VAR__\",\"deviceBrand\":\"Apple\",\"deviceModel\":\"iPhone 13 Pro\",\"faultDesc\":\"Screen broken, touch not working\",\"advancePaid\":2000,\"totalQuote\":8500}')",
+      "Bash(curl -s -H 'Authorization: Bearer __TRACKED_VAR__' 'https://mobile-shop-saas.onrender.com/api/v1/sales?limit=5')",
+      "Bash(pnpm --filter mobile add react-native-safe-area-context)",
+      "Bash(pnpm add *)",
+      "Bash(git commit -m 'style\\(mobile\\): increase header top padding from 14 to 24dp *)",
+      "Bash(git commit -m 'fix\\(mobile\\): flush tab-bar indicator — move border from bar to each item *)",
+      "Bash(pnpm --filter api add -D @types/multer)",
+      "Bash(dir)",
+      "Bash(xargs wc -l)",
+      "Bash(mkdir -p \"E:\\\\Saas Projects\\\\Mobile Shop\\\\apps\\\\web\\\\src\\\\app\\\\repair\\\\[jobNumber]\")"
     ]
   }
 }

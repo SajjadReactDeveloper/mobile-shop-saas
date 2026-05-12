@@ -40,6 +40,19 @@ export class SubscriptionsController {
     );
   }
 
+  @Post('portal')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  createPortal(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() body: { returnUrl: string },
+  ) {
+    return this.subscriptionsService.createPortalSession(
+      user.shopId,
+      body.returnUrl,
+    );
+  }
+
   @Post('webhook')
   handleWebhook(
     @Req() req: Request & { rawBody?: Buffer },

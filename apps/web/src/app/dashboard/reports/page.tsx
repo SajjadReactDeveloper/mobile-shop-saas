@@ -3,8 +3,14 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import { TrendingUp, Package, Users, Calendar } from 'lucide-react'
-import { Card, Badge, PageHeader, Stat, StatsSkeleton, TableSkeleton } from '@/components/ui'
+import {
+  TrendingUp, Package, Users, Calendar, AlertTriangle, Zap,
+} from 'lucide-react'
+import {
+  ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
+  Tooltip, CartesianGrid,
+} from 'recharts'
+import { Card, Badge, PageHeader, Stat, StatsSkeleton } from '@/components/ui'
 
 interface Overview {
   period: { from: string; to: string }
@@ -17,6 +23,8 @@ interface Overview {
 }
 interface TopProduct { id: string; name: string; qty: number; revenue: number }
 interface Receivables { total: number; customers: { id: string; name: string; phone?: string; balanceOwed: number }[] }
+interface TrendDay { date: string; revenue: number; profit: number; sales: number }
+interface RestockItem { id: string; name: string; category: string; stockQty: number; dailyRate: number; daysLeft: number | null; imageUrl?: string }
 type Range = 'today' | 'week' | 'month' | 'custom'
 
 function getDateRange(range: Range, custom: { from: string; to: string }) {
@@ -47,8 +55,25 @@ function ProfitBar({ label, value, max, color, count }: { label: string; value: 
   )
 }
 
+function fmtDate(iso: string) {
+  const d = new Date(iso)
+  return d.toLocaleDateString('en-PK', { month: 'short', day: 'numeric' })
+}
+
 const RANGE_LABELS: Record<Range, string> = {
   today: 'Today', week: 'Last 7 days', month: 'This month', custom: 'Custom',
+}
+
+const URGENCY: Record<number, { label: string; color: string; bg: string }> = {
+  0: { label: 'Critical', color: 'text-red-700', bg: 'bg-red-50 border-red-200' },
+  3: { label: 'Urgent', color: 'text-orange-700', bg: 'bg-orange-50 border-orange-200' },
+  7: { label: 'Soon', color: 'text-amber-700', bg: 'bg-amber-50 border-amber-200' },
+}
+function getUrgency(days: number | null) {
+  if (days === null) return URGENCY[7]
+  if (days <= 3) return URGENCY[0]
+  if (days <= 7) return URGENCY[3]
+  return URGENCY[7]
 }
 
 export default function ReportsPage() {
@@ -72,18 +97,39 @@ export default function ReportsPage() {
     queryKey: ['report-receivables'],
     queryFn: () => api.get('/reports/receivables').then(r => r.data),
   })
+  const { data: trend = [] } = useQuery<TrendDay[]>({
+    queryKey: ['report-trend', from, to],
+    queryFn: () => api.get(`/reports/daily-trend?from=${from}&to=${to}`).then(r => r.data),
+    enabled: !!validCustom && range !== 'today',
+  })
+  const { data: restock = [] } = useQuery<RestockItem[]>({
+    queryKey: ['report-restock'],
+    queryFn: () => api.get('/reports/restock-suggestions').then(r => r.data),
+  })
 
   const sources = overview ? [
     { label: 'Sales Profit',         value: overview.sales.grossProfit,    color: 'bg-violet-500',   count: overview.sales.count },
-    { label: 'Repair Revenue',       value: overview.repairs.revenue,      color: 'bg-orange-400', count: overview.repairs.count },
-    { label: 'Easy Load Profit',     value: overview.easyLoad.profit,      color: 'bg-emerald-500',count: overview.easyLoad.count },
-    { label: 'Easypaisa Commission', value: overview.easypaisa.commission, color: 'bg-purple-500', count: overview.easypaisa.count },
+    { label: 'Repair Revenue',       value: overview.repairs.revenue,      color: 'bg-orange-400',   count: overview.repairs.count },
+    { label: 'Easy Load Profit',     value: overview.easyLoad.profit,      color: 'bg-emerald-500',  count: overview.easyLoad.count },
+    { label: 'Easypaisa Commission', value: overview.easypaisa.commission, color: 'bg-purple-500',   count: overview.easypaisa.count },
   ] : []
   const maxSource = Math.max(...sources.map(s => s.value), 1)
 
   return (
     <div className="space-y-6">
       <PageHeader title="Reports" subtitle="P&L overview and analytics" />
+
+      {/* Restock alert banner */}
+      {restock.length > 0 && (
+        <div className="flex items-start gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <span>
+            <strong>{restock.length}</strong> product{restock.length > 1 ? 's' : ''} will run out
+            within 14 days at current sales rate.{' '}
+            <a href="#restock" className="underline font-semibold">View below ↓</a>
+          </span>
+        </div>
+      )}
 
       {/* Range selector */}
       <div className="flex items-center gap-2 flex-wrap">
@@ -114,13 +160,63 @@ export default function ReportsPage() {
 
       {ovLoading ? <StatsSkeleton count={4} /> : overview ? (
         <>
-          {/* KPI */}
+          {/* KPIs */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <Stat icon={TrendingUp} label="Total Profit" value={`PKR ${overview.totalProfit.toLocaleString()}`} sub="All sources" color="text-emerald-600 bg-emerald-50" />
-            <Stat icon={TrendingUp} label="Sales Revenue" value={`PKR ${overview.sales.revenue.toLocaleString()}`} sub={`${overview.sales.count} transactions`} color="text-violet-600 bg-violet-50" />
-            <Stat icon={Package} label="Inventory Value" value={`PKR ${overview.inventoryValuation.toLocaleString()}`} sub="At buying price" color="text-purple-600 bg-purple-50" />
-            <Stat icon={Users} label="Receivables" value={`PKR ${(receivables?.total ?? 0).toLocaleString()}`} sub={`${receivables?.customers.length ?? 0} customers`} color="text-red-600 bg-red-50" />
+            <Stat icon={TrendingUp} label="Total Profit"    value={`PKR ${overview.totalProfit.toLocaleString()}`}         sub="All sources"                              color="text-emerald-600 bg-emerald-50" />
+            <Stat icon={TrendingUp} label="Sales Revenue"  value={`PKR ${overview.sales.revenue.toLocaleString()}`}        sub={`${overview.sales.count} transactions`}   color="text-violet-600 bg-violet-50" />
+            <Stat icon={Package}    label="Inventory Value" value={`PKR ${overview.inventoryValuation.toLocaleString()}`}  sub="At buying price"                          color="text-purple-600 bg-purple-50" />
+            <Stat icon={Users}      label="Receivables"     value={`PKR ${(receivables?.total ?? 0).toLocaleString()}`}    sub={`${receivables?.customers.length ?? 0} customers`} color="text-red-600 bg-red-50" />
           </div>
+
+          {/* Trend chart — hidden for single-day range */}
+          {range !== 'today' && trend.length > 1 && (
+            <Card>
+              <h2 className="text-sm font-bold text-gray-900 mb-4">Daily Revenue &amp; Profit Trend</h2>
+              <ResponsiveContainer width="100%" height={220}>
+                <AreaChart data={trend} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="gradRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#7c3aed" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="gradProfit" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                  <XAxis
+                    dataKey="date"
+                    tickFormatter={fmtDate}
+                    tick={{ fontSize: 11, fill: '#9ca3af' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tickFormatter={v => `${Math.round((v as number) / 1000)}k`}
+                    tick={{ fontSize: 11, fill: '#9ca3af' }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={36}
+                  />
+                  <Tooltip
+                    formatter={(val, name) => [
+                      `PKR ${Number(val).toLocaleString()}`,
+                      name === 'revenue' ? 'Revenue' : 'Profit',
+                    ]}
+                    labelFormatter={(label) => fmtDate(String(label))}
+                    contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e5e7eb' }}
+                  />
+                  <Area type="monotone" dataKey="revenue" stroke="#7c3aed" strokeWidth={2} fill="url(#gradRevenue)" dot={false} />
+                  <Area type="monotone" dataKey="profit"  stroke="#10b981" strokeWidth={2} fill="url(#gradProfit)"  dot={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+              <div className="flex gap-4 mt-3 justify-center">
+                <div className="flex items-center gap-1.5 text-xs text-gray-500"><div className="w-3 h-3 rounded-full bg-violet-500" /> Revenue</div>
+                <div className="flex items-center gap-1.5 text-xs text-gray-500"><div className="w-3 h-3 rounded-full bg-emerald-500" /> Profit</div>
+              </div>
+            </Card>
+          )}
 
           {/* Profit breakdown */}
           <Card>
@@ -147,7 +243,9 @@ export default function ReportsPage() {
             <div className="px-5 py-4 border-b border-gray-100">
               <h2 className="text-sm font-bold text-gray-900">Top Products by Revenue</h2>
             </div>
-            {tpLoading ? <TableSkeleton rows={5} cols={3} /> : topProducts.length === 0 ? (
+            {tpLoading ? (
+              <div className="p-5 space-y-3">{[...Array(5)].map((_, i) => <div key={i} className="h-8 bg-gray-100 rounded-lg animate-pulse" />)}</div>
+            ) : topProducts.length === 0 ? (
               <p className="text-sm text-gray-400 text-center py-8">No sales in this period</p>
             ) : (
               <div className="divide-y divide-gray-50">
@@ -198,6 +296,41 @@ export default function ReportsPage() {
           )}
         </>
       ) : null}
+
+      {/* Smart Restock Suggestions */}
+      {restock.length > 0 && (
+        <div id="restock"><Card padding={false}>
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
+            <Zap className="w-4 h-4 text-amber-500" />
+            <h2 className="text-sm font-bold text-gray-900">Smart Restock Suggestions</h2>
+            <span className="text-xs text-gray-400 ml-auto">Based on last 30 days sales velocity</span>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {restock.map(item => {
+              const u = getUrgency(item.daysLeft)
+              return (
+                <div key={item.id} className={`flex items-center justify-between px-5 py-3.5 border-l-4 ${u.bg} border-l-current`}>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-gray-800">{item.name}</span>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${u.bg} ${u.color}`}>{u.label}</span>
+                    </div>
+                    <div className="text-xs text-gray-400 mt-0.5">
+                      {item.dailyRate} units/day · {item.stockQty} left in stock
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className={`text-sm font-bold ${u.color}`}>
+                      {item.daysLeft !== null ? `~${item.daysLeft} days` : '<1 day'}
+                    </div>
+                    <div className="text-xs text-gray-400">until stockout</div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </Card></div>
+      )}
     </div>
   )
 }
