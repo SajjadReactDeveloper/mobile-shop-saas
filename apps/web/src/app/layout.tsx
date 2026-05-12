@@ -11,8 +11,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Mobile Shop SaaS',
-  description: 'Complete management system for mobile shops',
+  title: 'Flowchat — Mobile Shop Management',
+  description: 'Complete management system for Pakistani mobile shops. Sales, inventory, repairs, easy load, udhaar and more.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

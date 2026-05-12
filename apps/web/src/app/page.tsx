@@ -3,6 +3,7 @@ import {
   ShoppingCart, Package, PhoneCall, Wallet,
   Wrench, Users, DollarSign, BarChart3,
   CheckCircle, Smartphone, Zap, Shield,
+  MessageCircle, Mail, Globe,
 } from 'lucide-react'
 import { LandingNav } from '@/components/LandingNav'
 
@@ -58,6 +59,7 @@ export default function HomePage() {
         <div className="inline-flex items-center gap-2 bg-violet-50 text-violet-700 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
           <Zap className="w-3.5 h-3.5" /> Built for Pakistani mobile shops
         </div>
+
         <h1 className="text-5xl font-extrabold text-gray-900 leading-tight max-w-3xl mx-auto">
           Run your mobile shop <span className="text-violet-600">without the headache</span>
         </h1>
@@ -241,39 +243,96 @@ export default function HomePage() {
             </div>
 
             {/* Phone mockup */}
-            <div className="shrink-0 flex items-center justify-center">
-              <div className="relative w-48 h-80 bg-gray-900 rounded-[2.5rem] border-4 border-white/20 shadow-2xl flex flex-col overflow-hidden">
-                {/* Status bar */}
-                <div className="h-6 bg-gray-800 flex items-center justify-center">
-                  <div className="w-16 h-1.5 bg-gray-700 rounded-full" />
-                </div>
-                {/* Screen content */}
-                <div className="flex-1 bg-[#faf9ff] p-3 flex flex-col gap-2">
-                  <div className="bg-violet-600 rounded-xl p-3 text-white text-center">
-                    <div className="text-[9px] font-semibold opacity-70">Today&apos;s Revenue</div>
-                    <div className="text-base font-extrabold mt-0.5">PKR 24,500</div>
-                  </div>
-                  {[['Sales', '12', 'text-violet-600'], ['Repairs', '3', 'text-orange-500'], ['Easy Load', '8', 'text-blue-600']].map(([l, v, c]) => (
-                    <div key={l} className="bg-white rounded-xl px-3 py-2 flex justify-between items-center shadow-sm">
-                      <span className="text-[10px] font-medium text-gray-500">{l}</span>
-                      <span className={`text-[10px] font-bold ${c}`}>{v} today</span>
-                    </div>
-                  ))}
-                  <div className="bg-white rounded-xl px-3 py-2 shadow-sm">
-                    <div className="flex items-center gap-1.5 mb-1.5">
-                      <div className="w-3 h-3 bg-violet-100 rounded flex items-center justify-center">
-                        <Smartphone className="w-2 h-2 text-violet-600" />
+            <div className="shrink-0 flex items-center justify-center lg:justify-end">
+              {/* Glow */}
+              <div className="relative">
+                <div className="absolute inset-0 bg-violet-400/30 blur-3xl rounded-full scale-75 translate-y-8" />
+                {/* Device shell */}
+                <div className="relative w-56 h-[460px] bg-gray-900 rounded-[3rem] border-[5px] border-gray-700 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.6)] flex flex-col overflow-hidden">
+                  {/* Dynamic island */}
+                  <div className="absolute top-3 left-1/2 -translate-x-1/2 w-20 h-5 bg-black rounded-full z-10" />
+                  {/* Status bar */}
+                  <div className="h-10 bg-[#7c3aed] flex items-end justify-between px-5 pb-1.5 shrink-0">
+                    <span className="text-[9px] text-white/80 font-semibold">9:41</span>
+                    <div className="flex items-center gap-1">
+                      <div className="flex gap-0.5 items-end h-2.5">
+                        {[40,60,80,100].map(h => <div key={h} style={{height:`${h}%`}} className="w-0.5 bg-white/80 rounded-full" />)}
                       </div>
-                      <span className="text-[9px] font-bold text-gray-700">Scan Barcode</span>
-                    </div>
-                    <div className="h-8 border border-dashed border-violet-300 rounded-lg flex items-center justify-center">
-                      <span className="text-[8px] text-violet-400">[ ▌▌▐▌▌▌▐ ]</span>
+                      <svg className="w-3 h-3 text-white/80" fill="currentColor" viewBox="0 0 24 24"><path d="M1.75 7A.75.75 0 0 1 1 6.25C1 3.35 3.35 1 6.25 1h11.5C20.65 1 23 3.35 23 6.25a.75.75 0 0 1-1.5 0C21.5 4.18 19.82 2.5 17.75 2.5H6.25C4.18 2.5 2.5 4.18 2.5 6.25A.75.75 0 0 1 1.75 7Z"/><path d="M12 22.5a10.5 10.5 0 1 0 0-21 10.5 10.5 0 0 0 0 21Z" opacity=".1"/></svg>
                     </div>
                   </div>
-                </div>
-                {/* Home indicator */}
-                <div className="h-5 bg-gray-800 flex items-center justify-center">
-                  <div className="w-10 h-1 bg-gray-600 rounded-full" />
+
+                  {/* Screen */}
+                  <div className="flex-1 bg-[#f5f3ff] flex flex-col overflow-hidden">
+                    {/* Header */}
+                    <div className="bg-[#7c3aed] px-4 pb-4 pt-1">
+                      <div className="text-[9px] text-violet-200 font-medium">Good morning 👋</div>
+                      <div className="text-[11px] text-white font-extrabold mt-0.5">Flowchat Dashboard</div>
+                      {/* Revenue card */}
+                      <div className="mt-3 bg-white/15 rounded-2xl p-3 backdrop-blur-sm">
+                        <div className="text-[8px] text-violet-200 font-semibold uppercase tracking-wide">Today&apos;s Revenue</div>
+                        <div className="text-[20px] font-extrabold text-white leading-tight">PKR 24,500</div>
+                        <div className="text-[8px] text-green-300 mt-0.5">↑ 12% from yesterday</div>
+                      </div>
+                    </div>
+
+                    {/* Stats row */}
+                    <div className="grid grid-cols-3 gap-1.5 px-3 py-2 bg-white border-b border-gray-100">
+                      {[['Sales','12','#7c3aed'],['Repairs','3','#f97316'],['Load','8','#2563eb']].map(([l,v,c]) => (
+                        <div key={l} className="text-center py-1.5">
+                          <div style={{color:c}} className="text-[13px] font-extrabold">{v}</div>
+                          <div className="text-[8px] text-gray-400 font-medium">{l}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* List items */}
+                    <div className="flex-1 px-3 py-2 flex flex-col gap-1.5 overflow-hidden">
+                      {[
+                        { label: 'INV-00041', sub: 'Samsung A15 Cover', amt: '+PKR 200', color: '#16a34a' },
+                        { label: 'JOB-00012', sub: 'iPhone 14 Screen',  amt: 'In Repair', color: '#f97316' },
+                        { label: 'INV-00040', sub: 'Charger × 2',       amt: '+PKR 800', color: '#16a34a' },
+                      ].map(item => (
+                        <div key={item.label} className="bg-white rounded-xl px-3 py-2 flex items-center justify-between shadow-sm border border-gray-50">
+                          <div>
+                            <div className="text-[9px] font-bold text-gray-800 font-mono">{item.label}</div>
+                            <div className="text-[8px] text-gray-400 mt-0.5">{item.sub}</div>
+                          </div>
+                          <span style={{color:item.color}} className="text-[9px] font-bold">{item.amt}</span>
+                        </div>
+                      ))}
+
+                      {/* Barcode scanner */}
+                      <div className="bg-white rounded-xl px-3 py-2 shadow-sm border border-gray-50">
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <div className="w-4 h-4 bg-violet-100 rounded-lg flex items-center justify-center">
+                            <Smartphone className="w-2.5 h-2.5 text-violet-600" />
+                          </div>
+                          <span className="text-[9px] font-bold text-gray-700">Scan Barcode / IMEI</span>
+                        </div>
+                        <div className="h-7 border border-dashed border-violet-300 rounded-lg flex items-center justify-center gap-0.5">
+                          {[3,5,2,4,6,2,5,3,4,5,2,4].map((h,i) => (
+                            <div key={i} style={{height:`${h*3}px`}} className="w-[2px] bg-violet-400 rounded-full" />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Tab bar */}
+                    <div className="bg-white border-t border-gray-100 flex justify-around py-2 px-2">
+                      {[['🏠','Home'],['🛒','POS'],['🔧','Repair'],['👤','More']].map(([icon,label],i) => (
+                        <div key={label} className={`flex flex-col items-center gap-0.5 ${i===0?'opacity-100':'opacity-40'}`}>
+                          <span className="text-[10px]">{icon}</span>
+                          <span className={`text-[7px] font-semibold ${i===0?'text-violet-600':'text-gray-400'}`}>{label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Home indicator */}
+                  <div className="h-5 bg-gray-900 flex items-center justify-center shrink-0">
+                    <div className="w-20 h-1 bg-gray-700 rounded-full" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -292,18 +351,95 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-100 py-8">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
-          <div className="flex items-center gap-2">
-            <Smartphone className="w-4 h-4 text-violet-600" />
-            <span className="font-medium text-gray-600">Mobile Shop SaaS</span>
+      <footer className="bg-gray-950 text-gray-400">
+        {/* Main footer */}
+        <div className="max-w-6xl mx-auto px-6 py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          {/* Brand */}
+          <div className="lg:col-span-1">
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-9 h-9 bg-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-violet-900/40">
+                <MessageCircle className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-extrabold text-xl text-white tracking-tight">Flowchat</span>
+            </div>
+            <p className="text-sm leading-relaxed text-gray-500 max-w-xs">
+              Complete shop management for Pakistani mobile shops. Sales, inventory, repairs, easy load, udhaar — all in one place.
+            </p>
+            <div className="flex gap-3 mt-6">
+              {[
+                { icon: Globe,  href: '#' },
+                { icon: Mail,   href: 'mailto:hello@flowchat.pk' },
+              ].map(({ icon: Icon, href }) => (
+                <a key={href} href={href} className="w-9 h-9 rounded-lg bg-gray-800 hover:bg-violet-600 flex items-center justify-center transition-colors">
+                  <Icon className="w-4 h-4 text-gray-400 hover:text-white" />
+                </a>
+              ))}
+            </div>
           </div>
-          <div className="flex gap-6">
-            <Link href="/auth/login" className="hover:text-gray-600">Sign In</Link>
-            <Link href="/auth/register" className="hover:text-gray-600">Register</Link>
-            <Link href="#pricing" className="hover:text-gray-600">Pricing</Link>
+
+          {/* Product */}
+          <div>
+            <h4 className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Product</h4>
+            <ul className="space-y-3 text-sm">
+              {[
+                { label: 'POS & Sales',      href: '#' },
+                { label: 'Inventory',         href: '#' },
+                { label: 'Repair Jobs',       href: '#' },
+                { label: 'Easy Load',         href: '#' },
+                { label: 'Easypaisa',         href: '#' },
+                { label: 'Reports',           href: '#' },
+              ].map(l => (
+                <li key={l.label}><Link href={l.href} className="hover:text-violet-400 transition-colors">{l.label}</Link></li>
+              ))}
+            </ul>
           </div>
-          <span>© {new Date().getFullYear()} Mobile Shop SaaS</span>
+
+          {/* Company */}
+          <div>
+            <h4 className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Company</h4>
+            <ul className="space-y-3 text-sm">
+              {[
+                { label: 'About',     href: '#' },
+                { label: 'Pricing',   href: '#pricing' },
+                { label: 'Blog',      href: '#' },
+                { label: 'Contact',   href: 'mailto:hello@flowchat.pk' },
+              ].map(l => (
+                <li key={l.label}><Link href={l.href} className="hover:text-violet-400 transition-colors">{l.label}</Link></li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Get Started */}
+          <div>
+            <h4 className="text-xs font-bold text-gray-300 uppercase tracking-widest mb-5">Get Started</h4>
+            <ul className="space-y-3 text-sm">
+              {[
+                { label: 'Sign In',           href: '/auth/login' },
+                { label: 'Create Free Shop',  href: '/auth/register' },
+                { label: 'Android App',       href: '#' },
+              ].map(l => (
+                <li key={l.label}><Link href={l.href} className="hover:text-violet-400 transition-colors">{l.label}</Link></li>
+              ))}
+            </ul>
+            <div className="mt-6 p-4 bg-gray-900 rounded-2xl border border-gray-800">
+              <p className="text-xs text-gray-400 mb-2">Start free today</p>
+              <Link href="/auth/register" className="block text-center text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white py-2.5 rounded-xl transition-colors">
+                Create Free Account
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="border-t border-gray-800">
+          <div className="max-w-6xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
+            <span>© {new Date().getFullYear()} Flowchat. All rights reserved.</span>
+            <div className="flex gap-5">
+              <Link href="#" className="hover:text-gray-400 transition-colors">Privacy Policy</Link>
+              <Link href="#" className="hover:text-gray-400 transition-colors">Terms of Service</Link>
+              <Link href="#" className="hover:text-gray-400 transition-colors">Support</Link>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
