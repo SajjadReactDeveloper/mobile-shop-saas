@@ -34,6 +34,5 @@ RUN npm install --omit=dev && \
     npm install prisma && \
     npx prisma generate
 COPY --from=builder /app/apps/api/dist ./dist
-COPY apps/api/start.js ./start.js
 EXPOSE 4000
-CMD ["node", "start.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
