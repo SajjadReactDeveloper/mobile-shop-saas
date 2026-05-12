@@ -16,6 +16,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { EventsGateway } from './gateway/events.gateway';
 import { PrismaModule } from './prisma/prisma.module';
+import { UploadModule } from './upload/upload.module';
 import { AppController } from './app.controller';
 
 @Module({
@@ -36,6 +37,7 @@ import { AppController } from './app.controller';
     ReportsModule,
     NotificationsModule,
     SubscriptionsModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [EventsGateway],

@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  TextInput, Modal, RefreshControl, Alert,
+  TextInput, Modal, RefreshControl, Alert, Image,
 } from 'react-native'
+import * as ImagePicker from 'expo-image-picker'
 import { STATUS_TOP } from '../lib/constants'
 import { api } from '../lib/api'
 import { ListItemsSkeleton } from '../components/Skeleton'
@@ -10,7 +11,7 @@ import { ListItemsSkeleton } from '../components/Skeleton'
 interface Product {
   id: string; name: string; brand?: string; category: string
   sellingPrice: number; buyingPrice: number; stockQty: number
-  imeiTracked: boolean; lowStockAlert: number
+  imeiTracked: boolean; lowStockAlert: number; imageUrl?: string
 }
 
 const CAT_COLORS: Record<string, { bg: string; text: string }> = {
@@ -32,6 +33,8 @@ export function InventoryScreen() {
   const [showAdd, setShowAdd] = useState(false)
   const [showStock, setShowStock] = useState<Product | null>(null)
   const [form, setForm] = useState({ name: '', brand: '', category: 'OTHER', sellingPrice: '', buyingPrice: '', stockQty: '0', imeiTracked: false })
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [imageUploading, setImageUploading] = useState(false)
   const [stockForm, setStockForm] = useState({ qty: '1', unitPrice: '', supplier: '' })
   const [saving, setSaving] = useState(false)
 
@@ -44,6 +47,27 @@ export function InventoryScreen() {
   useEffect(() => { void load() }, [load])
   const onRefresh = async () => { setRefreshing(true); await load(); setRefreshing(false) }
 
+  const pickImage = async () => {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    if (!perm.granted) { Alert.alert('Permission needed', 'Allow access to photos to upload product images.'); return }
+    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8 })
+    if (result.canceled || !result.assets[0]) return
+    const asset = result.assets[0]
+    setImageUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', { uri: asset.uri, name: asset.fileName ?? 'photo.jpg', type: asset.mimeType ?? 'image/jpeg' } as unknown as Blob)
+      const res = await api.post<{ url: string }>('/upload/image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      setImageUrl(res.data.url)
+    } catch {
+      Alert.alert('Upload failed', 'Could not upload image. Please try again.')
+    } finally {
+      setImageUploading(false)
+    }
+  }
+
   const addProduct = async () => {
     if (!form.name || !form.sellingPrice || !form.buyingPrice) return Alert.alert('Required', 'Name, buying price, and selling price are required.')
     setSaving(true)
@@ -52,8 +76,10 @@ export function InventoryScreen() {
         name: form.name, brand: form.brand || undefined, category: form.category,
         buyingPrice: Number(form.buyingPrice), sellingPrice: Number(form.sellingPrice),
         stockQty: Number(form.stockQty), imeiTracked: form.imeiTracked, lowStockAlert: 5,
+        imageUrl: imageUrl ?? undefined,
       })
       setShowAdd(false)
+      setImageUrl(null)
       setForm({ name: '', brand: '', category: 'OTHER', sellingPrice: '', buyingPrice: '', stockQty: '0', imeiTracked: false })
       await load()
     } catch (e: unknown) {
@@ -124,6 +150,11 @@ export function InventoryScreen() {
             return (
               <View key={p.id} style={[s.card, isLow && s.cardLow]}>
                 <View style={s.cardTop}>
+                  {p.imageUrl ? (
+                    <Image source={{ uri: p.imageUrl }} style={s.cardThumb} />
+                  ) : (
+                    <View style={s.cardThumbPlaceholder}><Text style={{ fontSize: 22 }}>📦</Text></View>
+                  )}
                   <View style={s.cardInfo}>
                     <View style={[s.catBadge, { backgroundColor: catStyle.bg }]}>
                       <Text style={[s.catText, { color: catStyle.text }]}>{p.category.replace('_', ' ')}</Text>
@@ -214,6 +245,25 @@ export function InventoryScreen() {
                 <Text style={s.checkSub}>Enable for phones & tablets</Text>
               </View>
             </TouchableOpacity>
+
+            <Text style={s.sectionLabel}>PRODUCT IMAGE</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 4 }}>
+              {imageUrl ? (
+                <Image source={{ uri: imageUrl }} style={s.imagePreview} />
+              ) : null}
+              <TouchableOpacity
+                style={[s.imagePickerBtn, imageUploading && s.saveBtnDisabled]}
+                onPress={pickImage}
+                disabled={imageUploading}
+              >
+                <Text style={s.imagePickerText}>{imageUploading ? '⏳ Uploading…' : imageUrl ? '🔄 Change Photo' : '📷 Add Photo'}</Text>
+              </TouchableOpacity>
+              {imageUrl && (
+                <TouchableOpacity onPress={() => setImageUrl(null)} style={s.removeImageBtn}>
+                  <Text style={s.removeImageText}>✕</Text>
+                </TouchableOpacity>
+              )}
+            </View>
 
             <TouchableOpacity style={[s.saveBtn, saving && s.saveBtnDisabled]} onPress={addProduct} disabled={saving}>
               <Text style={s.saveBtnText}>{saving ? 'Adding…' : 'Add Product'}</Text>
@@ -314,7 +364,14 @@ const s = StyleSheet.create({
   infoBanner:     { backgroundColor: '#f5f3ff', borderRadius: 12, padding: 14, marginBottom: 4 },
   infoBannerText: { fontSize: 14, fontWeight: '700', color: '#5b21b6' },
   infoBannerSub:  { fontSize: 12, color: '#7c3aed', marginTop: 2 },
-  saveBtn:        { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 24, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
-  saveBtnDisabled:{ opacity: 0.55 },
-  saveBtnText:    { color: '#fff', fontWeight: '700', fontSize: 15 },
+  saveBtn:           { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 24, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
+  saveBtnDisabled:   { opacity: 0.55 },
+  saveBtnText:       { color: '#fff', fontWeight: '700', fontSize: 15 },
+  cardThumb:         { width: 48, height: 48, borderRadius: 10, marginRight: 4 },
+  cardThumbPlaceholder: { width: 48, height: 48, borderRadius: 10, backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center', marginRight: 4 },
+  imagePreview:      { width: 72, height: 72, borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb' },
+  imagePickerBtn:    { flex: 1, backgroundColor: '#f5f3ff', borderRadius: 12, paddingVertical: 12, alignItems: 'center', borderWidth: 1.5, borderColor: '#ede9fe', borderStyle: 'dashed' },
+  imagePickerText:   { color: '#7c3aed', fontWeight: '600', fontSize: 13 },
+  removeImageBtn:    { width: 32, height: 32, borderRadius: 16, backgroundColor: '#fee2e2', alignItems: 'center', justifyContent: 'center' },
+  removeImageText:   { color: '#dc2626', fontWeight: '700', fontSize: 13 },
 })

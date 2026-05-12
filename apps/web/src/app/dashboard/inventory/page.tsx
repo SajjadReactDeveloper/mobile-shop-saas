@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import { Plus, Search, Eye, PlusCircle, AlertTriangle } from 'lucide-react'
+import { Plus, Search, Eye, PlusCircle, AlertTriangle, ImagePlus, X } from 'lucide-react'
 import { Button, Card, Badge, Modal, Input, Select, PageHeader, Empty, PageLoader, Table, Th, Td, Tabs, TableSkeleton } from '@/components/ui'
+import Image from 'next/image'
 
 type ProductCategory = 'MOBILE' | 'ACCESSORY' | 'SIM' | 'CHARGER' | 'SPARE_PART' | 'OTHER'
 
@@ -12,7 +13,7 @@ interface Product {
   id: string; name: string; brand?: string; model?: string
   category: ProductCategory; buyingPrice: number; sellingPrice: number
   stockQty: number; imeiTracked: boolean; lowStockAlert: number
-  isActive: boolean; _count?: { imeiLog: number }
+  isActive: boolean; imageUrl?: string; _count?: { imeiLog: number }
 }
 interface ImeiLog { id: string; imei: string; status: 'IN_STOCK' | 'SOLD' | 'RETURNED'; createdAt: string }
 
@@ -34,21 +35,56 @@ const CAT_COLOR: Record<ProductCategory, 'blue' | 'purple' | 'green' | 'orange' 
 /* ─── Add Product ─── */
 function AddProductModal({ onClose }: { onClose: () => void }) {
   const qc = useQueryClient()
+  const fileRef = useRef<HTMLInputElement>(null)
   const [form, setForm] = useState({
     name: '', brand: '', model: '',
     category: 'MOBILE' as ProductCategory,
     buyingPrice: '', sellingPrice: '',
     stockQty: '0', imeiTracked: false, lowStockAlert: '5',
   })
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
+
   const mut = useMutation({
     mutationFn: (d: object) => api.post('/inventory', d).then(r => r.data),
     onSuccess: () => { void qc.invalidateQueries({ queryKey: ['inventory'] }); onClose() },
   })
   const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }))
+
+  const handleImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await api.post<{ url: string }>('/upload/image', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      setImageUrl(res.data.url)
+    } catch {
+      alert('Image upload failed. Please try again.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
-    mut.mutate({ name: form.name, brand: form.brand || undefined, model: form.model || undefined, category: form.category, buyingPrice: Number(form.buyingPrice), sellingPrice: Number(form.sellingPrice), stockQty: Number(form.stockQty), imeiTracked: form.imeiTracked, lowStockAlert: Number(form.lowStockAlert) })
+    mut.mutate({
+      name: form.name,
+      brand: form.brand || undefined,
+      model: form.model || undefined,
+      category: form.category,
+      buyingPrice: Number(form.buyingPrice),
+      sellingPrice: Number(form.sellingPrice),
+      stockQty: Number(form.stockQty),
+      imeiTracked: form.imeiTracked,
+      lowStockAlert: Number(form.lowStockAlert),
+      imageUrl: imageUrl ?? undefined,
+    })
   }
+
   return (
     <form onSubmit={submit} className="space-y-4">
       <Input label="Product Name *" required value={form.name} onChange={e => set('name', e.target.value)} placeholder="e.g. Samsung Galaxy A15" />
@@ -74,6 +110,41 @@ function AddProductModal({ onClose }: { onClose: () => void }) {
           <div className="text-xs text-gray-500 mt-0.5">For phones — each unit will require an IMEI number at stock-in</div>
         </div>
       </label>
+
+      {/* Image Upload */}
+      <div>
+        <p className="text-sm font-medium text-gray-700 mb-2">Product Image</p>
+        {imageUrl ? (
+          <div className="relative w-28 h-28 rounded-xl overflow-hidden border border-gray-200 group">
+            <Image src={imageUrl} alt="Product" fill className="object-cover" />
+            <button
+              type="button"
+              onClick={() => { setImageUrl(null); if (fileRef.current) fileRef.current.value = '' }}
+              className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+            >
+              <X className="w-5 h-5 text-white" />
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={uploading}
+            className="flex flex-col items-center justify-center w-28 h-28 border-2 border-dashed border-gray-200 rounded-xl hover:border-violet-400 hover:bg-violet-50 transition-colors text-gray-400 hover:text-violet-600 disabled:opacity-50"
+          >
+            {uploading ? (
+              <span className="text-xs">Uploading…</span>
+            ) : (
+              <>
+                <ImagePlus className="w-6 h-6 mb-1" />
+                <span className="text-xs font-medium">Add Photo</span>
+              </>
+            )}
+          </button>
+        )}
+        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImage} />
+      </div>
+
       {mut.error && <p className="text-xs text-red-500">{(mut.error as { response?: { data?: { message?: string } } }).response?.data?.message ?? 'Something went wrong'}</p>}
       <div className="flex gap-2 pt-2">
         <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>Cancel</Button>
@@ -234,9 +305,22 @@ export default function InventoryPage() {
                 return (
                   <tr key={p.id} className="hover:bg-gray-50 transition-colors">
                     <Td>
-                      <div className="font-semibold text-gray-900">{p.name}</div>
-                      {(p.brand || p.model) && <div className="text-xs text-gray-400">{[p.brand, p.model].filter(Boolean).join(' · ')}</div>}
-                      {p.imeiTracked && <span className="text-xs text-violet-600 font-medium">IMEI tracked</span>}
+                      <div className="flex items-center gap-3">
+                        {p.imageUrl ? (
+                          <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-gray-100 shrink-0">
+                            <Image src={p.imageUrl} alt={p.name} fill className="object-cover" />
+                          </div>
+                        ) : (
+                          <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 text-gray-300">
+                            <ImagePlus className="w-4 h-4" />
+                          </div>
+                        )}
+                        <div>
+                          <div className="font-semibold text-gray-900">{p.name}</div>
+                          {(p.brand || p.model) && <div className="text-xs text-gray-400">{[p.brand, p.model].filter(Boolean).join(' · ')}</div>}
+                          {p.imeiTracked && <span className="text-xs text-violet-600 font-medium">IMEI tracked</span>}
+                        </div>
+                      </div>
                     </Td>
                     <Td><Badge color={CAT_COLOR[p.category]}>{p.category.replace('_', ' ')}</Badge></Td>
                     <Td className="text-right text-gray-500">PKR {Number(p.buyingPrice).toLocaleString()}</Td>

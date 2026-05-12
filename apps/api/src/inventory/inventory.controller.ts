@@ -65,6 +65,7 @@ export class InventoryController {
       stockQty: number;
       imeiTracked: boolean;
       lowStockThreshold?: number;
+      imageUrl?: string;
     },
   ) {
     return this.inventoryService.create(user.shopId, body);
@@ -94,6 +95,7 @@ export class InventoryController {
       name: string;
       sellingPrice: number;
       lowStockThreshold: number;
+      imageUrl: string;
     }>,
   ) {
     return this.inventoryService.update(id, user.shopId, body);
