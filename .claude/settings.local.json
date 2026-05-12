@@ -41,7 +41,8 @@
       "Bash(pnpm --filter api add -D @types/multer)",
       "Bash(dir)",
       "Bash(xargs wc -l)",
-      "Bash(mkdir -p \"E:\\\\Saas Projects\\\\Mobile Shop\\\\apps\\\\web\\\\src\\\\app\\\\repair\\\\[jobNumber]\")"
+      "Bash(mkdir -p \"E:\\\\Saas Projects\\\\Mobile Shop\\\\apps\\\\web\\\\src\\\\app\\\\repair\\\\[jobNumber]\")",
+      "Bash(pnpm --filter api add @nestjs/schedule)"
     ]
   }
 }

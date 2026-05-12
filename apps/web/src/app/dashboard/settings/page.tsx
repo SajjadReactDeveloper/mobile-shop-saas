@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
-import { Save, Plus, CheckCircle, ChevronDown, Trash2 } from 'lucide-react'
+import { Save, Plus, CheckCircle, ChevronDown, Trash2, Send } from 'lucide-react'
 import { Button, Card, Badge, Modal, Input, Select, PageHeader, Tabs, ListSkeleton, StatsSkeleton } from '@/components/ui'
 
 type UserRole = 'OWNER' | 'CASHIER' | 'TECHNICIAN'
@@ -24,12 +24,28 @@ function ShopTab({ shop }: { shop: Shop }) {
   const qc = useQueryClient()
   const [form, setForm] = useState({ name: shop.name, city: shop.city ?? '', address: shop.address ?? '', phone: shop.phone ?? '' })
   const [saved, setSaved] = useState(false)
+  const [summaryState, setSummaryState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [summaryMsg, setSummaryMsg] = useState('')
+
   const mut = useMutation({
     mutationFn: (d: object) => api.patch('/shop', d).then(r => r.data),
     onSuccess: () => { void qc.invalidateQueries({ queryKey: ['shop'] }); setSaved(true); setTimeout(() => setSaved(false), 2500) },
   })
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
   const submit = (e: React.FormEvent) => { e.preventDefault(); mut.mutate({ name: form.name, city: form.city || undefined, address: form.address || undefined, phone: form.phone || undefined }) }
+
+  const sendSummary = async () => {
+    setSummaryState('sending')
+    try {
+      const { data } = await api.post<{ sent: boolean; message: string }>('/notifications/daily-summary/send')
+      setSummaryMsg(data.message)
+      setSummaryState(data.sent ? 'sent' : 'error')
+    } catch {
+      setSummaryMsg('Failed to send. Check WhatsApp configuration.')
+      setSummaryState('error')
+    }
+    setTimeout(() => setSummaryState('idle'), 5000)
+  }
 
   return (
     <form onSubmit={submit} className="space-y-5">
@@ -48,6 +64,56 @@ function ShopTab({ shop }: { shop: Shop }) {
       <Button type="submit" loading={mut.isPending}>
         {saved ? <><CheckCircle className="w-4 h-4" /> Saved!</> : <><Save className="w-4 h-4" /> Save Changes</>}
       </Button>
+
+      {/* Daily WhatsApp Summary */}
+      <div className="border-t border-gray-100 pt-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
+              📊 Daily WhatsApp P&amp;L Summary
+            </h3>
+            <p className="text-xs text-gray-500 mt-1">
+              Automatically sent to the shop owner every day at <strong>9:00 PM PKT</strong>. Includes revenue, profit, repairs, easy load, and outstanding udhaar.
+            </p>
+            {summaryMsg && (
+              <p className={`text-xs mt-2 font-medium ${summaryState === 'sent' ? 'text-emerald-600' : 'text-red-500'}`}>
+                {summaryState === 'sent' ? '✅ ' : '❌ '}{summaryMsg}
+              </p>
+            )}
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            loading={summaryState === 'sending'}
+            onClick={sendSummary}
+            className="shrink-0"
+          >
+            {summaryState === 'sent'
+              ? <><CheckCircle className="w-4 h-4" /> Sent!</>
+              : <><Send className="w-4 h-4" /> Send Now</>
+            }
+          </Button>
+        </div>
+
+        {/* Preview card */}
+        <div className="mt-4 bg-[#075e54] rounded-xl p-4 font-mono text-xs leading-6 text-white">
+          <p className="font-bold text-sm mb-1">📊 Daily Summary — {new Date().toLocaleDateString('en-PK', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+          <p className="opacity-80 mb-3">🏪 {shop.name}{shop.city ? `, ${shop.city}` : ''}</p>
+          <p>💰 Revenue:      <span className="font-bold">PKR 45,200</span></p>
+          <p>📈 Gross Profit: <span className="font-bold">PKR 12,800</span></p>
+          <p>🛒 Sales:        8 transactions</p>
+          <p>🔧 Repairs:      2 delivered (PKR 8,000)</p>
+          <p>⚡ Easy Load:    PKR 350 profit</p>
+          <p>💚 Easypaisa:   PKR 120 commission</p>
+          <p>💳 Udhaar in:   PKR 3,500</p>
+          <p className="mt-2 font-bold">✅ Total Profit: PKR 21,270</p>
+          <p className="opacity-60 mt-2 text-[10px]">Sent by Mobile Shop 📱</p>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">
+          Preview above. Actual numbers are from today&apos;s transactions. Make sure the owner&apos;s phone number is set above.
+        </p>
+      </div>
     </form>
   )
 }
