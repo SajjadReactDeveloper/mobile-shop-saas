@@ -44,10 +44,10 @@ export default function DashboardPage() {
   const sales   = todaySummary?.totalSales ?? 0
 
   const quickLinks = [
-    { href: '/dashboard/sales',         icon: ShoppingCart, label: 'New Sale',        color: 'bg-violet-600 text-white' },
-    { href: '/dashboard/inventory',     icon: Package,      label: 'Add Product',     color: 'bg-purple-600 text-white' },
-    { href: '/dashboard/repairs',       icon: Wrench,       label: 'New Repair',      color: 'bg-orange-500 text-white' },
-    { href: '/dashboard/cash-register', icon: DollarSign,   label: 'Cash Register',   color: 'bg-emerald-600 text-white' },
+    { href: '/dashboard/sales',         icon: ShoppingCart, label: 'New Sale',      iconBg: 'bg-violet-50', iconColor: 'text-violet-600' },
+    { href: '/dashboard/inventory',     icon: Package,      label: 'Add Product',   iconBg: 'bg-blue-50',   iconColor: 'text-blue-600'   },
+    { href: '/dashboard/repairs',       icon: Wrench,       label: 'New Repair',    iconBg: 'bg-orange-50', iconColor: 'text-orange-600' },
+    { href: '/dashboard/cash-register', icon: DollarSign,   label: 'Cash Register', iconBg: 'bg-emerald-50',iconColor: 'text-emerald-600'},
   ]
 
   return (
@@ -62,11 +62,13 @@ export default function DashboardPage() {
 
       {/* Quick links */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {quickLinks.map(({ href, icon: Icon, label, color }) => (
+        {quickLinks.map(({ href, icon: Icon, label, iconBg, iconColor }) => (
           <Link key={href} href={href}
-            className={`flex flex-col items-center gap-2 py-4 rounded-xl font-semibold text-sm transition-all hover:scale-105 hover:shadow-lg ${color}`}>
-            <Icon className="w-5 h-5" />
-            {label}
+            className="flex items-center gap-3 bg-white border border-gray-100 rounded-xl px-4 py-3.5 hover:border-gray-200 hover:shadow-sm transition-all group">
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${iconBg}`}>
+              <Icon className={`w-4 h-4 ${iconColor}`} />
+            </div>
+            <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">{label}</span>
           </Link>
         ))}
       </div>
