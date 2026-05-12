@@ -27,12 +27,16 @@ export class SalesService {
   ) {}
 
   async findAll(shopId: string, from?: string, to?: string) {
+    let dateFilter = {};
+    if (from && to) {
+      const start = new Date(from);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(to);
+      end.setHours(23, 59, 59, 999);
+      dateFilter = { createdAt: { gte: start, lte: end } };
+    }
     return this.prisma.sale.findMany({
-      where: {
-        shopId,
-        ...(from &&
-          to && { createdAt: { gte: new Date(from), lte: new Date(to) } }),
-      },
+      where: { shopId, ...dateFilter },
       include: {
         customer: true,
         createdBy: { select: { name: true } },
