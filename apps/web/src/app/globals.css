@@ -37,6 +37,16 @@ button, [role="button"], [role="tab"], [role="menuitem"],
 select, label[for], summary { cursor: pointer; }
 a { cursor: pointer; }
 
+/* ── Marquee auto-scroll ── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+.animate-marquee:hover { animation-play-state: paused; }
+
 /* Hide scrollbar everywhere it's not wanted */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
