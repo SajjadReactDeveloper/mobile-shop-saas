@@ -23,10 +23,12 @@ body {
 }
 
 /* ── 80mm thermal receipt print ── */
+#thermal-receipt { display: none; }
+
 @media print {
   body * { visibility: hidden !important; }
-  #thermal-receipt, #thermal-receipt * { visibility: visible !important; }
-  #thermal-receipt { position: fixed; left: 0; top: 0; width: 80mm; padding: 4mm; }
+  #thermal-receipt, #thermal-receipt * { visibility: visible !important; display: block; }
+  #thermal-receipt { display: block !important; position: fixed; left: 0; top: 0; width: 80mm; padding: 4mm; }
   @page { size: 80mm auto; margin: 0; }
 }
 
