@@ -26,11 +26,11 @@ interface Customer { id: string; name: string; phone?: string }
 
 const STATUS_COLOR: Record<RepairStatus, string> = {
   RECEIVED: '#e5e7eb', DIAGNOSING: '#bfdbfe', AWAITING_PARTS: '#fef9c3',
-  IN_REPAIR: '#ffedd5', READY: '#bbf7d0', DELIVERED: '#ccfbf1', CANCELLED: '#fee2e2',
+  IN_REPAIR: '#ffedd5', READY: '#bbf7d0', DELIVERED: '#ede9fe', CANCELLED: '#fee2e2',
 }
 const STATUS_TEXT: Record<RepairStatus, string> = {
   RECEIVED: '#374151', DIAGNOSING: '#1d4ed8', AWAITING_PARTS: '#92400e',
-  IN_REPAIR: '#c2410c', READY: '#15803d', DELIVERED: '#0f766e', CANCELLED: '#dc2626',
+  IN_REPAIR: '#c2410c', READY: '#15803d', DELIVERED: '#6d28d9', CANCELLED: '#dc2626',
 }
 const STATUS_LABEL: Record<RepairStatus, string> = {
   RECEIVED: 'Received', DIAGNOSING: 'Diagnosing', AWAITING_PARTS: 'Awaiting Parts',
@@ -242,9 +242,9 @@ export function RepairsScreen({ onBack }: Props) {
 }
 
 const s = StyleSheet.create({
-  container:      { flex: 1, backgroundColor: '#f0fdfa' },
+  container:      { flex: 1, backgroundColor: '#faf9ff' },
   center:         { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header:         { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#0d9488' },
+  header:         { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#7c3aed' },
   backBtn:        { marginRight: 10 },
   backText:       { fontSize: 30, color: '#fff', fontWeight: '300', lineHeight: 34 },
   title:          { fontSize: 22, fontWeight: '800', color: '#fff' },
@@ -254,28 +254,28 @@ const s = StyleSheet.create({
   empty:          { textAlign: 'center', color: '#9ca3af', marginTop: 56, fontSize: 14 },
   card:           { backgroundColor: '#fff', marginHorizontal: 12, marginTop: 10, borderRadius: 16, padding: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
   cardTop:        { flexDirection: 'row', gap: 8 },
-  jobNum:         { fontSize: 12, fontWeight: '700', color: '#0d9488' },
+  jobNum:         { fontSize: 12, fontWeight: '700', color: '#7c3aed' },
   device:         { fontSize: 15, fontWeight: '700', color: '#111827', marginTop: 2 },
   customer:       { fontSize: 12, color: '#6b7280', marginTop: 2 },
   fault:          { fontSize: 12, color: '#9ca3af', marginTop: 4 },
   statusBadge:    { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   statusText:     { fontSize: 11, fontWeight: '700' },
   quote:          { fontSize: 14, fontWeight: '800', color: '#111827' },
-  advBtn:         { marginTop: 10, backgroundColor: '#f0fdfa', borderRadius: 12, paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: '#ccfbf1' },
+  advBtn:         { marginTop: 10, backgroundColor: '#f5f3ff', borderRadius: 12, paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: '#ede9fe' },
   advBtnDisabled: { opacity: 0.5 },
-  advBtnText:     { color: '#0d9488', fontWeight: '700', fontSize: 13 },
+  advBtnText:     { color: '#7c3aed', fontWeight: '700', fontSize: 13 },
   modal:          { flex: 1, backgroundColor: '#fff' },
   modalHeader:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 20, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
   modalTitle:     { fontSize: 18, fontWeight: '800', color: '#111827' },
   closeBtn:       { fontSize: 18, color: '#6b7280', padding: 4 },
   label:          { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 6, marginTop: 14 },
   input:          { backgroundColor: '#f9fafb', borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, color: '#111827' },
-  selectedCustomer: { backgroundColor: '#f0fdfa', borderRadius: 12, padding: 12, flexDirection: 'row', alignItems: 'center' },
+  selectedCustomer: { backgroundColor: '#f5f3ff', borderRadius: 12, padding: 12, flexDirection: 'row', alignItems: 'center' },
   searchInput:    { backgroundColor: '#f9fafb', borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, color: '#111827' },
   custItem:       { padding: 16, borderBottomWidth: 1, borderBottomColor: '#f9fafb' },
   custName:       { fontSize: 14, fontWeight: '700', color: '#111827' },
   custPhone:      { fontSize: 12, color: '#6b7280', marginTop: 2 },
-  saveBtn:        { backgroundColor: '#0d9488', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 24, marginBottom: 40, shadowColor: '#0d9488', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
+  saveBtn:        { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 24, marginBottom: 40, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
   saveBtnDisabled:{ opacity: 0.55 },
   saveBtnText:    { color: '#fff', fontWeight: '700', fontSize: 15 },
 })

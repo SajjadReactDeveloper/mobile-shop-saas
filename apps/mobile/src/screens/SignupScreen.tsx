@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react'
+import React, { useState } from 'react'
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
   KeyboardAvoidingView, Platform, ScrollView, Alert,
@@ -51,10 +51,10 @@ export function SignupScreen({ onBack, onSignup }: Props) {
       {/* Violet hero */}
       <View style={[s.hero, { paddingTop: insets.top + 16 }]}>
         <TouchableOpacity style={s.back} onPress={onBack}>
-          <Text style={s.backText}>â† Back</Text>
+          <Text style={s.backText}>← Back</Text>
         </TouchableOpacity>
         <View style={s.logoWrap}>
-          <Text style={s.logoEmoji}>ðŸ“±</Text>
+          <Text style={s.logoEmoji}>📱</Text>
         </View>
         <Text style={s.heroTitle}>Create Your Shop</Text>
         <Text style={s.heroSub}>Set up your free account in seconds</Text>
@@ -97,7 +97,7 @@ export function SignupScreen({ onBack, onSignup }: Props) {
           <Text style={s.label}>Password * (min 8 characters)</Text>
           <TextInput
             style={s.input} value={form.password} onChangeText={set('password')}
-            placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" placeholderTextColor="#9ca3af"
+            placeholder="••••••••" placeholderTextColor="#9ca3af"
             secureTextEntry
           />
 
@@ -106,7 +106,7 @@ export function SignupScreen({ onBack, onSignup }: Props) {
             onPress={handleSignup}
             disabled={loading}
           >
-            <Text style={s.btnText}>{loading ? 'Creating accountâ€¦' : 'Create Account'}</Text>
+            <Text style={s.btnText}>{loading ? 'Creating account…' : 'Create Account'}</Text>
           </TouchableOpacity>
 
           <Text style={s.termsText}>
@@ -121,8 +121,8 @@ export function SignupScreen({ onBack, onSignup }: Props) {
 }
 
 const s = StyleSheet.create({
-  flex:         { flex: 1, backgroundColor: '#0d9488' },
-  hero:         { backgroundColor: '#0d9488', paddingHorizontal: 24, paddingBottom: 28 },
+  flex:         { flex: 1, backgroundColor: '#7c3aed' },
+  hero:         { backgroundColor: '#7c3aed', paddingHorizontal: 24, paddingBottom: 28 },
   back:         { marginBottom: 16 },
   backText:     { color: 'rgba(255,255,255,0.8)', fontSize: 15, fontWeight: '500' },
   logoWrap:     { width: 56, height: 56, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
@@ -130,10 +130,10 @@ const s = StyleSheet.create({
   heroTitle:    { fontSize: 26, fontWeight: '800', color: '#fff', letterSpacing: -0.5 },
   heroSub:      { fontSize: 14, color: 'rgba(255,255,255,0.75)', marginTop: 4 },
   formCard:     { flex: 1, backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingHorizontal: 24, paddingTop: 28 },
-  sectionLabel: { fontSize: 11, fontWeight: '700', color: '#0d9488', letterSpacing: 1, marginTop: 20, marginBottom: 4 },
+  sectionLabel: { fontSize: 11, fontWeight: '700', color: '#7c3aed', letterSpacing: 1, marginTop: 20, marginBottom: 4 },
   label:        { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 6, marginTop: 12 },
   input:        { backgroundColor: '#f9fafb', borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, color: '#111827' },
-  btn:          { backgroundColor: '#0d9488', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 28, shadowColor: '#0d9488', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 8, elevation: 6 },
+  btn:          { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 28, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 8, elevation: 6 },
   btnDisabled:  { opacity: 0.65 },
   btnText:      { color: '#fff', fontWeight: '700', fontSize: 16 },
   termsText:    { textAlign: 'center', fontSize: 11, color: '#9ca3af', marginTop: 16, lineHeight: 16 },
