@@ -198,10 +198,10 @@ export function CashRegisterScreen({ onBack }: Props) {
             )}
 
             {/* Expenses list */}
-            {register.expenseItems.length > 0 && (
+            {(register.expenseItems ?? []).length > 0 && (
               <View style={s.card}>
                 <Text style={s.cardTitle}>Expenses</Text>
-                {register.expenseItems.map(e => (
+                {(register.expenseItems ?? []).map(e => (
                   <View key={e.id} style={s.row}>
                     <Text style={s.rowLabel}>{e.description}</Text>
                     <Text style={[s.rowVal, s.red]}>PKR {Number(e.amount).toLocaleString()}</Text>
