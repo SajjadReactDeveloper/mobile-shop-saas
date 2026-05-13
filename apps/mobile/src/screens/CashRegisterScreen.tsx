@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  RefreshControl, Alert, Modal, TextInput,
+  RefreshControl, Alert, TextInput,
 } from 'react-native'
+import BottomDrawer from '../components/BottomDrawer'
 import { api } from '../lib/api'
 import { AccountCardsSkeleton } from '../components/Skeleton'
 import { STATUS_TOP } from '../lib/constants'
@@ -234,8 +235,7 @@ export function CashRegisterScreen({ onBack }: Props) {
       </ScrollView>
 
       {/* ── Open Day Modal ── */}
-      <Modal visible={showOpen} animationType="slide" presentationStyle="pageSheet">
-        <View style={s.modal}>
+      <BottomDrawer visible={showOpen} onClose={() => setShowOpen(false)}>
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Open Day</Text>
             <TouchableOpacity onPress={() => setShowOpen(false)}><Text style={s.closeBtnX}>✕</Text></TouchableOpacity>
@@ -248,12 +248,10 @@ export function CashRegisterScreen({ onBack }: Props) {
               <Text style={s.saveBtnText}>{saving ? 'Opening…' : 'Open Day'}</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
+      </BottomDrawer>
 
       {/* ── Add Expense Modal ── */}
-      <Modal visible={showExpense} animationType="slide" presentationStyle="pageSheet">
-        <View style={s.modal}>
+      <BottomDrawer visible={showExpense} onClose={() => setShowExpense(false)}>
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Add Expense</Text>
             <TouchableOpacity onPress={() => setShowExpense(false)}><Text style={s.closeBtnX}>✕</Text></TouchableOpacity>
@@ -267,12 +265,10 @@ export function CashRegisterScreen({ onBack }: Props) {
               <Text style={s.saveBtnText}>{saving ? 'Saving…' : 'Add Expense'}</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
+      </BottomDrawer>
 
       {/* ── Add Quick Sale Modal ── */}
-      <Modal visible={showQuickSale} animationType="slide" presentationStyle="pageSheet">
-        <View style={s.modal}>
+      <BottomDrawer visible={showQuickSale} onClose={() => { setShowQuickSale(false); setQuickForm(EMPTY_QUICK) }}>
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Add Quick Sale</Text>
             <TouchableOpacity onPress={() => { setShowQuickSale(false); setQuickForm(EMPTY_QUICK) }}>
@@ -342,8 +338,7 @@ export function CashRegisterScreen({ onBack }: Props) {
             </TouchableOpacity>
             <View style={{ height: 40 }} />
           </ScrollView>
-        </View>
-      </Modal>
+      </BottomDrawer>
     </View>
   )
 }

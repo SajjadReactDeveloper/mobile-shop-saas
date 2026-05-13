@@ -1,8 +1,9 @@
 ﻿import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  RefreshControl, Alert, Modal, TextInput,
+  RefreshControl, Alert, TextInput,
 } from 'react-native'
+import BottomDrawer from '../components/BottomDrawer'
 import { api } from '../lib/api'
 import { ListItemsSkeleton, Sk } from '../components/Skeleton'
 import { STATUS_TOP } from '../lib/constants'
@@ -213,8 +214,7 @@ export function CustomersScreen({ onBack }: Props) {
         ) : null}
 
         {/* Record Payment Modal */}
-        <Modal visible={showPayment} animationType="slide" presentationStyle="pageSheet">
-          <View style={s.modal}>
+        <BottomDrawer visible={showPayment} onClose={() => setShowPayment(false)}>
             <View style={s.modalHeader}>
               <Text style={s.modalTitle}>Record Payment</Text>
               <TouchableOpacity onPress={() => { setShowPayment(false); setPaymentAmount('') }}>
@@ -243,8 +243,7 @@ export function CustomersScreen({ onBack }: Props) {
                 <Text style={s.saveBtnText}>{saving ? 'Saving…' : 'Record Payment'}</Text>
               </TouchableOpacity>
             </View>
-          </View>
-        </Modal>
+        </BottomDrawer>
       </View>
     )
   }
@@ -322,8 +321,7 @@ export function CustomersScreen({ onBack }: Props) {
       </ScrollView>
 
       {/* Add Customer Modal */}
-      <Modal visible={showAdd} animationType="slide" presentationStyle="pageSheet">
-        <View style={s.modal}>
+      <BottomDrawer visible={showAdd} onClose={() => setShowAdd(false)}>
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Add Customer</Text>
             <TouchableOpacity onPress={() => { setShowAdd(false); setAddForm({ name: '', phone: '', notes: '' }) }}>
@@ -341,8 +339,7 @@ export function CustomersScreen({ onBack }: Props) {
               <Text style={s.saveBtnText}>{saving ? 'Adding…' : 'Add Customer'}</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
+      </BottomDrawer>
     </View>
   )
 }

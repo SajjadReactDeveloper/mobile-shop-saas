@@ -1,8 +1,9 @@
 ﻿import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  RefreshControl, Alert, Modal, TextInput,
+  RefreshControl, Alert, TextInput,
 } from 'react-native'
+import BottomDrawer from '../components/BottomDrawer'
 import { api } from '../lib/api'
 import { AccountCardsSkeleton } from '../components/Skeleton'
 import { STATUS_TOP } from '../lib/constants'
@@ -136,8 +137,7 @@ export function EasyLoadScreen({ onBack }: Props) {
       </ScrollView>
 
       {/* Add SIM Modal */}
-      <Modal visible={showAdd} animationType="slide" presentationStyle="pageSheet">
-        <View style={s.modal}>
+      <BottomDrawer visible={showAdd} onClose={() => setShowAdd(false)}>
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Add SIM Account</Text>
             <TouchableOpacity onPress={() => setShowAdd(false)}><Text style={s.closeBtn}>✕</Text></TouchableOpacity>
@@ -159,12 +159,10 @@ export function EasyLoadScreen({ onBack }: Props) {
               <Text style={s.saveBtnText}>{saving ? 'Saving…' : 'Add SIM'}</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
+      </BottomDrawer>
 
       {/* Load Modal */}
-      <Modal visible={!!loadModal} animationType="slide" presentationStyle="pageSheet">
-        <View style={s.modal}>
+      <BottomDrawer visible={!!loadModal} onClose={() => setLoadModal(null)}>
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Send Load</Text>
             <TouchableOpacity onPress={() => setLoadModal(null)}><Text style={s.closeBtn}>✕</Text></TouchableOpacity>
@@ -192,12 +190,10 @@ export function EasyLoadScreen({ onBack }: Props) {
               <Text style={s.saveBtnText}>{saving ? 'Sending…' : 'Send Load'}</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
+      </BottomDrawer>
 
       {/* Top-up Modal */}
-      <Modal visible={!!topupModal} animationType="slide" presentationStyle="pageSheet">
-        <View style={s.modal}>
+      <BottomDrawer visible={!!topupModal} onClose={() => setTopupModal(null)}>
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Top Up Balance</Text>
             <TouchableOpacity onPress={() => setTopupModal(null)}><Text style={s.closeBtn}>✕</Text></TouchableOpacity>
@@ -218,8 +214,7 @@ export function EasyLoadScreen({ onBack }: Props) {
               <Text style={s.saveBtnText}>{saving ? 'Saving…' : 'Top Up'}</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
+      </BottomDrawer>
     </View>
   )
 }

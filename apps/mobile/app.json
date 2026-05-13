@@ -29,6 +29,7 @@
         "android.permission.CAMERA"
       ],
       "edgeToEdgeEnabled": true,
+      "softwareKeyboardLayoutMode": "pan",
       "predictiveBackGestureEnabled": false
     },
     "web": {

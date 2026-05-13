@@ -1,8 +1,9 @@
 ﻿import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  RefreshControl, Alert, Modal, TextInput,
+  RefreshControl, Alert, TextInput,
 } from 'react-native'
+import BottomDrawer from '../components/BottomDrawer'
 import { api } from '../lib/api'
 import { ListItemsSkeleton } from '../components/Skeleton'
 import { STATUS_TOP } from '../lib/constants'
@@ -169,8 +170,7 @@ export function RepairsScreen({ onBack }: Props) {
       </ScrollView>
 
       {/* New Job Modal */}
-      <Modal visible={showNew} animationType="slide" presentationStyle="pageSheet">
-        <View style={s.modal}>
+      <BottomDrawer visible={showNew} onClose={() => setShowNew(false)}>
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>New Repair Job</Text>
             <TouchableOpacity onPress={() => setShowNew(false)}><Text style={s.closeBtn}>✕</Text></TouchableOpacity>
@@ -214,12 +214,10 @@ export function RepairsScreen({ onBack }: Props) {
               <Text style={s.saveBtnText}>{saving ? 'Creating…' : 'Create Job'}</Text>
             </TouchableOpacity>
           </ScrollView>
-        </View>
-      </Modal>
+      </BottomDrawer>
 
       {/* Customer picker */}
-      <Modal visible={showCustPicker} animationType="slide" presentationStyle="pageSheet">
-        <View style={s.modal}>
+      <BottomDrawer visible={showCustPicker} onClose={() => setShowCustPicker(false)}>
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Select Customer</Text>
             <TouchableOpacity onPress={() => setShowCustPicker(false)}><Text style={s.closeBtn}>✕</Text></TouchableOpacity>
@@ -235,8 +233,7 @@ export function RepairsScreen({ onBack }: Props) {
               </TouchableOpacity>
             ))}
           </ScrollView>
-        </View>
-      </Modal>
+      </BottomDrawer>
     </View>
   )
 }

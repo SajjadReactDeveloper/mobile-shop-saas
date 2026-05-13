@@ -1,8 +1,9 @@
 ﻿import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  RefreshControl, ActivityIndicator, Alert, Modal, TextInput,
+  RefreshControl, ActivityIndicator, Alert, TextInput,
 } from 'react-native'
+import BottomDrawer from '../components/BottomDrawer'
 import { api } from '../lib/api'
 import { AccountCardsSkeleton } from '../components/Skeleton'
 import { STATUS_TOP } from '../lib/constants'
@@ -218,8 +219,7 @@ export function EasypaisaScreen({ onBack }: Props) {
       </ScrollView>
 
       {/* Add Wallet Modal */}
-      <Modal visible={showAdd} animationType="slide" presentationStyle="pageSheet">
-        <View style={s.modal}>
+      <BottomDrawer visible={showAdd} onClose={() => setShowAdd(false)}>
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Add Easypaisa Wallet</Text>
             <TouchableOpacity onPress={() => { setShowAdd(false); setAddForm({ accountPhone: '', currentBalance: '' }) }}>
@@ -235,12 +235,10 @@ export function EasypaisaScreen({ onBack }: Props) {
               <Text style={s.saveBtnText}>{saving ? 'Adding…' : 'Add Wallet'}</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
+      </BottomDrawer>
 
       {/* Transaction Modal */}
-      <Modal visible={!!txnAccount} animationType="slide" presentationStyle="pageSheet">
-        <View style={s.modal}>
+      <BottomDrawer visible={!!txnAccount} onClose={() => setTxnAccount(null)}>
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>New Transaction</Text>
             <TouchableOpacity onPress={() => setTxnAccount(null)}>
@@ -307,8 +305,7 @@ export function EasypaisaScreen({ onBack }: Props) {
             </TouchableOpacity>
             <View style={{ height: 40 }} />
           </ScrollView>
-        </View>
-      </Modal>
+      </BottomDrawer>
     </View>
   )
 }

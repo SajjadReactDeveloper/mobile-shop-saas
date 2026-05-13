@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  TextInput, Modal, RefreshControl, Alert, Image,
+  TextInput, RefreshControl, Alert, Image,
 } from 'react-native'
+import BottomDrawer from '../components/BottomDrawer'
 import * as ImagePicker from 'expo-image-picker'
 import { STATUS_TOP } from '../lib/constants'
 import { api } from '../lib/api'
@@ -215,8 +216,7 @@ export function InventoryScreen() {
       </ScrollView>
 
       {/* Add Product Modal */}
-      <Modal visible={showAdd} animationType="slide" presentationStyle="pageSheet">
-        <View style={s.modal}>
+      <BottomDrawer visible={showAdd} onClose={() => setShowAdd(false)}>
           <View style={s.modalHandle} />
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>New Product</Text>
@@ -297,12 +297,10 @@ export function InventoryScreen() {
             </TouchableOpacity>
             <View style={{ height: 40 }} />
           </ScrollView>
-        </View>
-      </Modal>
+      </BottomDrawer>
 
       {/* Add Stock Modal */}
-      <Modal visible={!!showStock} animationType="slide" presentationStyle="pageSheet">
-        <View style={s.modal}>
+      <BottomDrawer visible={!!showStock} onClose={() => setShowStock(null)}>
           <View style={s.modalHandle} />
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Add Stock</Text>
@@ -368,8 +366,7 @@ export function InventoryScreen() {
             </TouchableOpacity>
             <View style={{ height: 40 }} />
           </ScrollView>
-        </View>
-      </Modal>
+      </BottomDrawer>
 
       {/* IMEI barcode scanner */}
       <BarcodeScannerModal
