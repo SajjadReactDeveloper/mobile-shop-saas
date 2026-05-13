@@ -16,13 +16,13 @@ interface Shop { id: string; name: string; city?: string; address?: string; phon
 interface StaffUser { id: string; name: string; email?: string; phone?: string; role: UserRole; isActive: boolean }
 
 const ROLE_LABEL: Record<UserRole, string> = { OWNER: 'Owner', CASHIER: 'Cashier', TECHNICIAN: 'Technician' }
-const ROLE_COLOR: Record<UserRole, string> = { OWNER: '#7c3aed', CASHIER: '#7c3aed', TECHNICIAN: '#d97706' }
-const ROLE_BG: Record<UserRole, string> = { OWNER: '#f5f3ff', CASHIER: '#f5f3ff', TECHNICIAN: '#fffbeb' }
+const ROLE_COLOR: Record<UserRole, string> = { OWNER: '#0d9488', CASHIER: '#0d9488', TECHNICIAN: '#d97706' }
+const ROLE_BG: Record<UserRole, string> = { OWNER: '#f0fdfa', CASHIER: '#f0fdfa', TECHNICIAN: '#fffbeb' }
 
 const TIER_BADGE: Record<SubscriptionTier, { bg: string; text: string }> = {
   FREE:     { bg: '#f3f4f6', text: '#374151' },
   PRO:      { bg: '#dbeafe', text: '#1d4ed8' },
-  BUSINESS: { bg: '#f3e8ff', text: '#6d28d9' },
+  BUSINESS: { bg: '#f3e8ff', text: '#0f766e' },
 }
 const STATUS_COLOR: Record<SubscriptionStatus, string> = {
   TRIALING: '#d97706', ACTIVE: '#16a34a', PAST_DUE: '#dc2626', CANCELED: '#6b7280',
@@ -242,39 +242,39 @@ export function SettingsScreen({ onLogout, onBack }: Props) {
 }
 
 const s = StyleSheet.create({
-  container:        { flex: 1, backgroundColor: '#faf9ff' },
+  container:        { flex: 1, backgroundColor: '#f0fdfa' },
   center:           { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header:           { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  header:           { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#0d9488' },
   backBtn:          { marginRight: 10 },
   backText:         { fontSize: 30, color: '#fff', fontWeight: '300', lineHeight: 34 },
   title:            { fontSize: 22, fontWeight: '800', color: '#fff' },
   subtitle:         { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
   logoutBtn:        { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.4)', backgroundColor: 'rgba(255,255,255,0.15)' },
   logoutText:       { color: '#fff', fontWeight: '700', fontSize: 13 },
-  tabBar:           { flexDirection: 'row', backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#ede9fe', paddingHorizontal: 16, paddingTop: 8 },
+  tabBar:           { flexDirection: 'row', backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#ccfbf1', paddingHorizontal: 16, paddingTop: 8 },
   tabItem:          { flex: 1, paddingVertical: 10, alignItems: 'center', borderBottomWidth: 2.5, borderBottomColor: 'transparent' },
-  tabItemActive:    { borderBottomColor: '#7c3aed' },
+  tabItemActive:    { borderBottomColor: '#0d9488' },
   tabLabel:         { fontSize: 12, fontWeight: '600', color: '#9ca3af' },
-  tabLabelActive:   { color: '#7c3aed' },
+  tabLabelActive:   { color: '#0d9488' },
   tabContent:       { padding: 12 },
   card:             { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
   cardTitle:        { fontSize: 13, fontWeight: '700', color: '#374151', marginBottom: 10 },
   label:            { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 6, marginTop: 12 },
   input:            { backgroundColor: '#f9fafb', borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, color: '#111827' },
-  saveBtn:          { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginBottom: 12, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.25, shadowRadius: 6, elevation: 4 },
+  saveBtn:          { backgroundColor: '#0d9488', borderRadius: 14, paddingVertical: 14, alignItems: 'center', marginBottom: 12, shadowColor: '#0d9488', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.25, shadowRadius: 6, elevation: 4 },
   saveBtnDim:       { backgroundColor: '#16a34a', shadowColor: '#16a34a' },
   saveBtnText:      { color: '#fff', fontWeight: '700', fontSize: 15 },
   sectionMeta:      { fontSize: 13, color: '#6b7280', marginBottom: 8, paddingHorizontal: 4 },
   empty:            { textAlign: 'center', color: '#9ca3af', fontSize: 14, paddingVertical: 20 },
   staffRow:         { flexDirection: 'row', alignItems: 'center', paddingVertical: 14 },
-  staffRowBorder:   { borderTopWidth: 1, borderTopColor: '#f5f3ff' },
-  staffAvatar:      { width: 42, height: 42, borderRadius: 21, backgroundColor: '#f5f3ff', justifyContent: 'center', alignItems: 'center' },
-  staffAvatarText:  { fontSize: 17, fontWeight: '800', color: '#7c3aed' },
+  staffRowBorder:   { borderTopWidth: 1, borderTopColor: '#f0fdfa' },
+  staffAvatar:      { width: 42, height: 42, borderRadius: 21, backgroundColor: '#f0fdfa', justifyContent: 'center', alignItems: 'center' },
+  staffAvatarText:  { fontSize: 17, fontWeight: '800', color: '#0d9488' },
   staffName:        { fontSize: 14, fontWeight: '700', color: '#111827' },
   staffContact:     { fontSize: 12, color: '#9ca3af', marginTop: 2 },
   roleBadge:        { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   roleText:         { fontSize: 11, fontWeight: '700' },
-  infoBox:          { backgroundColor: '#f5f3ff', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#ede9fe' },
+  infoBox:          { backgroundColor: '#f0fdfa', borderRadius: 12, padding: 14, marginBottom: 12, borderWidth: 1, borderColor: '#ccfbf1' },
   infoText:         { fontSize: 13, color: '#5b21b6', lineHeight: 20 },
   // Billing
   statusText:       { fontSize: 14, fontWeight: '700' },
@@ -282,7 +282,7 @@ const s = StyleSheet.create({
   tierBadge:        { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   tierText:         { fontSize: 12, fontWeight: '800' },
   tierCard:         { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 10, borderWidth: 1.5, borderColor: '#e5e7eb' },
-  tierCardActive:   { borderColor: '#7c3aed', backgroundColor: '#f5f3ff' },
+  tierCardActive:   { borderColor: '#0d9488', backgroundColor: '#f0fdfa' },
   currentPlanBadge: { backgroundColor: '#16a34a', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3, alignSelf: 'flex-start', marginBottom: 8 },
   currentPlanText:  { color: '#fff', fontSize: 11, fontWeight: '700' },
   tierName:         { fontSize: 16, fontWeight: '800', color: '#111827' },

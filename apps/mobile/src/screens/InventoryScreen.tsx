@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+﻿import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   TextInput, Modal, RefreshControl, Alert, Image,
@@ -16,7 +16,7 @@ interface Product {
 }
 
 const CAT_COLORS: Record<string, { bg: string; text: string }> = {
-  MOBILE:     { bg: '#ede9fe', text: '#6d28d9' },
+  MOBILE:     { bg: '#ccfbf1', text: '#0f766e' },
   ACCESSORY:  { bg: '#f0fdf4', text: '#16a34a' },
   SIM:        { bg: '#ecfeff', text: '#0891b2' },
   CHARGER:    { bg: '#fff7ed', text: '#ea580c' },
@@ -150,21 +150,21 @@ export function InventoryScreen() {
 
       {/* Search */}
       <View style={s.searchWrap}>
-        <Text style={s.searchIcon}>🔍</Text>
+        <Text style={s.searchIcon}>ðŸ”</Text>
         <TextInput
-          style={s.searchInput} placeholder="Search products…" placeholderTextColor="#9ca3af"
+          style={s.searchInput} placeholder="Search productsâ€¦" placeholderTextColor="#9ca3af"
           value={search} onChangeText={setSearch}
         />
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7c3aed" colors={['#7c3aed']} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#0d9488" colors={['#0d9488']} />}
       >
         {filtered.length === 0 ? (
           <View style={s.emptyWrap}>
-            <Text style={s.emptyEmoji}>📦</Text>
-            <Text style={s.emptyText}>{search ? 'No products match your search' : 'No products yet — add your first product'}</Text>
+            <Text style={s.emptyEmoji}>ðŸ“¦</Text>
+            <Text style={s.emptyText}>{search ? 'No products match your search' : 'No products yet â€” add your first product'}</Text>
           </View>
         ) : (
           filtered.map(p => {
@@ -176,7 +176,7 @@ export function InventoryScreen() {
                   {p.imageUrl ? (
                     <Image source={{ uri: p.imageUrl }} style={s.cardThumb} />
                   ) : (
-                    <View style={s.cardThumbPlaceholder}><Text style={{ fontSize: 22 }}>📦</Text></View>
+                    <View style={s.cardThumbPlaceholder}><Text style={{ fontSize: 22 }}>ðŸ“¦</Text></View>
                   )}
                   <View style={s.cardInfo}>
                     <View style={[s.catBadge, { backgroundColor: catStyle.bg }]}>
@@ -193,7 +193,7 @@ export function InventoryScreen() {
                 <View style={s.cardBottom}>
                   <View style={[s.stockPill, isLow && s.stockPillLow]}>
                     <Text style={[s.stockText, isLow && s.stockTextLow]}>
-                      {isLow ? '⚠️ ' : ''}{p.stockQty} in stock
+                      {isLow ? 'âš ï¸ ' : ''}{p.stockQty} in stock
                     </Text>
                   </View>
                   <TouchableOpacity
@@ -221,7 +221,7 @@ export function InventoryScreen() {
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>New Product</Text>
             <TouchableOpacity onPress={() => setShowAdd(false)} style={s.closeBtn}>
-              <Text style={s.closeBtnText}>✕</Text>
+              <Text style={s.closeBtnText}>âœ•</Text>
             </TouchableOpacity>
           </View>
           <ScrollView style={s.modalBody} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
@@ -265,7 +265,7 @@ export function InventoryScreen() {
 
             <TouchableOpacity style={s.checkRow} onPress={() => setForm(f => ({ ...f, imeiTracked: !f.imeiTracked }))}>
               <View style={[s.checkbox, form.imeiTracked && s.checkboxOn]}>
-                {form.imeiTracked && <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</Text>}
+                {form.imeiTracked && <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>âœ“</Text>}
               </View>
               <View>
                 <Text style={s.checkLabel}>IMEI Tracking</Text>
@@ -283,17 +283,17 @@ export function InventoryScreen() {
                 onPress={pickImage}
                 disabled={imageUploading}
               >
-                <Text style={s.imagePickerText}>{imageUploading ? '⏳ Uploading…' : imageUrl ? '🔄 Change Photo' : '📷 Add Photo'}</Text>
+                <Text style={s.imagePickerText}>{imageUploading ? 'â³ Uploadingâ€¦' : imageUrl ? 'ðŸ”„ Change Photo' : 'ðŸ“· Add Photo'}</Text>
               </TouchableOpacity>
               {imageUrl && (
                 <TouchableOpacity onPress={() => setImageUrl(null)} style={s.removeImageBtn}>
-                  <Text style={s.removeImageText}>✕</Text>
+                  <Text style={s.removeImageText}>âœ•</Text>
                 </TouchableOpacity>
               )}
             </View>
 
             <TouchableOpacity style={[s.saveBtn, saving && s.saveBtnDisabled]} onPress={addProduct} disabled={saving}>
-              <Text style={s.saveBtnText}>{saving ? 'Adding…' : 'Add Product'}</Text>
+              <Text style={s.saveBtnText}>{saving ? 'Addingâ€¦' : 'Add Product'}</Text>
             </TouchableOpacity>
             <View style={{ height: 40 }} />
           </ScrollView>
@@ -307,16 +307,16 @@ export function InventoryScreen() {
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Add Stock</Text>
             <TouchableOpacity onPress={() => setShowStock(null)} style={s.closeBtn}>
-              <Text style={s.closeBtnText}>✕</Text>
+              <Text style={s.closeBtnText}>âœ•</Text>
             </TouchableOpacity>
           </View>
           <ScrollView style={s.modalBody} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
             {showStock && (
               <View style={s.infoBanner}>
-                <Text style={s.infoBannerText}>📦 {showStock.name}</Text>
+                <Text style={s.infoBannerText}>ðŸ“¦ {showStock.name}</Text>
                 <Text style={s.infoBannerSub}>
                   {showStock.stockQty} currently in stock
-                  {showStock.imeiTracked ? '  ·  📱 IMEI tracked' : ''}
+                  {showStock.imeiTracked ? '  Â·  ðŸ“± IMEI tracked' : ''}
                 </Text>
               </View>
             )}
@@ -331,7 +331,7 @@ export function InventoryScreen() {
             <Text style={s.label}>Supplier (optional)</Text>
             <TextInput style={s.input} value={stockForm.supplier} onChangeText={v => setStockForm(f => ({ ...f, supplier: v }))} placeholder="Supplier name" placeholderTextColor="#9ca3af" />
 
-            {/* IMEI entry section — only for IMEI-tracked products */}
+            {/* IMEI entry section â€” only for IMEI-tracked products */}
             {showStock?.imeiTracked && imeis.length > 0 && (
               <>
                 <View style={s.imeiHeader}>
@@ -347,7 +347,7 @@ export function InventoryScreen() {
                       style={[s.input, s.imeiInput, imei.length > 0 && s.imeiInputFilled]}
                       value={imei}
                       onChangeText={v => setImeis(prev => prev.map((x, i) => i === idx ? v : x))}
-                      placeholder="Type or scan IMEI…"
+                      placeholder="Type or scan IMEIâ€¦"
                       placeholderTextColor="#9ca3af"
                       keyboardType="numeric"
                       maxLength={15}
@@ -356,7 +356,7 @@ export function InventoryScreen() {
                       style={s.imeiScanBtn}
                       onPress={() => setScanningImeiIdx(idx)}
                     >
-                      <Text style={s.imeiScanBtnText}>📷</Text>
+                      <Text style={s.imeiScanBtnText}>ðŸ“·</Text>
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -364,7 +364,7 @@ export function InventoryScreen() {
             )}
 
             <TouchableOpacity style={[s.saveBtn, saving && s.saveBtnDisabled]} onPress={addStock} disabled={saving}>
-              <Text style={s.saveBtnText}>{saving ? 'Saving…' : 'Confirm Stock Entry'}</Text>
+              <Text style={s.saveBtnText}>{saving ? 'Savingâ€¦' : 'Confirm Stock Entry'}</Text>
             </TouchableOpacity>
             <View style={{ height: 40 }} />
           </ScrollView>
@@ -388,14 +388,14 @@ export function InventoryScreen() {
 }
 
 const s = StyleSheet.create({
-  container:      { flex: 1, backgroundColor: '#faf9ff' },
-  header:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  container:      { flex: 1, backgroundColor: '#f0fdfa' },
+  header:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#0d9488' },
   headerTitle:    { fontSize: 22, fontWeight: '800', color: '#fff' },
   headerSub:      { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
   addBtn:         { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
   addBtnText:     { color: '#fff', fontWeight: '700', fontSize: 13 },
 
-  searchWrap:     { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#ede9fe' },
+  searchWrap:     { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#ccfbf1' },
   searchIcon:     { fontSize: 16 },
   searchInput:    { flex: 1, fontSize: 14, color: '#111827', paddingVertical: 4 },
 
@@ -419,8 +419,8 @@ const s = StyleSheet.create({
   stockPillLow:   { backgroundColor: '#fef2f2' },
   stockText:      { fontSize: 12, fontWeight: '600', color: '#16a34a' },
   stockTextLow:   { color: '#dc2626' },
-  stockBtn:       { backgroundColor: '#f5f3ff', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20 },
-  stockBtnText:   { color: '#7c3aed', fontWeight: '700', fontSize: 12 },
+  stockBtn:       { backgroundColor: '#f0fdfa', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20 },
+  stockBtnText:   { color: '#0d9488', fontWeight: '700', fontSize: 12 },
 
   // Modal
   modal:          { flex: 1, backgroundColor: '#fff' },
@@ -430,40 +430,40 @@ const s = StyleSheet.create({
   closeBtn:       { width: 32, height: 32, borderRadius: 16, backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center' },
   closeBtnText:   { fontSize: 14, color: '#6b7280', fontWeight: '600' },
   modalBody:      { padding: 20 },
-  sectionLabel:   { fontSize: 11, fontWeight: '700', color: '#7c3aed', letterSpacing: 1, marginTop: 16, marginBottom: 4 },
+  sectionLabel:   { fontSize: 11, fontWeight: '700', color: '#0d9488', letterSpacing: 1, marginTop: 16, marginBottom: 4 },
   label:          { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 6, marginTop: 12 },
   input:          { backgroundColor: '#f9fafb', borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, color: '#111827' },
   catPill:        { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, backgroundColor: '#f3f4f6', borderWidth: 1.5, borderColor: '#e5e7eb' },
-  catPillActive:  { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
+  catPillActive:  { backgroundColor: '#0d9488', borderColor: '#0d9488' },
   catPillText:    { fontSize: 12, fontWeight: '600', color: '#6b7280' },
   catPillTextActive: { color: '#fff' },
   checkRow:       { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16, backgroundColor: '#f9fafb', padding: 14, borderRadius: 12 },
   checkbox:       { width: 22, height: 22, borderWidth: 2, borderColor: '#d1d5db', borderRadius: 6, alignItems: 'center', justifyContent: 'center' },
-  checkboxOn:     { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
+  checkboxOn:     { backgroundColor: '#0d9488', borderColor: '#0d9488' },
   checkLabel:     { fontSize: 14, fontWeight: '600', color: '#111827' },
   checkSub:       { fontSize: 11, color: '#6b7280', marginTop: 1 },
-  infoBanner:     { backgroundColor: '#f5f3ff', borderRadius: 12, padding: 14, marginBottom: 4 },
+  infoBanner:     { backgroundColor: '#f0fdfa', borderRadius: 12, padding: 14, marginBottom: 4 },
   infoBannerText: { fontSize: 14, fontWeight: '700', color: '#5b21b6' },
-  infoBannerSub:  { fontSize: 12, color: '#7c3aed', marginTop: 2 },
-  saveBtn:           { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 24, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
+  infoBannerSub:  { fontSize: 12, color: '#0d9488', marginTop: 2 },
+  saveBtn:           { backgroundColor: '#0d9488', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 24, shadowColor: '#0d9488', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
   saveBtnDisabled:   { opacity: 0.55 },
   saveBtnText:       { color: '#fff', fontWeight: '700', fontSize: 15 },
   cardThumb:         { width: 48, height: 48, borderRadius: 10, marginRight: 4 },
   cardThumbPlaceholder: { width: 48, height: 48, borderRadius: 10, backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center', marginRight: 4 },
   imagePreview:      { width: 72, height: 72, borderRadius: 12, borderWidth: 1, borderColor: '#e5e7eb' },
-  imagePickerBtn:    { flex: 1, backgroundColor: '#f5f3ff', borderRadius: 12, paddingVertical: 12, alignItems: 'center', borderWidth: 1.5, borderColor: '#ede9fe', borderStyle: 'dashed' },
-  imagePickerText:   { color: '#7c3aed', fontWeight: '600', fontSize: 13 },
+  imagePickerBtn:    { flex: 1, backgroundColor: '#f0fdfa', borderRadius: 12, paddingVertical: 12, alignItems: 'center', borderWidth: 1.5, borderColor: '#ccfbf1', borderStyle: 'dashed' },
+  imagePickerText:   { color: '#0d9488', fontWeight: '600', fontSize: 13 },
   removeImageBtn:    { width: 32, height: 32, borderRadius: 16, backgroundColor: '#fee2e2', alignItems: 'center', justifyContent: 'center' },
   removeImageText:   { color: '#dc2626', fontWeight: '700', fontSize: 13 },
 
   // IMEI entry
   imeiHeader:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, marginBottom: 4 },
-  imeiSubLabel:   { fontSize: 12, color: '#7c3aed', fontWeight: '600' },
+  imeiSubLabel:   { fontSize: 12, color: '#0d9488', fontWeight: '600' },
   imeiRow:        { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 },
-  imeiNumBadge:   { width: 28, height: 28, borderRadius: 14, backgroundColor: '#ede9fe', alignItems: 'center', justifyContent: 'center' },
-  imeiNum:        { fontSize: 12, fontWeight: '700', color: '#7c3aed' },
+  imeiNumBadge:   { width: 28, height: 28, borderRadius: 14, backgroundColor: '#ccfbf1', alignItems: 'center', justifyContent: 'center' },
+  imeiNum:        { fontSize: 12, fontWeight: '700', color: '#0d9488' },
   imeiInput:      { flex: 1, marginTop: 0 },
-  imeiInputFilled:{ borderColor: '#7c3aed', backgroundColor: '#faf9ff' },
-  imeiScanBtn:    { width: 44, height: 44, borderRadius: 12, backgroundColor: '#f5f3ff', alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: '#ede9fe' },
+  imeiInputFilled:{ borderColor: '#0d9488', backgroundColor: '#f0fdfa' },
+  imeiScanBtn:    { width: 44, height: 44, borderRadius: 12, backgroundColor: '#f0fdfa', alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: '#ccfbf1' },
   imeiScanBtnText:{ fontSize: 20 },
 })

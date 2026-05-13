@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+﻿import React, { useEffect, useRef } from 'react'
 import {
   Modal, View, Text, TouchableOpacity, StyleSheet, StatusBar,
 } from 'react-native'
@@ -35,7 +35,7 @@ export function BarcodeScannerModal({ visible, onScan, onClose, hint }: Props) {
     return (
       <Modal visible animationType="slide" onRequestClose={onClose}>
         <View style={s.permWrap}>
-          <Text style={s.permIcon}>📷</Text>
+          <Text style={s.permIcon}>ðŸ“·</Text>
           <Text style={s.permTitle}>Camera Access Required</Text>
           <Text style={s.permSub}>
             Grant camera permission to scan barcodes and IMEI numbers.
@@ -69,7 +69,7 @@ export function BarcodeScannerModal({ visible, onScan, onClose, hint }: Props) {
           {/* Top dark bar */}
           <View style={[s.darkBar, { flex: 1 }]}>
             <TouchableOpacity style={s.closeBtn} onPress={onClose}>
-              <Text style={s.closeBtnText}>✕</Text>
+              <Text style={s.closeBtnText}>âœ•</Text>
             </TouchableOpacity>
             <Text style={s.title}>Scan Barcode</Text>
             <View style={{ width: 44 }} />
@@ -118,10 +118,10 @@ const s = StyleSheet.create({
   scanWindow:   { width: WINDOW, height: WINDOW },
 
   // Animated scan line
-  scanLine:     { position: 'absolute', left: 12, right: 12, top: '50%', height: 2, backgroundColor: '#7c3aed', opacity: 0.85, borderRadius: 2 },
+  scanLine:     { position: 'absolute', left: 12, right: 12, top: '50%', height: 2, backgroundColor: '#0d9488', opacity: 0.85, borderRadius: 2 },
 
   // Corner brackets
-  corner:       { position: 'absolute', width: CORNER, height: CORNER, borderColor: '#7c3aed', borderWidth: BORDER, borderRadius: 2 },
+  corner:       { position: 'absolute', width: CORNER, height: CORNER, borderColor: '#0d9488', borderWidth: BORDER, borderRadius: 2 },
   cornerTL:     { top: 0, left: 0, borderRightWidth: 0, borderBottomWidth: 0 },
   cornerTR:     { top: 0, right: 0, borderLeftWidth: 0, borderBottomWidth: 0 },
   cornerBL:     { bottom: 0, left: 0, borderRightWidth: 0, borderTopWidth: 0 },
@@ -139,7 +139,7 @@ const s = StyleSheet.create({
   permIcon:     { fontSize: 64, marginBottom: 20 },
   permTitle:    { fontSize: 22, fontWeight: '800', color: '#fff', marginBottom: 10 },
   permSub:      { fontSize: 15, color: 'rgba(255,255,255,0.6)', textAlign: 'center', lineHeight: 22, marginBottom: 32 },
-  permBtn:      { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 36, marginBottom: 12 },
+  permBtn:      { backgroundColor: '#0d9488', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 36, marginBottom: 12 },
   permBtnText:  { color: '#fff', fontWeight: '700', fontSize: 15 },
   cancelBtn:    { paddingVertical: 12, paddingHorizontal: 24 },
   cancelBtnText:{ color: 'rgba(255,255,255,0.5)', fontSize: 14 },
