@@ -314,9 +314,9 @@ export function EasypaisaScreen({ onBack }: Props) {
 }
 
 const s = StyleSheet.create({
-  container:       { flex: 1, backgroundColor: '#faf9ff' },
+  container:       { flex: 1, backgroundColor: '#f0f9ff' },
   center:          { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header:          { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  header:          { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#2563eb' },
   backBtn:         { marginRight: 10 },
   backText:        { fontSize: 30, color: '#fff', fontWeight: '300', lineHeight: 34 },
   title:           { fontSize: 22, fontWeight: '800', color: '#fff' },
@@ -333,10 +333,10 @@ const s = StyleSheet.create({
   actionRow:       { flexDirection: 'row', gap: 10, paddingHorizontal: 14, paddingBottom: 14 },
   txnBtn:          { flex: 2, backgroundColor: '#16a34a', borderRadius: 12, paddingVertical: 11, alignItems: 'center' },
   txnBtnText:      { color: '#fff', fontWeight: '700', fontSize: 13 },
-  historyBtn:      { flex: 1, backgroundColor: '#f5f3ff', borderRadius: 12, paddingVertical: 11, alignItems: 'center', borderWidth: 1, borderColor: '#ede9fe' },
-  historyBtnText:  { color: '#7c3aed', fontWeight: '700', fontSize: 12 },
+  historyBtn:      { flex: 1, backgroundColor: '#eff6ff', borderRadius: 12, paddingVertical: 11, alignItems: 'center', borderWidth: 1, borderColor: '#dbeafe' },
+  historyBtnText:  { color: '#2563eb', fontWeight: '700', fontSize: 12 },
   historyPanel:    { paddingHorizontal: 14, paddingBottom: 10 },
-  historyDivider:  { height: 1, backgroundColor: '#f5f3ff', marginBottom: 10 },
+  historyDivider:  { height: 1, backgroundColor: '#eff6ff', marginBottom: 10 },
   historyEmpty:    { textAlign: 'center', color: '#9ca3af', fontSize: 13, paddingVertical: 12 },
   txnRow:          { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: '#f9fafb' },
   txnDot:          { width: 8, height: 8, borderRadius: 4 },
@@ -370,7 +370,7 @@ const s = StyleSheet.create({
   previewBoxRed:   { backgroundColor: '#fef2f2' },
   previewBoxLabel: { fontSize: 13, color: '#374151' },
   previewBoxValue: { fontSize: 16, fontWeight: '800' },
-  saveBtn:         { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 24, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
+  saveBtn:         { backgroundColor: '#2563eb', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 24, shadowColor: '#2563eb', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
   saveBtnDisabled: { opacity: 0.55 },
   saveBtnText:     { color: '#fff', fontWeight: '700', fontSize: 15 },
 })

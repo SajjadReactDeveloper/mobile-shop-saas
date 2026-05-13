@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+﻿import React, { useState } from 'react'
 import {
   View, Text, TouchableOpacity, StyleSheet, Modal,
   Dimensions, Animated, useRef,
@@ -9,31 +9,31 @@ const { width: W, height: H } = Dimensions.get('window')
 
 const STEPS = [
   {
-    emoji: '🛒',
+    emoji: 'ðŸ›’',
     title: 'Quick Sales',
     body: 'Tap Sale in the bottom bar to start a POS transaction. Search products, add to cart, apply discounts and collect payment in seconds.',
-    color: '#7c3aed',
+    color: '#2563eb',
   },
   {
-    emoji: '📦',
+    emoji: 'ðŸ“¦',
     title: 'Inventory',
     body: 'Track every product with stock counts and low-stock alerts. IMEI tracking for phones keeps each unit accountable.',
-    color: '#6d28d9',
+    color: '#1d4ed8',
   },
   {
-    emoji: '⚡',
+    emoji: 'âš¡',
     title: 'Easy Load & Easypaisa',
     body: 'Manage your SIM balances and digital wallet accounts. Every transaction is logged automatically.',
     color: '#5b21b6',
   },
   {
-    emoji: '🔧',
+    emoji: 'ðŸ”§',
     title: 'Repairs',
     body: 'Create job cards for repairs. Customers get a WhatsApp notification when their device is ready. Share a tracking link so they can follow progress.',
     color: '#4c1d95',
   },
   {
-    emoji: '📊',
+    emoji: 'ðŸ“Š',
     title: 'Reports',
     body: 'See your daily P&L, top products, and outstanding udhaar from the dashboard. Smart restock alerts warn you before items run out.',
     color: '#3b0764',
@@ -85,7 +85,7 @@ export function OnboardingTour({ onDone }: Props) {
 
           {/* Buttons */}
           <TouchableOpacity style={[s.nextBtn, { backgroundColor: current.color }]} onPress={next}>
-            <Text style={s.nextBtnText}>{isLast ? 'Get Started 🚀' : 'Next →'}</Text>
+            <Text style={s.nextBtnText}>{isLast ? 'Get Started ðŸš€' : 'Next â†’'}</Text>
           </TouchableOpacity>
 
           {!isLast && (
@@ -104,7 +104,7 @@ const s = StyleSheet.create({
   card:       { backgroundColor: '#fff', borderRadius: 28, padding: 28, width: '100%', maxWidth: 380, alignItems: 'center' },
   dots:       { flexDirection: 'row', gap: 6, marginBottom: 24 },
   dot:        { width: 6, height: 6, borderRadius: 3, backgroundColor: '#e5e7eb' },
-  dotActive:  { width: 20, backgroundColor: '#7c3aed' },
+  dotActive:  { width: 20, backgroundColor: '#2563eb' },
   iconWrap:   { width: 80, height: 80, borderRadius: 24, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
   emoji:      { fontSize: 40 },
   title:      { fontSize: 22, fontWeight: '800', textAlign: 'center', marginBottom: 10 },

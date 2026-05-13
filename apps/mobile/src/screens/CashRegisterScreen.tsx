@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+﻿import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   RefreshControl, Alert, Modal, TextInput,
@@ -55,7 +55,7 @@ export function CashRegisterScreen({ onBack }: Props) {
   useEffect(() => { void load() }, [load])
   const onRefresh = async () => { setRefreshing(true); await load(); setRefreshing(false) }
 
-  /* ── Open day ── */
+  /* â”€â”€ Open day â”€â”€ */
   const openDay = async () => {
     if (!openingBal) return Alert.alert('Enter opening balance')
     setSaving(true)
@@ -68,7 +68,7 @@ export function CashRegisterScreen({ onBack }: Props) {
     } finally { setSaving(false) }
   }
 
-  /* ── Add expense ── */
+  /* â”€â”€ Add expense â”€â”€ */
   const addExpense = async () => {
     if (!register || !expenseForm.description || !expenseForm.amount) return Alert.alert('Fill required fields')
     setSaving(true)
@@ -81,7 +81,7 @@ export function CashRegisterScreen({ onBack }: Props) {
     } finally { setSaving(false) }
   }
 
-  /* ── Add quick sale ── */
+  /* â”€â”€ Add quick sale â”€â”€ */
   const addQuickSale = async () => {
     if (!register) return
     if (!quickForm.productName || !quickForm.sellingPrice) return Alert.alert('Fill required fields')
@@ -100,7 +100,7 @@ export function CashRegisterScreen({ onBack }: Props) {
     } finally { setSaving(false) }
   }
 
-  /* ── Close day ── */
+  /* â”€â”€ Close day â”€â”€ */
   const closeDay = async () => {
     if (!register) return
     const income   = Number(register.salesCash) + Number(register.easyLoadCash) + Number(register.easypaisaCash) + Number(register.repairCash)
@@ -125,7 +125,7 @@ export function CashRegisterScreen({ onBack }: Props) {
   const income          = register ? Number(register.salesCash) + Number(register.easyLoadCash) + Number(register.easypaisaCash) + Number(register.repairCash) : 0
   const expectedClosing = register ? Number(register.openingBalance) + income - Number(register.expenses) : 0
 
-  /* ── Quick sale live preview ── */
+  /* â”€â”€ Quick sale live preview â”€â”€ */
   const qQty     = Math.max(1, Number(quickForm.qty)    || 1)
   const qBuy     = Number(quickForm.buyingPrice)  || 0
   const qSell    = Number(quickForm.sellingPrice) || 0
@@ -136,7 +136,7 @@ export function CashRegisterScreen({ onBack }: Props) {
     <View style={s.container}>
       <View style={s.header}>
         <TouchableOpacity onPress={onBack} style={s.backBtn} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-          <Text style={s.backText}>‹</Text>
+          <Text style={s.backText}>â€¹</Text>
         </TouchableOpacity>
         <Text style={s.title}>Cash Register</Text>
       </View>
@@ -144,7 +144,7 @@ export function CashRegisterScreen({ onBack }: Props) {
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {register === null || register === undefined ? (
           <View style={s.emptyWrap}>
-            <Text style={s.emptyEmoji}>💵</Text>
+            <Text style={s.emptyEmoji}>ðŸ’µ</Text>
             <Text style={s.emptyTitle}>Day not opened</Text>
             <Text style={s.emptySub}>Open today's session to start tracking cash</Text>
             <TouchableOpacity style={s.openBtn} onPress={() => setShowOpen(true)}>
@@ -154,7 +154,7 @@ export function CashRegisterScreen({ onBack }: Props) {
         ) : (
           <>
             {register.isClosed && (
-              <View style={s.closedBanner}><Text style={s.closedText}>🔒 Day is closed</Text></View>
+              <View style={s.closedBanner}><Text style={s.closedText}>ðŸ”’ Day is closed</Text></View>
             )}
 
             {/* Summary card */}
@@ -165,7 +165,7 @@ export function CashRegisterScreen({ onBack }: Props) {
               <View style={s.row}><Text style={s.rowLabel}>Easy Load</Text><Text style={[s.rowVal, s.green]}>PKR {Number(register.easyLoadCash).toLocaleString()}</Text></View>
               <View style={s.row}><Text style={s.rowLabel}>Easypaisa</Text><Text style={[s.rowVal, s.green]}>PKR {Number(register.easypaisaCash).toLocaleString()}</Text></View>
               <View style={s.row}><Text style={s.rowLabel}>Repairs</Text><Text style={[s.rowVal, s.green]}>PKR {Number(register.repairCash).toLocaleString()}</Text></View>
-              <View style={s.row}><Text style={s.rowLabel}>Expenses</Text><Text style={[s.rowVal, s.red]}>−PKR {Number(register.expenses).toLocaleString()}</Text></View>
+              <View style={s.row}><Text style={s.rowLabel}>Expenses</Text><Text style={[s.rowVal, s.red]}>âˆ’PKR {Number(register.expenses).toLocaleString()}</Text></View>
               <View style={[s.row, s.totalRow]}>
                 <Text style={s.totalLabel}>{register.isClosed ? 'Closing Balance' : 'Expected Closing'}</Text>
                 <Text style={s.totalVal}>PKR {(register.isClosed ? Number(register.closingBalance) : expectedClosing).toLocaleString()}</Text>
@@ -183,7 +183,7 @@ export function CashRegisterScreen({ onBack }: Props) {
                     <View key={qs.id} style={s.qsRow}>
                       <View style={{ flex: 1 }}>
                         <Text style={s.qsName}>{qs.productName}</Text>
-                        <Text style={s.qsSub}>{qs.qty} × PKR {Number(qs.sellingPrice).toLocaleString()}</Text>
+                        <Text style={s.qsSub}>{qs.qty} Ã— PKR {Number(qs.sellingPrice).toLocaleString()}</Text>
                       </View>
                       <View style={{ alignItems: 'flex-end' }}>
                         <Text style={[s.rowVal, s.green]}>+PKR {rev.toLocaleString()}</Text>
@@ -215,7 +215,7 @@ export function CashRegisterScreen({ onBack }: Props) {
               <>
                 <View style={s.actions}>
                   <TouchableOpacity style={s.saleBtn} onPress={() => setShowQuickSale(true)}>
-                    <Text style={s.saleBtnText}>🛒 Add Sale</Text>
+                    <Text style={s.saleBtnText}>ðŸ›’ Add Sale</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={s.expenseBtn} onPress={() => setShowExpense(true)}>
                     <Text style={s.expenseBtnText}>+ Add Expense</Text>
@@ -223,7 +223,7 @@ export function CashRegisterScreen({ onBack }: Props) {
                 </View>
                 <View style={s.actionsSingle}>
                   <TouchableOpacity style={[s.closeBtn2, saving && s.disabled]} onPress={closeDay} disabled={saving}>
-                    <Text style={s.closeBtnText}>🔒 Close Day</Text>
+                    <Text style={s.closeBtnText}>ðŸ”’ Close Day</Text>
                   </TouchableOpacity>
                 </View>
               </>
@@ -233,30 +233,30 @@ export function CashRegisterScreen({ onBack }: Props) {
         <View style={{ height: 20 }} />
       </ScrollView>
 
-      {/* ── Open Day Modal ── */}
+      {/* â”€â”€ Open Day Modal â”€â”€ */}
       <Modal visible={showOpen} animationType="slide" presentationStyle="pageSheet">
         <View style={s.modal}>
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Open Day</Text>
-            <TouchableOpacity onPress={() => setShowOpen(false)}><Text style={s.closeBtnX}>✕</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowOpen(false)}><Text style={s.closeBtnX}>âœ•</Text></TouchableOpacity>
           </View>
           <View style={{ padding: 20 }}>
             <Text style={s.modalDesc}>Enter the cash you have in hand to start today's session.</Text>
             <Text style={s.label}>Opening Cash (PKR) *</Text>
             <TextInput style={s.input} keyboardType="numeric" value={openingBal} onChangeText={setOpeningBal} placeholder="0" autoFocus />
             <TouchableOpacity style={[s.saveBtn, saving && s.disabled]} onPress={openDay} disabled={saving}>
-              <Text style={s.saveBtnText}>{saving ? 'Opening…' : 'Open Day'}</Text>
+              <Text style={s.saveBtnText}>{saving ? 'Openingâ€¦' : 'Open Day'}</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
 
-      {/* ── Add Expense Modal ── */}
+      {/* â”€â”€ Add Expense Modal â”€â”€ */}
       <Modal visible={showExpense} animationType="slide" presentationStyle="pageSheet">
         <View style={s.modal}>
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Add Expense</Text>
-            <TouchableOpacity onPress={() => setShowExpense(false)}><Text style={s.closeBtnX}>✕</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowExpense(false)}><Text style={s.closeBtnX}>âœ•</Text></TouchableOpacity>
           </View>
           <View style={{ padding: 20 }}>
             <Text style={s.label}>Description *</Text>
@@ -264,19 +264,19 @@ export function CashRegisterScreen({ onBack }: Props) {
             <Text style={s.label}>Amount (PKR) *</Text>
             <TextInput style={s.input} keyboardType="numeric" value={expenseForm.amount} onChangeText={v => setExpenseForm(f => ({ ...f, amount: v }))} placeholder="0" />
             <TouchableOpacity style={[s.saveBtn, saving && s.disabled]} onPress={addExpense} disabled={saving}>
-              <Text style={s.saveBtnText}>{saving ? 'Saving…' : 'Add Expense'}</Text>
+              <Text style={s.saveBtnText}>{saving ? 'Savingâ€¦' : 'Add Expense'}</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
 
-      {/* ── Add Quick Sale Modal ── */}
+      {/* â”€â”€ Add Quick Sale Modal â”€â”€ */}
       <Modal visible={showQuickSale} animationType="slide" presentationStyle="pageSheet">
         <View style={s.modal}>
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Add Quick Sale</Text>
             <TouchableOpacity onPress={() => { setShowQuickSale(false); setQuickForm(EMPTY_QUICK) }}>
-              <Text style={s.closeBtnX}>✕</Text>
+              <Text style={s.closeBtnX}>âœ•</Text>
             </TouchableOpacity>
           </View>
           <ScrollView style={{ padding: 20 }}>
@@ -338,7 +338,7 @@ export function CashRegisterScreen({ onBack }: Props) {
             )}
 
             <TouchableOpacity style={[s.saveBtn, saving && s.disabled]} onPress={addQuickSale} disabled={saving}>
-              <Text style={s.saveBtnText}>{saving ? 'Saving…' : '🛒 Add Sale'}</Text>
+              <Text style={s.saveBtnText}>{saving ? 'Savingâ€¦' : 'ðŸ›’ Add Sale'}</Text>
             </TouchableOpacity>
             <View style={{ height: 40 }} />
           </ScrollView>
@@ -349,8 +349,8 @@ export function CashRegisterScreen({ onBack }: Props) {
 }
 
 const s = StyleSheet.create({
-  container:      { flex: 1, backgroundColor: '#faf9ff' },
-  header:         { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  container:      { flex: 1, backgroundColor: '#f0f9ff' },
+  header:         { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#2563eb' },
   backBtn:        { marginRight: 10 },
   backText:       { fontSize: 30, color: '#fff', fontWeight: '300', lineHeight: 34 },
   title:          { fontSize: 22, fontWeight: '800', color: '#fff' },
@@ -358,21 +358,21 @@ const s = StyleSheet.create({
   emptyEmoji:     { fontSize: 56, marginBottom: 16 },
   emptyTitle:     { fontSize: 20, fontWeight: '800', color: '#111827', marginBottom: 8 },
   emptySub:       { fontSize: 14, color: '#6b7280', textAlign: 'center', marginBottom: 28, lineHeight: 20 },
-  openBtn:        { backgroundColor: '#7c3aed', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 16, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 8, elevation: 6 },
+  openBtn:        { backgroundColor: '#2563eb', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 16, shadowColor: '#2563eb', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 8, elevation: 6 },
   openBtnText:    { color: '#fff', fontWeight: '700', fontSize: 16 },
   closedBanner:   { margin: 12, backgroundColor: '#f3f4f6', borderRadius: 12, padding: 14, alignItems: 'center' },
   closedText:     { fontSize: 14, color: '#374151', fontWeight: '600' },
   card:           { backgroundColor: '#fff', marginHorizontal: 12, marginTop: 10, borderRadius: 16, padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
-  cardTitle:      { fontSize: 12, fontWeight: '700', color: '#7c3aed', marginBottom: 12, letterSpacing: 0.5, textTransform: 'uppercase' },
+  cardTitle:      { fontSize: 12, fontWeight: '700', color: '#2563eb', marginBottom: 12, letterSpacing: 0.5, textTransform: 'uppercase' },
   row:            { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#f9fafb' },
   rowLabel:       { fontSize: 14, color: '#6b7280' },
   rowVal:         { fontSize: 14, fontWeight: '600', color: '#111827' },
   green:          { color: '#16a34a' },
   red:            { color: '#dc2626' },
-  violet:         { color: '#7c3aed' },
+  violet:         { color: '#2563eb' },
   totalRow:       { borderBottomWidth: 0, marginTop: 4, paddingTop: 12, borderTopWidth: 1.5, borderTopColor: '#e5e7eb' },
   totalLabel:     { fontSize: 15, fontWeight: '800', color: '#111827' },
-  totalVal:       { fontSize: 20, fontWeight: '800', color: '#7c3aed' },
+  totalVal:       { fontSize: 20, fontWeight: '800', color: '#2563eb' },
   // Quick sale row
   qsRow:          { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f9fafb' },
   qsName:         { fontSize: 14, fontWeight: '600', color: '#111827' },
@@ -380,7 +380,7 @@ const s = StyleSheet.create({
   // Action buttons
   actions:        { flexDirection: 'row', gap: 10, marginHorizontal: 12, marginTop: 12 },
   actionsSingle:  { marginHorizontal: 12, marginTop: 8 },
-  saleBtn:        { flex: 1, backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
+  saleBtn:        { flex: 1, backgroundColor: '#2563eb', borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
   saleBtnText:    { color: '#fff', fontWeight: '700', fontSize: 14 },
   expenseBtn:     { flex: 1, backgroundColor: '#fff', borderRadius: 14, paddingVertical: 14, alignItems: 'center', borderWidth: 1.5, borderColor: '#e5e7eb' },
   expenseBtnText: { color: '#374151', fontWeight: '700', fontSize: 14 },
@@ -397,9 +397,9 @@ const s = StyleSheet.create({
   input:          { backgroundColor: '#f9fafb', borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, color: '#111827' },
   row2:           { flexDirection: 'row' },
   previewRow:     { flexDirection: 'row', marginTop: 16 },
-  previewCard:    { flex: 1, backgroundColor: '#f5f3ff', borderRadius: 12, padding: 12, alignItems: 'center' },
+  previewCard:    { flex: 1, backgroundColor: '#eff6ff', borderRadius: 12, padding: 12, alignItems: 'center' },
   previewLabel:   { fontSize: 11, color: '#6b7280', marginBottom: 4 },
   previewVal:     { fontSize: 15, fontWeight: '800' },
-  saveBtn:        { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 24, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
+  saveBtn:        { backgroundColor: '#2563eb', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 24, shadowColor: '#2563eb', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
   saveBtnText:    { color: '#fff', fontWeight: '700', fontSize: 15 },
 })

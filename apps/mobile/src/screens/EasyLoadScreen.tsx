@@ -225,9 +225,9 @@ export function EasyLoadScreen({ onBack }: Props) {
 }
 
 const s = StyleSheet.create({
-  container:      { flex: 1, backgroundColor: '#faf9ff' },
+  container:      { flex: 1, backgroundColor: '#f0f9ff' },
   center:         { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header:         { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#7c3aed' },
+  header:         { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: STATUS_TOP, paddingBottom: 16, backgroundColor: '#2563eb' },
   backBtn:        { marginRight: 10 },
   backText:       { fontSize: 30, color: '#fff', fontWeight: '300', lineHeight: 34 },
   title:          { fontSize: 22, fontWeight: '800', color: '#fff' },
@@ -243,7 +243,7 @@ const s = StyleSheet.create({
   actionRow:      { flexDirection: 'row', gap: 10 },
   topupBtn:       { flex: 1, backgroundColor: '#f0fdf4', borderRadius: 12, paddingVertical: 11, alignItems: 'center', borderWidth: 1, borderColor: '#bbf7d0' },
   topupText:      { color: '#16a34a', fontWeight: '700', fontSize: 13 },
-  loadBtn:        { flex: 1, backgroundColor: '#7c3aed', borderRadius: 12, paddingVertical: 11, alignItems: 'center' },
+  loadBtn:        { flex: 1, backgroundColor: '#2563eb', borderRadius: 12, paddingVertical: 11, alignItems: 'center' },
   loadText:       { color: '#fff', fontWeight: '700', fontSize: 13 },
   modal:          { flex: 1, backgroundColor: '#fff' },
   modalHeader:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 20, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
@@ -253,13 +253,13 @@ const s = StyleSheet.create({
   input:          { backgroundColor: '#f9fafb', borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, color: '#111827' },
   networkGrid:    { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   netOption:      { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, borderWidth: 1.5, borderColor: 'transparent' },
-  netOptionActive:{ borderColor: '#7c3aed', backgroundColor: '#f5f3ff' },
+  netOptionActive:{ borderColor: '#2563eb', backgroundColor: '#eff6ff' },
   netOptionText:  { fontWeight: '700', fontSize: 13 },
-  infoBox:        { backgroundColor: '#f5f3ff', borderRadius: 12, padding: 14, marginBottom: 4 },
+  infoBox:        { backgroundColor: '#eff6ff', borderRadius: 12, padding: 14, marginBottom: 4 },
   infoText:       { fontSize: 13, color: '#374151' },
-  infoBal:        { fontSize: 16, fontWeight: '800', color: '#7c3aed', marginTop: 4 },
+  infoBal:        { fontSize: 16, fontWeight: '800', color: '#2563eb', marginTop: 4 },
   previewBal:     { fontSize: 14, color: '#16a34a', fontWeight: '700', marginTop: 8 },
-  saveBtn:        { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 24, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
+  saveBtn:        { backgroundColor: '#2563eb', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 24, shadowColor: '#2563eb', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
   saveBtnDisabled:{ opacity: 0.55 },
   saveBtnText:    { color: '#fff', fontWeight: '700', fontSize: 15 },
 })
