@@ -1,9 +1,9 @@
-﻿import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Animated, View, StyleSheet, Dimensions } from 'react-native'
 
 const { width: SCREEN_W } = Dimensions.get('window')
 
-/* â”€â”€â”€ Base pulse block â”€â”€â”€ */
+/* ─── Base pulse block ─── */
 interface SkProps { w?: number | string; h?: number; radius?: number; style?: object }
 export function Sk({ w = '100%', h = 16, radius = 10, style }: SkProps) {
   const opacity = useRef(new Animated.Value(0.35)).current
@@ -29,7 +29,7 @@ export function Sk({ w = '100%', h = 16, radius = 10, style }: SkProps) {
   )
 }
 
-/* â”€â”€â”€ Stat cards skeleton (Dashboard) â”€â”€â”€ */
+/* ─── Stat cards skeleton (Dashboard) ─── */
 export function StatCardsSkeleton() {
   return (
     <View style={sk.statsGrid}>
@@ -46,7 +46,7 @@ export function StatCardsSkeleton() {
   )
 }
 
-/* â”€â”€â”€ List items skeleton (Customers, Repairs, Inventory) â”€â”€â”€ */
+/* ─── List items skeleton (Customers, Repairs, Inventory) ─── */
 export function ListItemsSkeleton({ rows = 6 }: { rows?: number }) {
   return (
     <View style={sk.fullScreen}>
@@ -66,7 +66,7 @@ export function ListItemsSkeleton({ rows = 6 }: { rows?: number }) {
   )
 }
 
-/* â”€â”€â”€ Account card skeleton (EasyLoad, Easypaisa) â”€â”€â”€ */
+/* ─── Account card skeleton (EasyLoad, Easypaisa) ─── */
 export function AccountCardsSkeleton({ rows = 3 }: { rows?: number }) {
   return (
     <View style={[sk.fullScreen, { gap: 12 }]}>
@@ -98,7 +98,7 @@ export function AccountCardsSkeleton({ rows = 3 }: { rows?: number }) {
   )
 }
 
-/* â”€â”€â”€ Dashboard skeleton â”€â”€â”€ */
+/* ─── Dashboard skeleton ─── */
 export function DashboardScreenSkeleton() {
   return (
     <View style={[sk.screen, sk.fullScreen]}>
@@ -126,7 +126,7 @@ export function DashboardScreenSkeleton() {
   )
 }
 
-/* â”€â”€â”€ POS skeleton â”€â”€â”€ */
+/* ─── POS skeleton ─── */
 export function POSScreenSkeleton() {
   return (
     <View style={[sk.screen, sk.fullScreen]}>
@@ -144,7 +144,7 @@ export function POSScreenSkeleton() {
   )
 }
 
-/* â”€â”€â”€ Settings skeleton â”€â”€â”€ */
+/* ─── Settings skeleton ─── */
 export function SettingsScreenSkeleton() {
   return (
     <View style={[sk.screen, sk.fullScreen]}>
@@ -167,7 +167,7 @@ export function SettingsScreenSkeleton() {
 }
 
 const sk = StyleSheet.create({
-  fullScreen:     { flex: 1, backgroundColor: '#f0f9ff', paddingHorizontal: 16, paddingTop: 16 },
+  fullScreen:     { flex: 1, backgroundColor: '#faf9ff', paddingHorizontal: 16, paddingTop: 16 },
   screen:         { paddingHorizontal: 16, paddingTop: 16 },
   statsGrid:      { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 20 },
   statCard:       { width: (SCREEN_W - 52) / 2, backgroundColor: '#f9fafb', borderRadius: 16, padding: 14 },

@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native'
 import { api } from '../lib/api'
 import { STATUS_TOP } from '../lib/constants'
@@ -13,12 +13,12 @@ interface Props {
 interface Profile { name: string; email?: string; phone?: string; role: string; shop: { name: string; city?: string } }
 
 const ITEMS: { id: SubScreen; emoji: string; label: string; desc: string; color: string; bg: string }[] = [
-  { id: 'customers', emoji: 'ðŸ‘¤', label: 'Customers',    desc: 'Ledger & udhaar',         color: '#0891b2', bg: '#ecfeff' },
-  { id: 'repairs',   emoji: 'ðŸ”§', label: 'Repairs',      desc: 'Job cards & tracking',     color: '#d97706', bg: '#fffbeb' },
-  { id: 'easyload',  emoji: 'ðŸ“±', label: 'Easy Load',    desc: 'Network SIM balances',     color: '#2563eb', bg: '#eff6ff' },
-  { id: 'easypaisa', emoji: 'ðŸ’š', label: 'Easypaisa',    desc: 'Wallet transactions',      color: '#16a34a', bg: '#f0fdf4' },
-  { id: 'cash',      emoji: 'ðŸ’µ', label: 'Cash Register', desc: 'Daily session & expenses', color: '#0f766e', bg: '#f0fdfa' },
-  { id: 'settings',  emoji: 'âš™ï¸', label: 'Settings',     desc: 'Shop, staff & billing',    color: '#6b7280', bg: '#f9fafb' },
+  { id: 'customers', emoji: '👤', label: 'Customers',    desc: 'Ledger & udhaar',         color: '#0891b2', bg: '#ecfeff' },
+  { id: 'repairs',   emoji: '🔧', label: 'Repairs',      desc: 'Job cards & tracking',     color: '#d97706', bg: '#fffbeb' },
+  { id: 'easyload',  emoji: '📱', label: 'Easy Load',    desc: 'Network SIM balances',     color: '#7c3aed', bg: '#f5f3ff' },
+  { id: 'easypaisa', emoji: '💚', label: 'Easypaisa',    desc: 'Wallet transactions',      color: '#16a34a', bg: '#f0fdf4' },
+  { id: 'cash',      emoji: '💵', label: 'Cash Register', desc: 'Daily session & expenses', color: '#0f766e', bg: '#f0fdfa' },
+  { id: 'settings',  emoji: '⚙️', label: 'Settings',     desc: 'Shop, staff & billing',    color: '#6b7280', bg: '#f9fafb' },
 ]
 
 export function MoreScreen({ onNavigate, onLogout }: Props) {
@@ -53,7 +53,7 @@ export function MoreScreen({ onNavigate, onLogout }: Props) {
             </Text>
           </View>
           <View style={s.profileInfo}>
-            <Text style={s.profileName}>{profile?.name ?? 'â€¦'}</Text>
+            <Text style={s.profileName}>{profile?.name ?? '…'}</Text>
             <Text style={s.profileEmail}>{profile?.email ?? profile?.phone ?? ''}</Text>
             <View style={s.roleBadge}>
               <Text style={s.roleText}>{profile?.role ?? ''}</Text>
@@ -82,17 +82,17 @@ export function MoreScreen({ onNavigate, onLogout }: Props) {
                 <Text style={s.menuLabel}>{item.label}</Text>
                 <Text style={s.menuDesc}>{item.desc}</Text>
               </View>
-              <Text style={s.menuChevron}>â€º</Text>
+              <Text style={s.menuChevron}>›</Text>
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Logout */}
         <TouchableOpacity style={s.logoutBtn} onPress={handleLogout} activeOpacity={0.8}>
-          <Text style={s.logoutText}>ðŸšª  Log out</Text>
+          <Text style={s.logoutText}>🚪  Log out</Text>
         </TouchableOpacity>
 
-        <Text style={s.versionText}>Flowchat Â· v1.0</Text>
+        <Text style={s.versionText}>Flowchat · v1.0</Text>
         <View style={{ height: 32 }} />
       </ScrollView>
     </View>
@@ -100,18 +100,18 @@ export function MoreScreen({ onNavigate, onLogout }: Props) {
 }
 
 const s = StyleSheet.create({
-  container:    { flex: 1, backgroundColor: '#f0f9ff' },
-  header:       { backgroundColor: '#2563eb', paddingTop: STATUS_TOP, paddingHorizontal: 20, paddingBottom: 16 },
+  container:    { flex: 1, backgroundColor: '#faf9ff' },
+  header:       { backgroundColor: '#7c3aed', paddingTop: STATUS_TOP, paddingHorizontal: 20, paddingBottom: 16 },
   headerTitle:  { fontSize: 22, fontWeight: '800', color: '#fff' },
 
-  profileCard:  { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', margin: 14, borderRadius: 18, padding: 16, gap: 12, shadowColor: '#2563eb', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 8, elevation: 3 },
-  avatar:       { width: 52, height: 52, borderRadius: 26, backgroundColor: '#2563eb', alignItems: 'center', justifyContent: 'center' },
+  profileCard:  { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', margin: 14, borderRadius: 18, padding: 16, gap: 12, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 8, elevation: 3 },
+  avatar:       { width: 52, height: 52, borderRadius: 26, backgroundColor: '#7c3aed', alignItems: 'center', justifyContent: 'center' },
   avatarText:   { fontSize: 22, fontWeight: '800', color: '#fff' },
   profileInfo:  { flex: 1 },
   profileName:  { fontSize: 16, fontWeight: '800', color: '#111827' },
   profileEmail: { fontSize: 12, color: '#6b7280', marginTop: 2 },
-  roleBadge:    { marginTop: 6, backgroundColor: '#eff6ff', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20, alignSelf: 'flex-start' },
-  roleText:     { fontSize: 10, fontWeight: '700', color: '#2563eb' },
+  roleBadge:    { marginTop: 6, backgroundColor: '#f5f3ff', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 20, alignSelf: 'flex-start' },
+  roleText:     { fontSize: 10, fontWeight: '700', color: '#7c3aed' },
   shopInfo:     { alignItems: 'flex-end' },
   shopName:     { fontSize: 12, fontWeight: '700', color: '#374151', maxWidth: 90, textAlign: 'right' },
   shopCity:     { fontSize: 11, color: '#9ca3af', marginTop: 2 },

@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
   TextInput, Modal, Alert, FlatList,
@@ -15,8 +15,8 @@ interface Customer { id: string; name: string; phone?: string; balanceOwed: numb
 interface CartItem { product: Product; qty: number; unitPrice: number }
 
 const PAY_LABELS: Record<PaymentMethod, string> = {
-  CASH: 'ðŸ’µ Cash', EASYPAISA: 'ðŸ’š Easypaisa', JAZZCASH: 'ðŸ”´ JazzCash',
-  BANK_TRANSFER: 'ðŸ¦ Bank', CREDIT: 'ðŸ“’ Credit',
+  CASH: '💵 Cash', EASYPAISA: '💚 Easypaisa', JAZZCASH: '🔴 JazzCash',
+  BANK_TRANSFER: '🏦 Bank', CREDIT: '📒 Credit',
 }
 
 export function POSScreen() {
@@ -143,18 +143,18 @@ export function POSScreen() {
 
       {/* Product search */}
       <View style={s.searchWrap}>
-        <Text style={s.searchIcon}>ðŸ”</Text>
+        <Text style={s.searchIcon}>🔍</Text>
         <TextInput
-          style={s.searchInput} placeholder="Search product to add to cartâ€¦"
+          style={s.searchInput} placeholder="Search product to add to cart…"
           placeholderTextColor="#9ca3af" value={search} onChangeText={setSearch}
         />
         {search.length > 0 ? (
           <TouchableOpacity onPress={() => setSearch('')}>
-            <Text style={{ color: '#9ca3af', fontSize: 18, paddingRight: 4 }}>âœ•</Text>
+            <Text style={{ color: '#9ca3af', fontSize: 18, paddingRight: 4 }}>✕</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity style={s.scanBtn} onPress={() => setShowScanner(true)}>
-            <Text style={s.scanBtnText}>ðŸ“·</Text>
+            <Text style={s.scanBtnText}>📷</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -181,7 +181,7 @@ export function POSScreen() {
         {/* Cart items */}
         {cart.length === 0 ? (
           <View style={s.emptyCart}>
-            <Text style={s.emptyCartEmoji}>ðŸ›’</Text>
+            <Text style={s.emptyCartEmoji}>🛒</Text>
             <Text style={s.emptyCartText}>Search above to add products</Text>
           </View>
         ) : (
@@ -195,7 +195,7 @@ export function POSScreen() {
                 </View>
                 <View style={s.qtyControls}>
                   <TouchableOpacity style={s.qtyBtn} onPress={() => updateQty(item.product.id, -1)}>
-                    <Text style={s.qtyBtnText}>âˆ’</Text>
+                    <Text style={s.qtyBtnText}>−</Text>
                   </TouchableOpacity>
                   <Text style={s.qtyNum}>{item.qty}</Text>
                   <TouchableOpacity style={s.qtyBtn} onPress={() => updateQty(item.product.id, 1)}>
@@ -224,12 +224,12 @@ export function POSScreen() {
                   )}
                 </View>
                 <TouchableOpacity onPress={() => { setCustomerId(''); setCustomerSearch('') }}>
-                  <Text style={s.clearCustomer}>âœ• Clear</Text>
+                  <Text style={s.clearCustomer}>✕ Clear</Text>
                 </TouchableOpacity>
               </View>
             ) : (
               <TouchableOpacity style={s.pickCustomerBtn} onPress={() => setShowCustomers(true)}>
-                <Text style={s.pickCustomerText}>ðŸ‘¤ Select customerâ€¦</Text>
+                <Text style={s.pickCustomerText}>👤 Select customer…</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -294,7 +294,7 @@ export function POSScreen() {
               style={[s.checkoutBtn, placing && s.checkoutBtnDisabled]}
               onPress={checkout} disabled={placing}
             >
-              <Text style={s.checkoutText}>{placing ? 'Processingâ€¦' : `âœ“ Complete Sale Â· PKR ${total.toLocaleString()}`}</Text>
+              <Text style={s.checkoutText}>{placing ? 'Processing…' : `✓ Complete Sale · PKR ${total.toLocaleString()}`}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -316,12 +316,12 @@ export function POSScreen() {
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>Select Customer</Text>
             <TouchableOpacity onPress={() => setShowCustomers(false)} style={s.closeBtn}>
-              <Text style={s.closeBtnText}>âœ•</Text>
+              <Text style={s.closeBtnText}>✕</Text>
             </TouchableOpacity>
           </View>
           <View style={{ padding: 16 }}>
             <TextInput
-              style={s.searchInput2} placeholder="Search name or phoneâ€¦"
+              style={s.searchInput2} placeholder="Search name or phone…"
               placeholderTextColor="#9ca3af"
               value={customerSearch} onChangeText={setCustomerSearch} autoFocus
             />
@@ -356,7 +356,7 @@ export function POSScreen() {
         <View style={s.overlay}>
           <View style={s.successCard}>
             <View style={s.successIconWrap}>
-              <Text style={{ fontSize: 40 }}>âœ…</Text>
+              <Text style={{ fontSize: 40 }}>✅</Text>
             </View>
             <Text style={s.successTitle}>Sale Complete!</Text>
             <Text style={s.successInv}>Invoice #{showSuccess}</Text>
@@ -379,7 +379,7 @@ export function POSScreen() {
                   })
                 }}
               >
-                <Text style={s.receiptBtnText}>ðŸ–¨ Print</Text>
+                <Text style={s.receiptBtnText}>🖨 Print</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[s.receiptBtn, { flex: 1 }]}
@@ -397,11 +397,11 @@ export function POSScreen() {
                   })
                 }}
               >
-                <Text style={s.receiptBtnText}>ðŸ“¤ Share</Text>
+                <Text style={s.receiptBtnText}>📤 Share</Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity style={s.successBtn} onPress={() => setShowSuccess(null)}>
-              <Text style={s.successBtnText}>New Sale â†’</Text>
+              <Text style={s.successBtnText}>New Sale →</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -411,23 +411,23 @@ export function POSScreen() {
 }
 
 const s = StyleSheet.create({
-  container:      { flex: 1, backgroundColor: '#f0f9ff' },
-  header:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: STATUS_TOP, paddingBottom: 14, backgroundColor: '#2563eb' },
+  container:      { flex: 1, backgroundColor: '#faf9ff' },
+  header:         { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: STATUS_TOP, paddingBottom: 14, backgroundColor: '#7c3aed' },
   headerTitle:    { fontSize: 22, fontWeight: '800', color: '#fff' },
   headerSub:      { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
   clearBtn:       { backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20 },
   clearBtnText:   { color: '#fff', fontWeight: '600', fontSize: 13 },
-  searchWrap:     { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#dbeafe' },
+  searchWrap:     { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff', paddingHorizontal: 14, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#ede9fe' },
   searchIcon:     { fontSize: 16 },
   searchInput:    { flex: 1, fontSize: 14, color: '#111827', paddingVertical: 4 },
-  scanBtn:        { width: 34, height: 34, borderRadius: 10, backgroundColor: '#eff6ff', alignItems: 'center', justifyContent: 'center' },
+  scanBtn:        { width: 34, height: 34, borderRadius: 10, backgroundColor: '#f5f3ff', alignItems: 'center', justifyContent: 'center' },
   scanBtnText:    { fontSize: 18 },
-  dropdown:       { backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#dbeafe', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4 },
-  dropItem:       { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#eff6ff' },
+  dropdown:       { backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#ede9fe', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4 },
+  dropItem:       { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f5f3ff' },
   dropItemDimmed: { opacity: 0.4 },
   dropName:       { fontSize: 14, fontWeight: '600', color: '#111827' },
   dropStock:      { fontSize: 11, color: '#9ca3af', marginTop: 2 },
-  dropPrice:      { fontSize: 14, fontWeight: '700', color: '#2563eb' },
+  dropPrice:      { fontSize: 14, fontWeight: '700', color: '#7c3aed' },
   scroll:         { flex: 1 },
   emptyCart:      { alignItems: 'center', paddingTop: 64 },
   emptyCartEmoji: { fontSize: 56, marginBottom: 12 },
@@ -437,36 +437,36 @@ const s = StyleSheet.create({
   cartItem:       { flexDirection: 'row', alignItems: 'center', padding: 12, paddingHorizontal: 14, borderTopWidth: 1, borderTopColor: '#f9fafb', gap: 10 },
   cartName:       { fontSize: 13, fontWeight: '700', color: '#111827' },
   cartUnitPrice:  { fontSize: 11, color: '#9ca3af', marginTop: 1 },
-  qtyControls:    { flexDirection: 'row', alignItems: 'center', backgroundColor: '#eff6ff', borderRadius: 10, overflow: 'hidden' },
+  qtyControls:    { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f5f3ff', borderRadius: 10, overflow: 'hidden' },
   qtyBtn:         { paddingHorizontal: 10, paddingVertical: 7 },
-  qtyBtnText:     { fontSize: 18, color: '#2563eb', fontWeight: '700' },
+  qtyBtnText:     { fontSize: 18, color: '#7c3aed', fontWeight: '700' },
   qtyNum:         { minWidth: 24, textAlign: 'center', fontSize: 14, fontWeight: '800', color: '#111827' },
   cartLineTotal:  { fontSize: 14, fontWeight: '800', color: '#111827', minWidth: 80, textAlign: 'right' },
   section:        { backgroundColor: '#fff', marginHorizontal: 12, marginTop: 10, borderRadius: 16, padding: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 2 },
-  sectionTitle:   { fontSize: 10, fontWeight: '700', color: '#2563eb', letterSpacing: 1, marginBottom: 10 },
-  selectedCustomer: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#eff6ff', borderRadius: 12, padding: 10 },
-  customerAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#2563eb', alignItems: 'center', justifyContent: 'center' },
+  sectionTitle:   { fontSize: 10, fontWeight: '700', color: '#7c3aed', letterSpacing: 1, marginBottom: 10 },
+  selectedCustomer: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#f5f3ff', borderRadius: 12, padding: 10 },
+  customerAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#7c3aed', alignItems: 'center', justifyContent: 'center' },
   customerAvatarText: { color: '#fff', fontWeight: '700', fontSize: 14 },
   customerName:   { fontSize: 14, fontWeight: '700', color: '#111827' },
   customerOwes:   { fontSize: 11, color: '#dc2626', marginTop: 1 },
   clearCustomer:  { fontSize: 12, color: '#6b7280', fontWeight: '500' },
-  pickCustomerBtn: { borderWidth: 1.5, borderColor: '#dbeafe', borderRadius: 12, padding: 12, backgroundColor: '#f0f9ff' },
+  pickCustomerBtn: { borderWidth: 1.5, borderColor: '#ede9fe', borderRadius: 12, padding: 12, backgroundColor: '#faf9ff' },
   pickCustomerText: { fontSize: 14, color: '#9ca3af' },
   totalRow:       { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 },
   totalRowBold:   { borderTopWidth: 1.5, borderTopColor: '#f3f4f6', marginTop: 4, paddingTop: 10 },
   totalLabel:     { fontSize: 14, color: '#6b7280' },
   totalValue:     { fontSize: 14, color: '#111827', fontWeight: '600' },
   totalLabelBold: { fontSize: 16, fontWeight: '700', color: '#111827' },
-  totalValueBold: { fontSize: 18, fontWeight: '800', color: '#2563eb' },
+  totalValueBold: { fontSize: 18, fontWeight: '800', color: '#7c3aed' },
   discountInput:  { borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 6, fontSize: 14, width: 110, textAlign: 'right', color: '#111827', backgroundColor: '#f9fafb' },
   payBtn:         { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 20, borderWidth: 1.5, borderColor: '#e5e7eb', backgroundColor: '#f9fafb' },
-  payBtnActive:   { backgroundColor: '#2563eb', borderColor: '#2563eb' },
+  payBtnActive:   { backgroundColor: '#7c3aed', borderColor: '#7c3aed' },
   payBtnText:     { fontSize: 13, color: '#6b7280', fontWeight: '600' },
   payBtnTextActive: { color: '#fff' },
   changeBox:      { backgroundColor: '#f0fdf4', borderRadius: 12, padding: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
   changeLabel:    { fontSize: 13, color: '#16a34a', fontWeight: '600' },
   changeValue:    { fontSize: 15, color: '#16a34a', fontWeight: '800' },
-  checkoutBtn:    { backgroundColor: '#2563eb', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 14, shadowColor: '#2563eb', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
+  checkoutBtn:    { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 14, shadowColor: '#7c3aed', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 5 },
   checkoutBtnDisabled: { opacity: 0.55 },
   checkoutText:   { color: '#fff', fontWeight: '700', fontSize: 15 },
   modal:          { flex: 1, backgroundColor: '#fff' },
@@ -477,8 +477,8 @@ const s = StyleSheet.create({
   closeBtnText:   { fontSize: 14, color: '#6b7280', fontWeight: '600' },
   searchInput2:   { backgroundColor: '#f9fafb', borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 11, fontSize: 14, color: '#111827' },
   custItem:       { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#f9fafb', gap: 12 },
-  custAvatar:     { width: 40, height: 40, borderRadius: 20, backgroundColor: '#eff6ff', alignItems: 'center', justifyContent: 'center' },
-  custAvatarText: { fontSize: 16, fontWeight: '700', color: '#2563eb' },
+  custAvatar:     { width: 40, height: 40, borderRadius: 20, backgroundColor: '#f5f3ff', alignItems: 'center', justifyContent: 'center' },
+  custAvatarText: { fontSize: 16, fontWeight: '700', color: '#7c3aed' },
   custName:       { fontSize: 14, fontWeight: '700', color: '#111827' },
   custPhone:      { fontSize: 12, color: '#6b7280', marginTop: 1 },
   custOwes:       { fontSize: 12, color: '#dc2626', fontWeight: '600' },
@@ -487,9 +487,9 @@ const s = StyleSheet.create({
   successIconWrap:{ width: 80, height: 80, borderRadius: 40, backgroundColor: '#f0fdf4', alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
   successTitle:   { fontSize: 22, fontWeight: '800', color: '#111827', marginBottom: 4 },
   successInv:     { fontSize: 13, color: '#9ca3af', marginBottom: 4 },
-  successAmount:  { fontSize: 24, fontWeight: '800', color: '#2563eb', marginBottom: 20 },
-  successBtn:     { backgroundColor: '#2563eb', borderRadius: 14, paddingVertical: 13, paddingHorizontal: 36, marginTop: 4 },
+  successAmount:  { fontSize: 24, fontWeight: '800', color: '#7c3aed', marginBottom: 20 },
+  successBtn:     { backgroundColor: '#7c3aed', borderRadius: 14, paddingVertical: 13, paddingHorizontal: 36, marginTop: 4 },
   successBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
-  receiptBtn:     { backgroundColor: '#eff6ff', borderRadius: 12, paddingVertical: 11, alignItems: 'center', borderWidth: 1, borderColor: '#dbeafe' },
-  receiptBtnText: { color: '#2563eb', fontWeight: '600', fontSize: 13 },
+  receiptBtn:     { backgroundColor: '#f5f3ff', borderRadius: 12, paddingVertical: 11, alignItems: 'center', borderWidth: 1, borderColor: '#ede9fe' },
+  receiptBtnText: { color: '#7c3aed', fontWeight: '600', fontSize: 13 },
 })

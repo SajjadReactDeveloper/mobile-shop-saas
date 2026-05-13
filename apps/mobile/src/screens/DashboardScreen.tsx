@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { View, Text, ScrollView, StyleSheet, RefreshControl, TouchableOpacity } from 'react-native'
 import { api } from '../lib/api'
 import { DashboardScreenSkeleton } from '../components/Skeleton'
@@ -64,7 +64,7 @@ export function DashboardScreen({ onNavigate }: Props) {
   const salesCnt = today?.totalSales ?? 0
 
   const PAY_ICON: Record<string, string> = {
-    CASH: 'ðŸ’µ', EASYPAISA: 'ðŸ’š', JAZZCASH: 'ðŸ”´', BANK_TRANSFER: 'ðŸ¦', CREDIT: 'ðŸ“’',
+    CASH: '💵', EASYPAISA: '💚', JAZZCASH: '🔴', BANK_TRANSFER: '🏦', CREDIT: '📒',
   }
 
   return (
@@ -72,17 +72,17 @@ export function DashboardScreen({ onNavigate }: Props) {
       style={s.container}
       showsVerticalScrollIndicator={false}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563eb" colors={['#2563eb']} />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7c3aed" colors={['#7c3aed']} />
       }
     >
-      {/* â”€â”€ Violet header â”€â”€ */}
+      {/* ── Violet header ── */}
       <View style={s.header}>
         <View style={s.headerRow}>
           <View style={s.headerLeft}>
             <Text style={s.shopName} numberOfLines={1}>{profile?.shop?.name ?? 'Mobile Shop'}</Text>
-            <Text style={s.greeting}>{greeting}, {profile?.name?.split(' ')[0] ?? ''} ðŸ‘‹</Text>
+            <Text style={s.greeting}>{greeting}, {profile?.name?.split(' ')[0] ?? ''} 👋</Text>
           </View>
-          {/* Profile avatar â†’ More */}
+          {/* Profile avatar → More */}
           <TouchableOpacity style={s.avatarBtn} onPress={() => onNavigate('more')} activeOpacity={0.8}>
             <Text style={s.avatarText}>
               {profile?.name?.charAt(0)?.toUpperCase() ?? '?'}
@@ -96,7 +96,7 @@ export function DashboardScreen({ onNavigate }: Props) {
             <Text style={s.heroLabel}>Today's Revenue</Text>
             <Text style={s.heroValue}>PKR {revenue.toLocaleString()}</Text>
             <Text style={s.heroSub}>
-              {salesCnt} sale{salesCnt !== 1 ? 's' : ''} Â· PKR {profit.toLocaleString()} profit
+              {salesCnt} sale{salesCnt !== 1 ? 's' : ''} · PKR {profit.toLocaleString()} profit
             </Text>
           </View>
           <View style={s.heroRight}>
@@ -111,12 +111,12 @@ export function DashboardScreen({ onNavigate }: Props) {
         </View>
       </View>
 
-      {/* â”€â”€ Stats row â”€â”€ */}
+      {/* ── Stats row ── */}
       <View style={s.statsRow}>
         {[
-          { label: 'Products',  value: String(stats?.products ?? 0),        emoji: 'ðŸ“¦', color: '#d97706', bg: '#fffbeb', nav: 'inventory' },
-          { label: 'Customers', value: String(stats?.customers ?? 0),        emoji: 'ðŸ‘¥', color: '#0891b2', bg: '#ecfeff', nav: 'customers' },
-          { label: 'Repairs',   value: String(stats?.pendingRepairs ?? 0),   emoji: 'ðŸ”§', color: '#e11d48', bg: '#fff1f2', nav: 'repairs'   },
+          { label: 'Products',  value: String(stats?.products ?? 0),        emoji: '📦', color: '#d97706', bg: '#fffbeb', nav: 'inventory' },
+          { label: 'Customers', value: String(stats?.customers ?? 0),        emoji: '👥', color: '#0891b2', bg: '#ecfeff', nav: 'customers' },
+          { label: 'Repairs',   value: String(stats?.pendingRepairs ?? 0),   emoji: '🔧', color: '#e11d48', bg: '#fff1f2', nav: 'repairs'   },
         ].map(k => (
           <TouchableOpacity
             key={k.label}
@@ -131,17 +131,17 @@ export function DashboardScreen({ onNavigate }: Props) {
         ))}
       </View>
 
-      {/* â”€â”€ Quick actions â”€â”€ */}
+      {/* ── Quick actions ── */}
       <View style={s.section}>
         <Text style={s.sectionTitle}>Quick Actions</Text>
         <View style={s.actionsGrid}>
           {[
-            { emoji: 'ðŸ›’', label: 'New Sale',    nav: 'pos',       bg: '#eff6ff', color: '#2563eb' },
-            { emoji: 'ðŸ“¦', label: 'Add Stock',   nav: 'inventory', bg: '#f0fdf4', color: '#16a34a' },
-            { emoji: 'ðŸ”§', label: 'New Repair',  nav: 'repairs',   bg: '#fffbeb', color: '#d97706' },
-            { emoji: 'ðŸ’µ', label: 'Cash Reg.',   nav: 'cash',      bg: '#f0fdfa', color: '#0f766e' },
-            { emoji: 'ðŸ‘¤', label: 'Customers',   nav: 'customers', bg: '#ecfeff', color: '#0891b2' },
-            { emoji: 'ðŸ“±', label: 'Easy Load',   nav: 'easyload',  bg: '#fdf4ff', color: '#a21caf' },
+            { emoji: '🛒', label: 'New Sale',    nav: 'pos',       bg: '#f5f3ff', color: '#7c3aed' },
+            { emoji: '📦', label: 'Add Stock',   nav: 'inventory', bg: '#f0fdf4', color: '#16a34a' },
+            { emoji: '🔧', label: 'New Repair',  nav: 'repairs',   bg: '#fffbeb', color: '#d97706' },
+            { emoji: '💵', label: 'Cash Reg.',   nav: 'cash',      bg: '#f0fdfa', color: '#0f766e' },
+            { emoji: '👤', label: 'Customers',   nav: 'customers', bg: '#ecfeff', color: '#0891b2' },
+            { emoji: '📱', label: 'Easy Load',   nav: 'easyload',  bg: '#fdf4ff', color: '#a21caf' },
           ].map(a => (
             <TouchableOpacity
               key={a.label}
@@ -156,13 +156,13 @@ export function DashboardScreen({ onNavigate }: Props) {
         </View>
       </View>
 
-      {/* â”€â”€ Low stock alert â”€â”€ */}
+      {/* ── Low stock alert ── */}
       {lowStock.length > 0 && (
         <TouchableOpacity style={s.alertCard} onPress={() => onNavigate('inventory')} activeOpacity={0.85}>
           <View style={s.alertRow}>
-            <Text style={s.alertIcon}>âš ï¸</Text>
-            <Text style={s.alertTitle}>Low Stock â€” {lowStock.length} item{lowStock.length !== 1 ? 's' : ''}</Text>
-            <Text style={s.alertArrow}>â€º</Text>
+            <Text style={s.alertIcon}>⚠️</Text>
+            <Text style={s.alertTitle}>Low Stock — {lowStock.length} item{lowStock.length !== 1 ? 's' : ''}</Text>
+            <Text style={s.alertArrow}>›</Text>
           </View>
           {lowStock.slice(0, 3).map(p => (
             <View key={p.id} style={s.alertItem}>
@@ -171,23 +171,23 @@ export function DashboardScreen({ onNavigate }: Props) {
             </View>
           ))}
           {lowStock.length > 3 && (
-            <Text style={s.alertMore}>+{lowStock.length - 3} more â†’ tap to view all</Text>
+            <Text style={s.alertMore}>+{lowStock.length - 3} more → tap to view all</Text>
           )}
         </TouchableOpacity>
       )}
 
-      {/* â”€â”€ Recent sales â”€â”€ */}
+      {/* ── Recent sales ── */}
       <View style={s.section}>
         <View style={s.sectionHeader}>
           <Text style={s.sectionTitle}>Recent Sales</Text>
           <TouchableOpacity onPress={() => onNavigate('pos')}>
-            <Text style={s.sectionLink}>New sale â†’</Text>
+            <Text style={s.sectionLink}>New sale →</Text>
           </TouchableOpacity>
         </View>
 
         {recentSales.length === 0 ? (
           <View style={s.emptyCard}>
-            <Text style={s.emptyEmoji}>ðŸ›’</Text>
+            <Text style={s.emptyEmoji}>🛒</Text>
             <Text style={s.emptyText}>No sales yet today</Text>
             <TouchableOpacity style={s.emptyBtn} onPress={() => onNavigate('pos')}>
               <Text style={s.emptyBtnText}>Make first sale</Text>
@@ -200,7 +200,7 @@ export function DashboardScreen({ onNavigate }: Props) {
               const itemLabel = firstItem
                 ? `${firstItem.product.name}${sale.items.length > 1 ? ` +${sale.items.length - 1}` : ''}`
                 : 'Sale'
-              const payIcon = PAY_ICON[sale.paymentMethod] ?? 'ðŸ’³'
+              const payIcon = PAY_ICON[sale.paymentMethod] ?? '💳'
               return (
                 <View key={sale.id} style={[s.saleRow, idx > 0 && s.saleRowBorder]}>
                   <View style={s.saleIconWrap}>
@@ -230,10 +230,10 @@ export function DashboardScreen({ onNavigate }: Props) {
 }
 
 const s = StyleSheet.create({
-  container:    { flex: 1, backgroundColor: '#f0f9ff' },
+  container:    { flex: 1, backgroundColor: '#faf9ff' },
 
   // Header
-  header:       { backgroundColor: '#2563eb', paddingTop: STATUS_TOP, paddingHorizontal: 18, paddingBottom: 20 },
+  header:       { backgroundColor: '#7c3aed', paddingTop: STATUS_TOP, paddingHorizontal: 18, paddingBottom: 20 },
   headerRow:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 },
   headerLeft:   { flex: 1, paddingRight: 12 },
   shopName:     { fontSize: 13, fontWeight: '700', color: 'rgba(255,255,255,0.75)', letterSpacing: 0.3 },
@@ -263,7 +263,7 @@ const s = StyleSheet.create({
   section:      { paddingHorizontal: 14, paddingTop: 16 },
   sectionHeader:{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   sectionTitle: { fontSize: 14, fontWeight: '800', color: '#111827' },
-  sectionLink:  { fontSize: 13, color: '#2563eb', fontWeight: '600' },
+  sectionLink:  { fontSize: 13, color: '#7c3aed', fontWeight: '600' },
   actionsGrid:  { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   actionBtn:    { width: '30.5%', aspectRatio: 1, borderRadius: 16, alignItems: 'center', justifyContent: 'center', gap: 6 },
   actionEmoji:  { fontSize: 26 },
@@ -284,15 +284,15 @@ const s = StyleSheet.create({
   emptyCard:    { backgroundColor: '#fff', borderRadius: 16, padding: 24, alignItems: 'center', gap: 8 },
   emptyEmoji:   { fontSize: 36 },
   emptyText:    { fontSize: 14, color: '#9ca3af' },
-  emptyBtn:     { backgroundColor: '#2563eb', paddingHorizontal: 20, paddingVertical: 9, borderRadius: 20, marginTop: 4 },
+  emptyBtn:     { backgroundColor: '#7c3aed', paddingHorizontal: 20, paddingVertical: 9, borderRadius: 20, marginTop: 4 },
   emptyBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
   salesCard:    { backgroundColor: '#fff', borderRadius: 16, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 2 },
   saleRow:      { flexDirection: 'row', alignItems: 'center', padding: 13, gap: 10 },
-  saleRowBorder:{ borderTopWidth: 1, borderTopColor: '#eff6ff' },
-  saleIconWrap: { width: 38, height: 38, borderRadius: 12, backgroundColor: '#eff6ff', alignItems: 'center', justifyContent: 'center' },
+  saleRowBorder:{ borderTopWidth: 1, borderTopColor: '#f5f3ff' },
+  saleIconWrap: { width: 38, height: 38, borderRadius: 12, backgroundColor: '#f5f3ff', alignItems: 'center', justifyContent: 'center' },
   salePayIcon:  { fontSize: 18 },
   saleInfo:     { flex: 1 },
-  saleInv:      { fontSize: 12, fontWeight: '700', color: '#2563eb' },
+  saleInv:      { fontSize: 12, fontWeight: '700', color: '#7c3aed' },
   saleItem:     { fontSize: 13, fontWeight: '600', color: '#111827', marginTop: 1 },
   saleCust:     { fontSize: 11, color: '#9ca3af', marginTop: 1 },
   saleRight:    { alignItems: 'flex-end' },
